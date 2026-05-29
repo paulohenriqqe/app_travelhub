@@ -1,232 +1,830 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nomade Hub | Meu Diário de Viagens</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #ffffff; color: #37352f; }
-        .notion-card { transition: all 0.2s ease; border: 1px solid #e1dfdd; border-radius: 8px; overflow: hidden; }
-        .notion-card:hover { background-color: #f7f6f3; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-right: 4px; background-color: #f1f1ef; color: #37352f; font-weight: 500; }
-        #map { height: 600px; width: 100%; border-radius: 12px; border: 1px solid #e1dfdd; z-index: 10; }
-        .sidebar-item { cursor: pointer; padding: 8px 12px; border-radius: 6px; transition: 0.2s; font-size: 14px; }
-        .sidebar-item:hover { background-color: #f1f1ef; }
-        .sidebar-item.active { background-color: #f1f1ef; font-weight: 600; }
-        
-        /* Loading Spinner */
-        .loader { border: 3px solid #f3f3f3; border-top: 3px solid #2eaadc; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; display: inline-block; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nomade Hub</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1814;
+    --ink-2: #4a4640;
+    --ink-3: #8a8580;
+    --paper: #faf8f4;
+    --paper-2: #f2efe8;
+    --paper-3: #e8e4da;
+    --accent: #c4572a;
+    --accent-light: #f5ede8;
+    --accent-2: #2a6c57;
+    --accent-2-light: #e8f2ee;
+    --gold: #b8922a;
+    --gold-light: #faf3e0;
+    --sidebar-w: 260px;
+    --transition: 0.2s cubic-bezier(.4,0,.2,1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    display: flex;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ── SIDEBAR ── */
+  #sidebar {
+    width: var(--sidebar-w);
+    background: var(--ink);
+    color: var(--paper);
+    display: flex;
+    flex-direction: column;
+    padding: 28px 20px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 10;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 40px;
+    padding: 0 4px;
+  }
+  .logo-mark {
+    width: 34px; height: 34px;
+    border: 1.5px solid var(--accent);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Serif Display', serif;
+    font-size: 16px;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+  .logo-text {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    letter-spacing: 0.01em;
+    color: #faf8f4;
+  }
+  .logo-text span { color: var(--accent); }
+
+  .nav-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding: 0 8px;
+    margin-bottom: 8px;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 400;
+    color: #c8c4bc;
+    transition: var(--transition);
+    margin-bottom: 2px;
+    user-select: none;
+  }
+  .nav-item svg { opacity: 0.6; flex-shrink: 0; }
+  .nav-item:hover { background: rgba(255,255,255,0.07); color: #faf8f4; }
+  .nav-item:hover svg { opacity: 0.9; }
+  .nav-item.active { background: var(--accent); color: #fff; font-weight: 500; }
+  .nav-item.active svg { opacity: 1; }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .sheet-link {
+    font-size: 11px;
+    color: var(--ink-3);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px;
+    border-radius: 6px;
+    transition: var(--transition);
+  }
+  .sheet-link:hover { background: rgba(255,255,255,0.07); color: #c8c4bc; }
+
+  /* ── MAIN ── */
+  #main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── TOP BAR ── */
+  #topbar {
+    background: var(--paper);
+    border-bottom: 1px solid var(--paper-3);
+    padding: 16px 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .topbar-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 24px;
+    color: var(--ink);
+  }
+  .topbar-title em { color: var(--accent); font-style: italic; }
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .search-wrap {
+    position: relative;
+  }
+  .search-wrap svg {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--ink-3);
+  }
+  #searchInput {
+    background: var(--paper-2);
+    border: 1px solid var(--paper-3);
+    border-radius: 8px;
+    padding: 8px 12px 8px 32px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--ink);
+    width: 220px;
+    outline: none;
+    transition: var(--transition);
+  }
+  #searchInput:focus { border-color: var(--accent); background: #fff; }
+  #searchInput::placeholder { color: var(--ink-3); }
+  .count-badge {
+    background: var(--paper-2);
+    border: 1px solid var(--paper-3);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 13px;
+    color: var(--ink-2);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .count-badge .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* ── CONTENT ── */
+  #content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 32px 36px;
+  }
+  #content::-webkit-scrollbar { width: 6px; }
+  #content::-webkit-scrollbar-thumb { background: var(--paper-3); border-radius: 3px; }
+
+  /* ── LOADING ── */
+  .loader-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .loader-ring {
+    width: 36px; height: 36px;
+    border: 2px solid var(--paper-3);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loader-text {
+    font-size: 13px;
+    color: var(--ink-3);
+  }
+
+  /* ── GALLERY ── */
+  #view-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  .trip-card {
+    background: #fff;
+    border: 1px solid var(--paper-3);
+    border-radius: 14px;
+    padding: 22px;
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+  }
+  .trip-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--transition);
+  }
+  .trip-card:hover { border-color: var(--paper-3); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(26,24,20,0.08); }
+  .trip-card:hover::before { transform: scaleX(1); }
+
+  .card-uf {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .card-uf::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--accent-light);
+  }
+  .card-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: var(--ink);
+    margin-bottom: 10px;
+    line-height: 1.25;
+  }
+  .card-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+    background: var(--paper-2);
+    color: var(--ink-2);
+    border: 1px solid var(--paper-3);
+  }
+  .chip.city { background: var(--accent-light); color: var(--accent); border-color: transparent; }
+  .chip.date { color: var(--ink-3); background: transparent; border: none; padding-left: 0; font-size: 12px; }
+  .tags-row { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 14px; }
+  .tag {
+    padding: 3px 9px;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: 500;
+    background: var(--gold-light);
+    color: var(--gold);
+    border: 1px solid #e8d9a8;
+  }
+  .card-bottom {
+    border-top: 1px solid var(--paper-2);
+    padding-top: 12px;
+    font-size: 12px;
+    color: var(--ink-3);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .card-bottom b { color: var(--ink-2); font-weight: 500; }
+
+  /* ── MAP ── */
+  #view-map { display: none; }
+  .map-controls {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .map-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--paper-3);
+    background: #fff;
+    color: var(--ink-2);
+    transition: var(--transition);
+  }
+  .map-btn.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .map-btn:hover:not(.active) { background: var(--paper-2); }
+  #map {
+    height: 560px;
+    border-radius: 14px;
+    border: 1px solid var(--paper-3);
+    overflow: hidden;
+  }
+
+  /* ── STATS ── */
+  #view-stats { display: none; }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .stat-card {
+    background: #fff;
+    border: 1px solid var(--paper-3);
+    border-radius: 14px;
+    padding: 22px;
+  }
+  .stat-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-3);
+    margin-bottom: 10px;
+  }
+  .stat-value {
+    font-family: 'DM Serif Display', serif;
+    font-size: 36px;
+    color: var(--ink);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-sub { font-size: 12px; color: var(--ink-3); }
+
+  .uf-bars { margin-top: 8px; }
+  .uf-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .uf-name { font-size: 13px; font-weight: 600; width: 40px; color: var(--ink); }
+  .uf-bar-track {
+    flex: 1;
+    height: 8px;
+    background: var(--paper-2);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .uf-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 4px;
+    transition: width 0.6s cubic-bezier(.4,0,.2,1);
+  }
+  .uf-count { font-size: 12px; color: var(--ink-3); width: 20px; text-align: right; }
+
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: var(--ink);
+    margin-bottom: 16px;
+  }
+
+  /* ── FORM VIEW ── */
+  #view-form { display: none; }
+  .form-wrap {
+    max-width: 600px;
+  }
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .form-group.full { grid-column: 1 / -1; }
+  .form-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-3);
+  }
+  .form-input {
+    background: #fff;
+    border: 1px solid var(--paper-3);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    outline: none;
+    transition: var(--transition);
+    width: 100%;
+  }
+  .form-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
+  .btn-submit {
+    background: var(--ink);
+    color: #faf8f4;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 28px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-submit:hover { background: var(--accent); }
+  .form-success {
+    display: none;
+    background: var(--accent-2-light);
+    border: 1px solid #b0d4c4;
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 14px;
+    color: var(--accent-2);
+    margin-top: 16px;
+    font-weight: 500;
+  }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--ink-3);
+  }
+  .empty-state svg { margin-bottom: 16px; opacity: 0.3; }
+  .empty-state p { font-size: 15px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    #sidebar { display: none; }
+    #content { padding: 20px 16px; }
+    #topbar { padding: 14px 16px; }
+    .topbar-title { font-size: 20px; }
+    #searchInput { width: 140px; }
+    #view-gallery { grid-template-columns: 1fr; }
+  }
+</style>
 </head>
-<body class="flex min-h-screen">
+<body>
 
-    <aside class="w-64 bg-[#fbfbfa] border-r border-gray-200 p-4 hidden md:flex flex-col">
-        <div class="flex items-center gap-2 mb-8 px-2">
-            <div class="w-8 h-8 bg-blue-500 rounded flex items-center justify-center text-white font-bold">N</div>
-            <span class="font-bold text-gray-800">Nomade Hub</span>
+<!-- SIDEBAR -->
+<aside id="sidebar">
+  <div class="logo">
+    <div class="logo-mark">N</div>
+    <span class="logo-text">Nomade<span>Hub</span></span>
+  </div>
+
+  <div class="nav-label">Explorar</div>
+  <nav style="margin-bottom:24px">
+    <div class="nav-item active" data-view="gallery" onclick="switchView('gallery', this)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Galeria de Viagens
+    </div>
+    <div class="nav-item" data-view="map" onclick="switchView('map', this)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polygon points="3,6 9,3 15,6 21,3 21,18 15,21 9,18 3,21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
+      Mapa Interativo
+    </div>
+    <div class="nav-item" data-view="stats" onclick="switchView('stats', this)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Estatísticas
+    </div>
+    <div class="nav-item" data-view="form" onclick="switchView('form', this)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      Nova Viagem
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#4a4640;margin-bottom:8px">Base de dados</div>
+    <a href="https://docs.google.com/spreadsheets" target="_blank" class="sheet-link">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Google Sheets Database
+    </a>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div id="main">
+  <!-- TOP BAR -->
+  <div id="topbar">
+    <div class="topbar-title" id="page-title">Minhas <em>Viagens</em></div>
+    <div class="topbar-right">
+      <div id="count-area" class="count-badge">
+        <span class="dot"></span>
+        <span id="trip-count">Carregando…</span>
+      </div>
+      <div class="search-wrap">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="searchInput" placeholder="Buscar cidade, tag…">
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div id="content">
+
+    <!-- GALLERY -->
+    <div id="view-gallery">
+      <div class="loader-wrap">
+        <div class="loader-ring"></div>
+        <div class="loader-text">Buscando viagens…</div>
+      </div>
+    </div>
+
+    <!-- MAP -->
+    <div id="view-map">
+      <div class="map-controls">
+        <button class="map-btn active" id="btn-choro" onclick="updateMapType('choropleth')">Frequência por Estado</button>
+        <button class="map-btn" id="btn-bubble" onclick="updateMapType('bubbles')">Cidades Visitadas</button>
+      </div>
+      <div id="map"></div>
+    </div>
+
+    <!-- STATS -->
+    <div id="view-stats">
+      <div class="stats-grid" id="stats-cards"></div>
+      <div class="section-title">Estados mais visitados</div>
+      <div id="uf-bars" class="uf-bars"></div>
+    </div>
+
+    <!-- FORM -->
+    <div id="view-form">
+      <div class="form-wrap">
+        <div class="form-grid">
+          <div class="form-group full">
+            <div class="form-label">Nome da Viagem</div>
+            <input class="form-input" id="f-nome" placeholder="Ex: Rock in Rio 2025">
+          </div>
+          <div class="form-group">
+            <div class="form-label">Cidade</div>
+            <input class="form-input" id="f-cidade" placeholder="Ex: Rio de Janeiro">
+          </div>
+          <div class="form-group">
+            <div class="form-label">Estado (UF)</div>
+            <input class="form-input" id="f-uf" placeholder="Ex: RJ" maxlength="2" style="text-transform:uppercase">
+          </div>
+          <div class="form-group">
+            <div class="form-label">Data de Início</div>
+            <input class="form-input" id="f-inicio" type="date">
+          </div>
+          <div class="form-group">
+            <div class="form-label">Data de Fim</div>
+            <input class="form-input" id="f-fim" type="date">
+          </div>
+          <div class="form-group full">
+            <div class="form-label">Tags / Motivo</div>
+            <input class="form-input" id="f-tags" placeholder="Ex: Show, Festival, Lazer">
+          </div>
+          <div class="form-group full">
+            <div class="form-label">Artistas vistos</div>
+            <input class="form-input" id="f-artistas" placeholder="Ex: Coldplay, Dua Lipa">
+          </div>
+          <div class="form-group full">
+            <div class="form-label">Viajantes</div>
+            <input class="form-input" id="f-viajantes" placeholder="Ex: Eu e a Marina">
+          </div>
         </div>
-        
-        <nav class="space-y-1">
-            <div class="sidebar-item active" onclick="switchView('gallery')">🖼️ Galeria de Viagens</div>
-            <div class="sidebar-item" onclick="switchView('map')">🗺️ Mapa Interativo</div>
-            <div class="sidebar-item" onclick="switchView('stats')">📊 Estatísticas</div>
-        </nav>
-        
-        <div class="mt-auto p-2">
-            <div class="text-[10px] text-gray-400 uppercase font-bold mb-2">Planilha Conectada</div>
-            <a href="https://docs.google.com/spreadsheets/d/1RNecMUqxdEaBZw6QzMixrnF-o7n4Ldu5eaOVsLR8vWT0QhxalCbImnUNqJhPshjLyIW5a2Yf6F-Gvb" target="_blank" class="text-xs text-blue-500 truncate hover:underline block">Google Sheets Database</a>
-        </div>
-    </aside>
+        <button class="btn-submit" onclick="submitTrip()">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          Registrar Viagem
+        </button>
+        <div class="form-success" id="form-success">✓ Viagem registrada com sucesso!</div>
+      </div>
+    </div>
 
-    <main class="flex-1 p-6 md:p-12 overflow-y-auto">
-        <header class="mb-10">
-            <h1 id="page-title" class="text-4xl font-bold text-gray-900 mb-4">Minhas Viagens</h1>
-            <div class="flex flex-wrap gap-4 items-center text-sm text-gray-500">
-                <span id="trip-count"><div class="loader"></div> Carregando...</span>
-                <span>•</span>
-                <input type="text" id="searchInput" placeholder="Pesquisar cidade, tag ou artista..." class="px-3 py-1 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 w-full max-w-xs">
-            </div>
-        </header>
+  </div>
+</div>
 
-        <div id="view-gallery" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            </div>
+<script>
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRNecMUqxdEaBZw6QzMixrnF-o7n4Ldu5eaOVsLR8vWT0QhxalCbImnUNqJhPshjLyIW5a2Yf6F-Gvb/pub?output=csv";
 
-        <div id="view-map" class="hidden">
-            <div class="mb-4 flex gap-4">
-                <button onclick="updateMapType('choropleth')" id="btn-choro" class="text-xs bg-gray-100 px-3 py-1 rounded font-bold">Frequência por Estado</button>
-                <button onclick="updateMapType('bubbles')" id="btn-bubble" class="text-xs bg-white border px-3 py-1 rounded">Cidades Visitadas</button>
-            </div>
-            <div id="map"></div>
-        </div>
+let allTrips = [];
+let map, mapType = 'choropleth', geoData = null;
+let activeView = 'gallery';
 
-        <div id="view-stats" class="hidden grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-gray-50 p-6 rounded-xl border border-gray-100">
-                <div class="text-xs text-gray-400 font-bold uppercase mb-1">Estado mais visitado</div>
-                <div id="stat-top-state" class="text-3xl font-bold">-</div>
-            </div>
-            <div class="bg-gray-50 p-6 rounded-xl border border-gray-100">
-                <div class="text-xs text-gray-400 font-bold uppercase mb-1">Média de dias / viagem</div>
-                <div id="stat-avg-days" class="text-3xl font-bold">-</div>
-            </div>
-            <div class="bg-gray-50 p-6 rounded-xl border border-gray-100">
-                <div class="text-xs text-gray-400 font-bold uppercase mb-1">Artistas vistos</div>
-                <div id="stat-artists" class="text-3xl font-bold">-</div>
-            </div>
-        </div>
-    </main>
+window.onload = () => {
+  fetchData();
+  loadBrazilGeoJSON();
+};
 
-    <script>
-        const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRNecMUqxdEaBZw6QzMixrnF-o7n4Ldu5eaOVsLR8vWT0QhxalCbImnUNqJhPshjLyIW5a2Yf6F-Gvb/pub?output=csv";
-        
-        let allTrips = [];
-        let map;
-        let mapType = 'choropleth';
-        let geoData = null;
+async function fetchData() {
+  Papa.parse(CSV_URL, {
+    download: true,
+    header: true,
+    complete: (results) => {
+      allTrips = results.data.filter(r => r.Cidade && r.UF);
+      document.getElementById('trip-count').textContent = `${allTrips.length} viagens`;
+      processStats();
+      renderGallery(allTrips);
+    },
+    error: () => {
+      document.getElementById('view-gallery').innerHTML = `<div class="empty-state"><p>Não foi possível carregar os dados.</p></div>`;
+    }
+  });
+}
 
-        // Início
-        window.onload = () => {
-            fetchData();
-            loadBrazilGeoJSON();
+function switchView(view, el) {
+  activeView = view;
+  ['gallery','map','stats','form'].forEach(v => {
+    document.getElementById(`view-${v}`).style.display = 'none';
+  });
+  document.getElementById(`view-${view}`).style.display = view === 'gallery' ? 'grid' : 'block';
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (el) el.classList.add('active');
+
+  const titles = { gallery:'Minhas <em>Viagens</em>', map:'Mapa <em>Interativo</em>', stats:'Estatísticas', form:'Nova <em>Viagem</em>' };
+  document.getElementById('page-title').innerHTML = titles[view];
+
+  document.getElementById('searchInput').style.display = view === 'gallery' ? 'block' : 'none';
+
+  if (view === 'map') setTimeout(initMap, 100);
+}
+
+function renderGallery(data) {
+  const c = document.getElementById('view-gallery');
+  if (!data.length) {
+    c.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="10" r="4"/><path d="M12 2C7.6 2 4 5.6 4 10c0 6 8 14 8 14s8-8 8-14c0-4.4-3.6-8-8-8z"/></svg><p>Nenhuma viagem encontrada</p></div>`;
+    return;
+  }
+  c.innerHTML = data.map(trip => {
+    const tags = trip['Motivo (Tags)'] ? trip['Motivo (Tags)'].split(',').map(t => `<span class="tag">${t.trim()}</span>`).join('') : '';
+    const artists = trip['Artistas (vi)'] ? `<div>🎵 <b>Artistas:</b> ${trip['Artistas (vi)']}</div>` : '';
+    return `
+    <div class="trip-card">
+      <div class="card-uf">${trip.UF}</div>
+      <div class="card-title">${trip.Viagem || trip.Cidade}</div>
+      <div class="card-meta">
+        <span class="chip city">${trip.Cidade}</span>
+        <span class="chip date">${formatDate(trip['Data de início'])}</span>
+      </div>
+      ${tags ? `<div class="tags-row">${tags}</div>` : ''}
+      <div class="card-bottom">
+        ${artists}
+        <div>👥 <b>Viajantes:</b> ${trip.Viajantes || 'Só eu'}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function formatDate(d) {
+  if (!d) return '';
+  return d.split('-').reverse().join('/');
+}
+
+document.getElementById('searchInput').addEventListener('input', e => {
+  const t = e.target.value.toLowerCase();
+  renderGallery(allTrips.filter(r =>
+    r.Cidade.toLowerCase().includes(t) ||
+    r.UF.toLowerCase().includes(t) ||
+    (r['Motivo (Tags)'] && r['Motivo (Tags)'].toLowerCase().includes(t)) ||
+    (r.Viagem && r.Viagem.toLowerCase().includes(t))
+  ));
+});
+
+function processStats() {
+  const ufCount = {};
+  let totalDays = 0, dayCount = 0, artistSet = new Set();
+
+  allTrips.forEach(t => {
+    ufCount[t.UF] = (ufCount[t.UF] || 0) + 1;
+    if (t['Data de início'] && t['Data de fim']) {
+      const d = (new Date(t['Data de fim']) - new Date(t['Data de início'])) / 86400000;
+      if (!isNaN(d) && d >= 0) { totalDays += d; dayCount++; }
+    }
+    if (t['Artistas (vi)']) t['Artistas (vi)'].split(',').forEach(a => artistSet.add(a.trim()));
+  });
+
+  const topUF = Object.entries(ufCount).sort((a,b) => b[1]-a[1])[0];
+  const avgDays = dayCount > 0 ? (totalDays / dayCount).toFixed(1) : '—';
+  const states = Object.keys(ufCount).length;
+
+  const cardsEl = document.getElementById('stats-cards');
+  cardsEl.innerHTML = [
+    { label:'Total de viagens', value: allTrips.length, sub: 'registradas' },
+    { label:'Estados visitados', value: states, sub: `de 27 estados` },
+    { label:'Estado favorito', value: topUF ? topUF[0] : '—', sub: topUF ? `${topUF[1]} visitas` : '' },
+    { label:'Média dias / viagem', value: avgDays, sub: 'dias por viagem' },
+    { label:'Artistas vistos', value: artistSet.size, sub: 'em shows e festivais' },
+  ].map(s => `
+    <div class="stat-card">
+      <div class="stat-label">${s.label}</div>
+      <div class="stat-value">${s.value}</div>
+      <div class="stat-sub">${s.sub}</div>
+    </div>
+  `).join('');
+
+  const sorted = Object.entries(ufCount).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const max = sorted[0]?.[1] || 1;
+  document.getElementById('uf-bars').innerHTML = sorted.map(([uf, cnt]) => `
+    <div class="uf-row">
+      <div class="uf-name">${uf}</div>
+      <div class="uf-bar-track">
+        <div class="uf-bar-fill" style="width:${Math.round(cnt/max*100)}%"></div>
+      </div>
+      <div class="uf-count">${cnt}</div>
+    </div>
+  `).join('');
+}
+
+async function loadBrazilGeoJSON() {
+  try {
+    const res = await fetch('https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson');
+    geoData = await res.json();
+  } catch(e) {}
+}
+
+function initMap() {
+  if (map) { map.invalidateSize(); return; }
+  map = L.map('map', { zoomControl: false }).setView([-15.78, -47.93], 4);
+  L.control.zoom({ position: 'bottomright' }).addTo(map);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', { attribution: '©OpenStreetMap ©CartoDB' }).addTo(map);
+  renderMapLayer();
+}
+
+function updateMapType(type) {
+  mapType = type;
+  document.getElementById('btn-choro').classList.toggle('active', type === 'choropleth');
+  document.getElementById('btn-bubble').classList.toggle('active', type === 'bubbles');
+  renderMapLayer();
+}
+
+function renderMapLayer() {
+  if (!map) return;
+  map.eachLayer(l => { if (l instanceof L.GeoJSON || l instanceof L.CircleMarker) map.removeLayer(l); });
+  const counts = {};
+  allTrips.forEach(t => counts[t.UF] = (counts[t.UF] || 0) + 1);
+  const max = Math.max(...Object.values(counts), 1);
+
+  if (mapType === 'choropleth' && geoData) {
+    L.geoJSON(geoData, {
+      style: (f) => {
+        const v = counts[f.properties.sigla] || 0;
+        const intensity = v / max;
+        return {
+          fillColor: v === 0 ? '#f2efe8' : `hsl(${15 - intensity * 10}, ${60 + intensity*30}%, ${70 - intensity*45}%)`,
+          weight: 1.5, opacity: 1, color: '#fff', fillOpacity: 0.85
         };
+      },
+      onEachFeature: (f, layer) => {
+        const uf = f.properties.sigla;
+        const cnt = counts[uf] || 0;
+        layer.bindTooltip(`<b>${f.properties.name}</b><br>${cnt} visita${cnt !== 1 ? 's' : ''}`, { className: 'leaflet-tooltip-custom' });
+      }
+    }).addTo(map);
+  }
+}
 
-        async function fetchData() {
-            Papa.parse(CSV_URL, {
-                download: true,
-                header: true,
-                complete: function(results) {
-                    allTrips = results.data.filter(row => row.Cidade && row.UF);
-                    document.getElementById('trip-count').innerText = `${allTrips.length} viagens registradas`;
-                    processStats();
-                    renderGallery(allTrips);
-                }
-            });
-        }
+function submitTrip() {
+  const nome = document.getElementById('f-nome').value.trim();
+  const cidade = document.getElementById('f-cidade').value.trim();
+  if (!nome || !cidade) { alert('Preencha pelo menos Nome e Cidade.'); return; }
+  const row = {
+    Viagem: nome,
+    Cidade: cidade,
+    UF: document.getElementById('f-uf').value.trim().toUpperCase(),
+    'Data de início': document.getElementById('f-inicio').value,
+    'Data de fim': document.getElementById('f-fim').value,
+    'Motivo (Tags)': document.getElementById('f-tags').value,
+    'Artistas (vi)': document.getElementById('f-artistas').value,
+    Viajantes: document.getElementById('f-viajantes').value,
+  };
+  allTrips.push(row);
+  document.getElementById('trip-count').textContent = `${allTrips.length} viagens`;
+  processStats();
+  ['f-nome','f-cidade','f-uf','f-inicio','f-fim','f-tags','f-artistas','f-viajantes'].forEach(id => document.getElementById(id).value = '');
+  const s = document.getElementById('form-success');
+  s.style.display = 'block';
+  setTimeout(() => s.style.display = 'none', 3000);
+}
 
-        // Troca de visualização
-        function switchView(view) {
-            document.getElementById('view-gallery').classList.add('hidden');
-            document.getElementById('view-map').classList.add('hidden');
-            document.getElementById('view-stats').classList.add('hidden');
-            document.getElementById(`view-${view}`).classList.remove('hidden');
-            
-            document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
-            event.target.classList.add('active');
-
-            if(view === 'map') {
-                setTimeout(initMap, 200);
-            }
-        }
-
-        function renderGallery(data) {
-            const container = document.getElementById('view-gallery');
-            container.innerHTML = '';
-            
-            data.forEach(trip => {
-                const tags = trip['Motivo (Tags)'] ? trip['Motivo (Tags)'].split(',').map(t => `<span class="tag">${t.trim()}</span>`).join('') : '';
-                
-                const card = `
-                    <div class="notion-card p-5">
-                        <div class="text-xs font-bold text-blue-500 mb-1 uppercase tracking-wider">${trip.UF}</div>
-                        <h3 class="text-lg font-bold mb-2">${trip.Viagem || trip.Cidade}</h3>
-                        <div class="flex items-center gap-2 text-sm text-gray-500 mb-4">
-                            <span class="bg-gray-100 px-2 py-0.5 rounded text-[11px] font-bold">${trip.Cidade}</span>
-                            <span>${formatDate(trip['Data de início'])}</span>
-                        </div>
-                        <div class="mb-4">${tags}</div>
-                        <div class="text-xs text-gray-400">
-                            ${trip['Artistas (vi)'] ? `🎵 <b>Artistas:</b> ${trip['Artistas (vi)']}<br>` : ''}
-                            👥 <b>Viajantes:</b> ${trip.Viajantes || 'Só eu'}
-                        </div>
-                    </div>
-                `;
-                container.innerHTML += card;
-            });
-        }
-
-        function formatDate(d) {
-            if(!d) return '';
-            return d.split('-').reverse().join('/');
-        }
-
-        // Pesquisa
-        document.getElementById('searchInput').addEventListener('input', (e) => {
-            const term = e.target.value.toLowerCase();
-            const filtered = allTrips.filter(t => 
-                t.Cidade.toLowerCase().includes(term) || 
-                t.UF.toLowerCase().includes(term) || 
-                (t['Motivo (Tags)'] && t['Motivo (Tags)'].toLowerCase().includes(term))
-            );
-            renderGallery(filtered);
-        });
-
-        // Estatísticas
-        function processStats() {
-            const ufCount = {};
-            allTrips.forEach(t => ufCount[t.UF] = (ufCount[t.UF] || 0) + 1);
-            const topUF = Object.keys(ufCount).reduce((a, b) => ufCount[a] > ufCount[b] ? a : b);
-            document.getElementById('stat-top-state').innerText = topUF;
-
-            const artists = allTrips.filter(t => t['Artistas (vi)']).length;
-            document.getElementById('stat-artists').innerText = artists;
-        }
-
-        // Mapas
-        async function loadBrazilGeoJSON() {
-            const res = await fetch('https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson');
-            geoData = await res.json();
-        }
-
-        function initMap() {
-            if(map) return;
-            map = L.map('map').setView([-15.78, -47.93], 4);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
-            renderMapLayer();
-        }
-
-        function updateMapType(type) {
-            mapType = type;
-            document.getElementById('btn-choro').className = type === 'choropleth' ? 'text-xs bg-gray-100 px-3 py-1 rounded font-bold' : 'text-xs bg-white border px-3 py-1 rounded';
-            document.getElementById('btn-bubble').className = type === 'bubbles' ? 'text-xs bg-gray-100 px-3 py-1 rounded font-bold' : 'text-xs bg-white border px-3 py-1 rounded';
-            renderMapLayer();
-        }
-
-        function renderMapLayer() {
-            map.eachLayer(l => { if(l instanceof L.GeoJSON || l instanceof L.CircleMarker) map.removeLayer(l); });
-
-            const counts = {};
-            allTrips.forEach(t => counts[t.UF] = (counts[t.UF] || 0) + 1);
-
-            if(mapType === 'choropleth') {
-                L.geoJSON(geoData, {
-                    style: (feature) => ({
-                        fillColor: getColor(counts[feature.properties.sigla] || 0),
-                        weight: 1, opacity: 1, color: 'white', fillOpacity: 0.7
-                    })
-                }).addTo(map);
-            } else {
-                // Mapa de Bolhas simples
-                allTrips.forEach(t => {
-                    // Nota: Para precisão real aqui, precisaríamos de uma lat/lng. 
-                    // No sistema completo v3, eu adicionaria um geocoder.
-                    // Para este MVP, vamos focar no heatmap de estados.
-                });
-            }
-        }
-
-        function getColor(d) {
-            return d > 10 ? '#00441b' :
-                   d > 5  ? '#238b45' :
-                   d > 2  ? '#74c476' :
-                   d > 0  ? '#c7e9c0' : '#f7fcf5';
-        }
-    </script>
+// Initial hide
+['map','stats','form'].forEach(v => document.getElementById(`view-${v}`).style.display = 'none');
+</script>
 </body>
 </html>
