@@ -3,28 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nomade Hub</title>
+<title>Moments</title>
 
 <!-- Bibliotecas Externas -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-<!-- Adicionamos o Chart.js para os gráficos temporais -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    /* NOVA PALETA DE CORES BASEADA NA IMAGEM */
-    --blue-dark: #0c3c60;   /* Azul escuro da lateral esquerda da paleta */
-    --blue-med: #097599;    /* Azul médio */
-    --blue-light: #26b9dd;  /* Azul claro vibrante */
-    --blue-pale: #7bd4f1;   /* Azul bebê */
+    /* PALETA DE CORES */
+    --blue-dark: #0c3c60;
+    --blue-med: #097599;
+    --blue-light: #26b9dd;
+    --blue-pale: #7bd4f1;
     
-    --accent: #d4461c;      /* Laranja escuro/avermelhado */
-    --accent-soft: #f37321; /* Laranja vibrante */
-    --accent-bg: #fff0e6;   /* Fundo claro para tags laranja */
+    --accent: #d4461c;
+    --accent-soft: #f37321;
+    --accent-bg: #fff0e6;
     
     --ink: #1d1b17;
     --ink-2: #4f4a43;
@@ -55,7 +54,7 @@
 
   .app-shell { display: flex; min-height: 100vh; width: 100vw; }
 
-  /* SIDEBAR: Agora usando o Azul Escuro da paleta */
+  /* SIDEBAR */
   .sidebar {
     width: var(--sidebar-w); flex-shrink: 0; display: flex; flex-direction: column; gap: 24px;
     padding: 24px 18px; background: var(--blue-dark); color: #f7f2e9;
@@ -178,8 +177,8 @@
   .trip-topline { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
   .uf-badge {
     display: inline-flex; align-items: center; padding: 4px 10px;
-    border-radius: 999px; background: var(--accent-bg); color: var(--accent);
-    font-size: 11px; font-weight: 800; letter-spacing: .08em;
+    border-radius: 999px; background: var(--paper-2); color: var(--blue-dark);
+    font-size: 11px; font-weight: 800; letter-spacing: .08em; border: 1px solid var(--line);
   }
   .date-text { color: var(--ink-3); font-size: 12px; font-weight: 500; }
   .trip-title { margin: 0 0 8px; font-family: "DM Serif Display", serif; font-size: 22px; font-weight: 400; line-height: 1.2; color: var(--ink); }
@@ -187,20 +186,20 @@
   .trip-city svg { width: 16px; height: 16px; color: var(--blue-med); }
   
   .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 16px 0; }
-  .tag { display: inline-flex; padding: 4px 10px; border-radius: 6px; background: var(--paper-2); color: var(--blue-dark); font-size: 11px; font-weight: 700; border: 1px solid var(--line); }
+  .tag { display: inline-flex; padding: 4px 10px; border-radius: 6px; background: var(--accent-bg); color: var(--accent); font-size: 11px; font-weight: 700; }
   
   .trip-details { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; color: var(--ink-3); font-size: 13px; }
   .trip-details span { display: flex; align-items: center; gap: 8px; }
 
-  /* CORREÇÃO DO SCROLL DA TABELA */
-  .table-panel { max-width: 100%; overflow: hidden; } /* Evita que o painel cresça infinitamente */
+  /* TABELA */
+  .table-panel { max-width: 100%; overflow: hidden; }
   .table-wrap { 
     width: 100%; 
-    overflow-x: auto; /* Permite rolar horizontalmente */
-    -webkit-overflow-scrolling: touch; /* Rolagem suave no iOS */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     display: block; 
   }
-  table { width: 100%; border-collapse: collapse; min-width: 860px; } /* min-width obriga o scroll a aparecer se o ecrã for menor */
+  table { width: 100%; border-collapse: collapse; min-width: 860px; }
   th, td { padding: 14px 16px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
   th { background: var(--paper-2); color: var(--ink-3); font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
   td { color: var(--ink-2); font-size: 14px; }
@@ -208,7 +207,7 @@
   .table-row-clickable:hover { background: var(--paper); }
   .table-title { color: var(--ink); font-weight: 700; font-family: "DM Serif Display", serif; font-size: 16px; }
 
-  /* MAP */
+  /* MAPA */
   .map-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; align-items: start; }
   .map-panel { padding: 8px; }
   #map { width: 100%; height: 60vh; min-height: 480px; border-radius: 8px; background: #e0e6ed; z-index: 1; }
@@ -222,7 +221,7 @@
   .bar-fill { height: 100%; background: var(--blue-light); border-radius: inherit; transition: width 0.5s ease; }
   .rank-count { color: var(--ink-3); font-size: 13px; text-align: right; font-weight: 600; }
 
-  /* STATS & GRÁFICOS */
+  /* STATS */
   .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
   .chart-panel { padding: 20px; }
   .chart-title { margin: 0 0 16px; font-size: 16px; font-weight: 700; color: var(--blue-dark); }
@@ -262,7 +261,6 @@
   .modal-header { padding: 32px 32px 24px; border-bottom: 1px solid var(--line); background: var(--paper); border-radius: 16px 16px 0 0; }
   .modal-body { padding: 32px; display: flex; flex-direction: column; gap: 20px; }
   
-  /* LISTAS SIMPLES NO MODAL (Cidades/UFs) */
   .modal-list-item {
     display: flex; justify-content: space-between; align-items: center;
     padding: 12px 0; border-bottom: 1px solid var(--paper-2);
@@ -318,8 +316,8 @@
   <!-- SIDEBAR (Desktop) -->
   <aside class="sidebar">
     <div class="brand">
-      <div class="brand-mark">N</div>
-      <div class="brand-name"><strong>Nomade Hub</strong><span>Travel tracker</span></div>
+      <div class="brand-mark">M</div>
+      <div class="brand-name"><strong>Moments</strong><span>Travel tracker</span></div>
     </div>
     <nav class="nav-block">
       <div class="nav-label">Explorar</div>
@@ -328,7 +326,6 @@
       <button class="nav-item" data-view="stats"><i data-lucide="bar-chart-3"></i> Estatísticas</button>
       <button class="nav-item" data-view="form"><i data-lucide="plus-circle"></i> Nova viagem</button>
     </nav>
-    <!-- Remoção da indicação do Google Sheets foi feita aqui! -->
   </aside>
 
   <!-- MAIN -->
@@ -357,8 +354,7 @@
             </div>
             <div class="field"><label>Ano</label><select class="control" id="filter-year"></select></div>
             <div class="field"><label>UF</label><select class="control" id="filter-uf"></select></div>
-            <!-- NOVO: Filtro por Tipo -->
-            <div class="field"><label>Tipo de Viagem</label><select class="control" id="filter-tipo"></select></div>
+            <div class="field"><label>Motivo</label><select class="control" id="filter-tag"></select></div>
             
             <div class="field"><label>Ordenar</label>
               <select class="control" id="sort-order">
@@ -407,7 +403,6 @@
         <div class="dashboard-stack">
           <div class="kpi-grid" id="stats-kpi-grid"></div>
           <div class="stats-grid">
-            <!-- NOVO: Gráfico Temporal -->
             <div class="panel chart-panel" style="grid-column: 1 / -1;">
               <h2 class="chart-title"><i data-lucide="trending-up" style="width:18px; vertical-align:middle; margin-right:6px; color:var(--accent)"></i> Evolução de Viagens (Por Ano)</h2>
               <div class="chart-container">
@@ -417,8 +412,7 @@
 
             <div class="panel chart-panel"><h2 class="chart-title">Estados mais visitados</h2><div class="horizontal-list" id="stat-ufs"></div></div>
             <div class="panel chart-panel"><h2 class="chart-title">Cidades mais visitadas</h2><div class="horizontal-list" id="stat-cities"></div></div>
-            <div class="panel chart-panel"><h2 class="chart-title">Tipos de Viagem</h2><div class="horizontal-list" id="stat-tipos"></div></div>
-            <div class="panel chart-panel"><h2 class="chart-title">Tags mais frequentes</h2><div class="horizontal-list" id="stat-tags"></div></div>
+            <div class="panel chart-panel"><h2 class="chart-title">Motivos mais frequentes</h2><div class="horizontal-list" id="stat-tags"></div></div>
           </div>
         </div>
       </section>
@@ -428,24 +422,18 @@
         <div class="panel chart-panel" style="max-width: 700px; margin: 0 auto;">
           <h2 class="chart-title">Nova Viagem</h2>
           <form id="trip-form" style="display: flex; flex-direction: column; gap: 16px;">
-            <div class="field"><label>Nome da viagem *</label><input class="form-input" id="f-name" required></div>
+            <div class="field"><label>Viagem *</label><input class="form-input" id="f-name" required></div>
             <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px;">
               <div class="field"><label>Cidade *</label><input class="form-input" id="f-city" required></div>
               <div class="field"><label>UF *</label><input class="form-input" id="f-uf" maxlength="2" required placeholder="Ex: SP"></div>
             </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
-              <div class="field"><label>Início *</label><input type="date" class="form-input" id="f-start" required></div>
-              <div class="field"><label>Fim</label><input type="date" class="form-input" id="f-end"></div>
-              <div class="field"><label>Tipo</label>
-                <select class="form-input" id="f-tipo">
-                  <option value="Férias">Férias</option>
-                  <option value="Evento">Evento</option>
-                  <option value="Trabalho">Trabalho</option>
-                  <option value="Outros">Outros</option>
-                </select>
-              </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div class="field"><label>Data de início *</label><input type="date" class="form-input" id="f-start" required></div>
+              <div class="field"><label>Data de fim</label><input type="date" class="form-input" id="f-end"></div>
             </div>
-            <div class="field"><label>Tags</label><input class="form-input" id="f-tags" placeholder="Separadas por vírgula"></div>
+            <div class="field"><label>Motivo</label><input class="form-input" id="f-motivo" placeholder="Férias, Show, etc."></div>
+            <div class="field"><label>Artistas</label><input class="form-input" id="f-artistas" placeholder="Nome da banda/artista"></div>
+            <div class="field"><label>Acompanhantes</label><input class="form-input" id="f-acompanhantes" placeholder="Quem foi contigo?"></div>
             <button class="primary-action" type="submit" style="margin-top: 10px;">Adicionar à Sessão</button>
             <div id="form-message" style="color: var(--blue-med); font-size: 14px; font-weight: 600;"></div>
           </form>
@@ -473,6 +461,7 @@
 </div>
 
 <script>
+// A tua URL do CSV mantém-se
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRNecMUqxdEaBZw6QzMixrnF-o7n4Ldu5eaOVsLR8vWT0QhxalCbImnUNqJhPshjLyIW5a2Yf6F-Gvb/pub?output=csv";
 
 const UF_CENTROIDS = {
@@ -487,10 +476,10 @@ const UF_CENTROIDS = {
 
 const state = {
   trips: [], filtered: [],
-  filters: { search: "", year: "", uf: "", tag: "", tipo: "", sort: "recent" },
+  filters: { search: "", year: "", uf: "", tag: "", sort: "recent" }, // Tipo removido
   activeView: "dashboard", dashboardMode: "gallery", mapType: "choropleth",
   map: null, mapLayer: null, geoData: null, loaded: false,
-  chartInstance: null // Guarda a referência do gráfico para atualizar
+  chartInstance: null
 };
 
 const els = {};
@@ -504,7 +493,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function cacheElements() {
-  ["sync-pill", "sync-text", "kpi-grid", "stats-kpi-grid", "filter-search", "filter-year", "filter-uf", "filter-tag", "filter-tipo", "sort-order", "clear-filters", "result-count", "dashboard-results", "map-rank", "stat-ufs", "stat-cities", "stat-tipos", "stat-tags", "trip-modal", "modal-header", "modal-body"].forEach(id => { els[id] = document.getElementById(id); });
+  ["sync-pill", "sync-text", "kpi-grid", "stats-kpi-grid", "filter-search", "filter-year", "filter-uf", "filter-tag", "sort-order", "clear-filters", "result-count", "dashboard-results", "map-rank", "stat-ufs", "stat-cities", "stat-tags", "trip-modal", "modal-header", "modal-body"].forEach(id => { els[id] = document.getElementById(id); });
 }
 
 function bindEvents() {
@@ -512,7 +501,7 @@ function bindEvents() {
   document.querySelector("[data-jump-form]").addEventListener("click", () => switchView("form"));
   
   els["filter-search"].addEventListener("input", e => { state.filters.search = e.target.value.trim().toLowerCase(); applyFilters(); });
-  ["filter-year", "filter-uf", "filter-tag", "filter-tipo"].forEach(id => els[id].addEventListener("change", e => { state.filters[id.replace("filter-", "")] = e.target.value; applyFilters(); }));
+  ["filter-year", "filter-uf", "filter-tag"].forEach(id => els[id].addEventListener("change", e => { state.filters[id.replace("filter-", "")] = e.target.value; applyFilters(); }));
   els["sort-order"].addEventListener("change", e => { state.filters.sort = e.target.value; applyFilters(); });
   els["clear-filters"].addEventListener("click", clearFilters);
 
@@ -545,31 +534,31 @@ async function loadBrazilGeoJSON() {
   } catch (e) { console.error("Erro ao carregar mapa do Brasil"); }
 }
 
+// A função normalizeTrip agora lê diretamente os nomes exatos das colunas.
 function normalizeTrip(row, index) {
   const getField = (aliases) => {
-    const key = Object.keys(row).find(k => aliases.some(a => k.toLowerCase().includes(a.toLowerCase())));
+    const key = Object.keys(row).find(k => aliases.some(a => k.toLowerCase() === a.toLowerCase()));
     return key ? row[key] : "";
   };
   
-  const name = getField(["viagem", "nome"]);
-  const city = getField(["cidade", "municipio"]);
-  const uf = getField(["uf", "estado", "sigla"]).slice(0, 2).toUpperCase();
-  const startDate = getField(["início", "inicio"]);
-  const endDate = getField(["fim"]);
-  const tags = getField(["motivo", "tags", "motivos"]).split(",").map(t => t.trim()).filter(Boolean);
-  const travelers = getField(["viajantes", "pessoas"]).split(",").map(v => v.trim()).filter(Boolean);
+  const name = getField(["Viagem"]);
+  const city = getField(["Cidade"]);
+  const uf = getField(["UF"]).slice(0, 2).toUpperCase();
+  const startDate = getField(["Data de início"]);
+  const endDate = getField(["Data de fim"]);
   
-  // Extração do novo campo TIPO (Férias, Eventos, etc.)
-  let tipo = getField(["tipo", "categoria"]);
-  if(!tipo) tipo = tags.includes("Férias") ? "Férias" : (tags.includes("Show") || tags.includes("Festival") ? "Evento" : "Geral");
-
+  // Como o "Tipo" não existe mais como coluna independente, agrupamos tudo em "Motivo" (Tags)
+  const tags = getField(["Motivo"]).split(",").map(t => t.trim()).filter(Boolean);
+  const artists = getField(["Artistas"]).split(",").map(a => a.trim()).filter(Boolean);
+  const travelers = getField(["Acompanhantes"]).split(",").map(v => v.trim()).filter(Boolean);
+  
   let year = "";
   if (startDate && startDate.includes("-")) year = startDate.split("-")[0];
   else if (startDate && startDate.includes("/")) year = startDate.split("/")[2];
 
   return {
-    id: `trip-${index}`, name: name || city, city, uf, startDate, endDate, year, tags, tipo, travelers,
-    searchIndex: `${name} ${city} ${uf} ${tipo} ${tags.join(" ")}`.toLowerCase()
+    id: `trip-${index}`, name: name || city, city, uf, startDate, endDate, year, tags, artists, travelers,
+    searchIndex: `${name} ${city} ${uf} ${tags.join(" ")} ${artists.join(" ")}`.toLowerCase()
   };
 }
 
@@ -580,18 +569,16 @@ function populateFilters() {
   };
   fill("filter-year", "Todos os anos", t => t.year);
   fill("filter-uf", "Todas as UFs", t => t.uf);
-  fill("filter-tag", "Todas as tags", t => t.tags);
-  fill("filter-tipo", "Todos os tipos", t => t.tipo);
+  fill("filter-tag", "Todos os motivos", t => t.tags); // Lê da coluna Motivo
 }
 
 function applyFilters() {
-  const { search, year, uf, tag, tipo, sort } = state.filters;
+  const { search, year, uf, tag, sort } = state.filters;
   let data = state.trips.filter(t => 
     (!search || t.searchIndex.includes(search)) &&
     (!year || t.year === year) &&
     (!uf || t.uf === uf) &&
-    (!tag || t.tags.includes(tag)) &&
-    (!tipo || t.tipo === tipo)
+    (!tag || t.tags.includes(tag))
   );
   
   if (sort === "city") data.sort((a, b) => a.city.localeCompare(b.city));
@@ -601,8 +588,8 @@ function applyFilters() {
 }
 
 function clearFilters() {
-  state.filters = { search: "", year: "", uf: "", tag: "", tipo: "", sort: "recent" };
-  ["filter-search", "filter-year", "filter-uf", "filter-tag", "filter-tipo"].forEach(id => els[id].value = "");
+  state.filters = { search: "", year: "", uf: "", tag: "", sort: "recent" }; // Tipo foi removido daqui
+  ["filter-search", "filter-year", "filter-uf", "filter-tag"].forEach(id => els[id].value = "");
   els["sort-order"].value = "recent"; applyFilters();
 }
 
@@ -610,17 +597,14 @@ function renderAll() {
   renderKpis(); renderDashboardResults(); renderStats(); renderMapLayer(); refreshIcons();
 }
 
-/* LÓGICA DE CLIQUE NOS KPIs */
 function renderKpis() {
   const data = state.filtered;
   const cities = [...new Set(data.map(t => t.city))].sort();
   const ufs = [...new Set(data.map(t => t.uf))].sort();
   
-  // Guardamos as listas no estado global para usar quando clicarem
   state.currentCitiesList = cities;
   state.currentUfsList = ufs;
 
-  // Repara no `onclick` que passa o tipo de lista que queremos ver
   const html = `
     <article class="metric-card" onclick="openTripModal('Viagens Registradas')">
       <div class="metric-label"><i data-lucide="plane"></i> Viagens</div>
@@ -648,14 +632,13 @@ function renderDashboardResults() {
   if (state.dashboardMode === "gallery") {
     els["dashboard-results"].innerHTML = `<div class="gallery-grid">${state.filtered.map(renderTripCard).join("")}</div>`;
   } else {
-    // A classe table-wrap agora cuida perfeitamente da responsividade da tabela!
+    // Tabela atualizada sem a coluna "Tipo"
     els["dashboard-results"].innerHTML = `
       <div class="table-wrap"><table>
-        <thead><tr><th>Viagem</th><th>Local</th><th>Tipo</th><th>Data</th><th>Tags</th></tr></thead>
+        <thead><tr><th>Viagem</th><th>Local</th><th>Data</th><th>Motivo</th></tr></thead>
         <tbody>${state.filtered.map(t => `
           <tr class="table-row-clickable" onclick="openTripModal('${t.id}')">
             <td class="table-title">${t.name}</td><td>${t.city} - ${t.uf}</td>
-            <td><span class="uf-badge" style="background:var(--blue-pale); color:var(--blue-dark);">${t.tipo}</span></td>
             <td>${t.startDate || '-'}</td>
             <td>${t.tags.join(", ")}</td>
           </tr>`).join("")}
@@ -665,34 +648,33 @@ function renderDashboardResults() {
 }
 
 function renderTripCard(trip) {
+  // Removido o badge extra do "Tipo" no cartão
   return `
     <article class="trip-card" onclick="openTripModal('${trip.id}')">
       <div class="trip-topline">
         <span class="uf-badge">${trip.uf}</span>
-        <span class="uf-badge" style="background:var(--blue-pale); color:var(--blue-dark);">${trip.tipo}</span>
+        <span class="date-text">${trip.year || '-'}</span>
       </div>
       <h2 class="trip-title">${trip.name}</h2>
       <div class="trip-city"><i data-lucide="map-pin"></i>${trip.city}</div>
+      ${trip.tags.length ? `<div class="tag-row">${trip.tags.slice(0,3).map(tag => `<span class="tag">${tag}</span>`).join("")}</div>` : ""}
       <div class="trip-details" style="margin-top:16px;">
-        <span><i data-lucide="calendar"></i>${trip.year || '-'}</span>
         <span><i data-lucide="users"></i>${trip.travelers.length ? trip.travelers.length + " pax" : "Solo"}</span>
       </div>
     </article>`;
 }
 
-/* SISTEMA MULTIUSO DE MODAIS */
-
-// 1. Abre modal com DETALHES DA VIAGEM
+// Abre modal com DETALHES DA VIAGEM
 function openTripModal(tripId) {
-  if (tripId === 'Viagens Registradas') return; // Segurança caso cliquem no KPI de total de viagens
+  if (tripId === 'Viagens Registradas') return;
   
   const trip = state.trips.find(t => t.id === tripId);
   if (!trip) return;
 
+  // Removida a referência visual ao 'tipo' no Modal
   els["modal-header"].innerHTML = `
     <div style="display:flex; gap:8px; margin-bottom:8px;">
       <span class="uf-badge">${trip.uf}</span>
-      <span class="uf-badge" style="background:var(--blue-pale); color:var(--blue-dark);">${trip.tipo}</span>
     </div>
     <h2 style="font-family:'DM Serif Display', serif; font-size:28px; margin:0; color:var(--blue-dark);">${trip.name}</h2>
     <div style="color:var(--ink-2); font-size:15px; margin-top:4px; font-weight:500;">
@@ -701,21 +683,20 @@ function openTripModal(tripId) {
   `;
   els["modal-body"].innerHTML = `
     <p><strong>Datas:</strong> ${trip.startDate} até ${trip.endDate || 'N/A'}</p>
-    <p><strong>Tags:</strong> ${trip.tags.join(", ") || 'Sem tags'}</p>
-    <p><strong>Viajantes:</strong> ${trip.travelers.join(", ") || 'Solo'}</p>
+    <p><strong>Motivos:</strong> ${trip.tags.join(", ") || 'Nenhum registado'}</p>
+    ${trip.artists.length ? `<p><strong>Artistas:</strong> ${trip.artists.join(", ")}</p>` : ""}
+    <p><strong>Acompanhantes:</strong> ${trip.travelers.join(", ") || 'Viajei a solo'}</p>
   `;
   els["trip-modal"].classList.add("open");
   refreshIcons();
 }
 
-// 2. Abre modal com uma LISTA DE ITENS (ex: Cidades ou Estados)
 function openListModal(title, listItems, iconName) {
   els["modal-header"].innerHTML = `
     <h2 style="font-family:'DM Serif Display', serif; font-size:26px; margin:0; color:var(--blue-dark);">${title}</h2>
     <p style="margin:4px 0 0; color:var(--ink-3); font-size:14px;">Total: ${listItems.length} registros</p>
   `;
   
-  // Conta quantas viagens existem para cada item da lista
   const counts = {};
   state.filtered.forEach(t => {
     const key = (title.includes('Cidades')) ? t.city : t.uf;
@@ -749,7 +730,6 @@ function updateActiveButtons(selector, value) {
   document.querySelectorAll(selector).forEach(btn => btn.classList.toggle("active", btn.dataset.view === value || btn.dataset.mode === value || btn.dataset.mapType === value));
 }
 
-/* MAPA E MELHORIAS */
 function initMap() {
   if (state.map) { state.map.invalidateSize(); return; }
   const brazilBounds = [[-34.0, -74.0], [5.5, -34.0]];
@@ -762,13 +742,12 @@ function initMap() {
 function renderMapLayer() {
   if (!state.map || !state.geoData) return;
   if (state.mapLayer) state.map.removeLayer(state.mapLayer);
-  state.mapLayer = L.layerGroup(); // Agrupa as camadas do mapa
+  state.mapLayer = L.layerGroup(); 
 
   const ufCounts = state.filtered.reduce((acc, t) => { acc[t.uf] = (acc[t.uf] || 0) + 1; return acc; }, {});
   const max = Math.max(...Object.values(ufCounts), 1);
 
   if (state.mapType === "choropleth") {
-    // Mapa de Cor por UF
     L.geoJSON(state.geoData, {
       style: f => {
         const count = ufCounts[f.properties.sigla] || 0;
@@ -785,7 +764,6 @@ function renderMapLayer() {
           mouseover: (e) => { e.target.setStyle({ weight: 3, color: 'var(--blue-dark)' }); e.target.bringToFront(); },
           mouseout: (e) => { state.mapLayer.getLayers()[0].resetStyle(e.target); },
           click: () => {
-            // Clicar numa UF abre o modal com as cidades dela!
             const citiesInUF = [...new Set(state.filtered.filter(t => t.uf === uf).map(t => t.city))].sort();
             if(citiesInUF.length > 0) openListModal(`Cidades em ${uf}`, citiesInUF, 'map-pin');
           }
@@ -793,7 +771,6 @@ function renderMapLayer() {
       }
     }).addTo(state.mapLayer);
   } else {
-    // Bolhas - AQUI DESENHAMOS O CONTORNO DO BRASIL POR BAIXO
     L.geoJSON(state.geoData, {
       style: { color: "var(--line-strong)", weight: 1, fillColor: "var(--paper-2)", fillOpacity: 0.3 },
       onEachFeature: (f, layer) => {
@@ -805,7 +782,6 @@ function renderMapLayer() {
       }
     }).addTo(state.mapLayer);
 
-    // Depois desenhamos as bolhas
     Object.entries(ufCounts).forEach(([uf, count]) => {
       const coords = UF_CENTROIDS[uf];
       if(coords && count > 0) {
@@ -818,15 +794,18 @@ function renderMapLayer() {
   
   state.mapLayer.addTo(state.map);
   
-  // Atualiza o ranking lateral do mapa
   const topUfs = Object.entries(ufCounts).sort((a,b) => b[1]-a[1]).slice(0, 8);
   els["map-rank"].innerHTML = topUfs.map(([k,v]) => `<div class="rank-row"><div class="rank-name">${k}</div><div class="bar-track"><div class="bar-fill" style="width:${(v/max)*100}%"></div></div><div class="rank-count">${v}</div></div>`).join("");
 }
 
-/* ESTATÍSTICAS E GRÁFICO (CHART.JS) */
 function renderStats() {
   const getTop = (mapFn) => Object.entries(state.filtered.reduce((acc, t) => { 
-    const v = mapFn(t); if(v) acc[v] = (acc[v] || 0) + 1; return acc; 
+    // Agrupa e conta cada item que a função de mapeamento retornar (caso seja um array, mapeia um por um)
+    const values = Array.isArray(mapFn(t)) ? mapFn(t) : [mapFn(t)];
+    values.forEach(v => {
+      if(v) acc[v] = (acc[v] || 0) + 1;
+    });
+    return acc; 
   }, {})).sort((a,b) => b[1]-a[1]).slice(0,5);
 
   const draw = (id, data) => { 
@@ -836,19 +815,18 @@ function renderStats() {
 
   draw("stat-ufs", getTop(t => t.uf));
   draw("stat-cities", getTop(t => t.city));
-  draw("stat-tipos", getTop(t => t.tipo));
-  draw("stat-tags", getTop(t => t.tags).slice(0,8)); // Mostra mais tags
+  // Agora Tags extrai as listas usando o mapFn t => t.tags corretamente:
+  draw("stat-tags", getTop(t => t.tags).slice(0,8)); 
 
-  // NOVO: Renderização do Gráfico Chart.js
   const yearsData = Object.entries(state.filtered.reduce((acc, t) => { 
     if(t.year) acc[t.year] = (acc[t.year] || 0) + 1; 
     return acc; 
-  }, {})).sort((a,b) => a[0].localeCompare(b[0])); // Ordena por ano crescente
+  }, {})).sort((a,b) => a[0].localeCompare(b[0]));
 
   const ctx = document.getElementById('timeChart').getContext('2d');
   
   if (state.chartInstance) {
-    state.chartInstance.destroy(); // Apaga o gráfico antigo se mudarmos os filtros
+    state.chartInstance.destroy();
   }
 
   state.chartInstance = new Chart(ctx, {
@@ -858,9 +836,9 @@ function renderStats() {
       datasets: [{
         label: 'Número de Viagens',
         data: yearsData.map(d => d[1]),
-        backgroundColor: '#26b9dd', // Azul Claro
+        backgroundColor: '#26b9dd',
         borderRadius: 6,
-        hoverBackgroundColor: '#097599' // Azul Médio ao passar o rato
+        hoverBackgroundColor: '#097599'
       }]
     },
     options: {
