@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Moments</title>
 
-<!-- Bibliotecas Externas -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -43,8 +42,9 @@
 
   * { box-sizing: border-box; }
 
+  /* Estrutura Base */
   body {
-    margin: 0; min-height: 100vh; overflow: hidden;
+    margin: 0; height: 100vh; overflow: hidden;
     background: var(--paper); color: var(--ink);
     font-family: "DM Sans", system-ui, -apple-system, sans-serif;
   }
@@ -52,7 +52,7 @@
   button, input, select, textarea { font: inherit; }
   button { border: 0; cursor: pointer; }
 
-  .app-shell { display: flex; min-height: 100vh; width: 100vw; }
+  .app-shell { display: flex; height: 100vh; width: 100vw; overflow: hidden; }
 
   /* SIDEBAR */
   .sidebar {
@@ -86,10 +86,10 @@
   .nav-item.active svg { color: var(--blue-dark); }
 
   /* MAIN AREA */
-  .main { flex: 1; min-width: 0; display: flex; flex-direction: column; position: relative; max-width: 100%; }
+  .main { flex: 1; min-width: 0; display: flex; flex-direction: column; position: relative; height: 100vh; overflow: hidden; }
 
   .topbar {
-    min-height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 20px;
+    min-height: 76px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; gap: 20px;
     padding: 18px 32px; border-bottom: 1px solid var(--line);
     background: rgba(248,250,252,0.94); backdrop-filter: blur(12px); z-index: 5;
   }
@@ -113,9 +113,24 @@
   }
   .primary-action:hover { background: var(--accent-soft); transform: translateY(-1px); }
 
-  .content { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 24px 32px 100px; width: 100%; }
-  .content::-webkit-scrollbar { width: 8px; }
-  .content::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 999px; }
+  /* CORREÇÃO DO SCROLL: 
+     Removido o width:100% que causava quebra e forçada a visualização da barra */
+  .content { 
+    flex: 1; 
+    overflow-y: auto; 
+    overflow-x: hidden; 
+    padding: 24px 32px 100px 32px; 
+  }
+  
+  /* Estilização da barra de scroll para ficar sempre visível e bonita */
+  .content::-webkit-scrollbar { width: 12px; }
+  .content::-webkit-scrollbar-track { background: var(--paper-2); border-left: 1px solid var(--line); }
+  .content::-webkit-scrollbar-thumb { 
+    background: var(--blue-med); 
+    border-radius: 10px; 
+    border: 3px solid var(--paper-2); 
+  }
+  .content::-webkit-scrollbar-thumb:hover { background: var(--blue-dark); }
 
   .view { display: none; animation: fadeIn 0.3s ease; }
   .view.active { display: block; }
@@ -313,7 +328,6 @@
 <body>
 
 <div class="app-shell">
-  <!-- SIDEBAR (Desktop) -->
   <aside class="sidebar">
     <div class="brand">
       <div class="brand-mark">M</div>
@@ -328,21 +342,19 @@
     </nav>
   </aside>
 
-  <!-- MAIN -->
   <main class="main">
     <header class="topbar">
       <div>
         <div class="page-kicker" id="page-kicker">Painel pessoal</div>
-        <h1 class="page-title" id="page-title">Minhas <em>viagens</em></h1>
+        <h1 class="page-title" id="page-title">Meus <em>moments</em></h1>
       </div>
       <div class="top-actions">
         <div class="sync-pill" id="sync-pill"><span class="sync-dot"></span><span id="sync-text">Carregando dados</span></div>
-        <button class="primary-action" data-jump-form><i data-lucide="plus"></i> Nova viagem</button>
+        <button class="primary-action" data-jump-form><i data-lucide="plus"></i> Novo moment</button>
       </div>
     </header>
 
     <section class="content">
-      <!-- VIEW: DASHBOARD -->
       <section class="view active" id="view-dashboard">
         <div class="dashboard-stack">
           <div class="kpi-grid" id="kpi-grid"></div>
@@ -378,7 +390,6 @@
         </div>
       </section>
 
-      <!-- VIEW: MAP -->
       <section class="view" id="view-map">
         <div class="dashboard-stack">
           <div class="map-toolbar">
@@ -398,7 +409,6 @@
         </div>
       </section>
 
-      <!-- VIEW: STATS -->
       <section class="view" id="view-stats">
         <div class="dashboard-stack">
           <div class="kpi-grid" id="stats-kpi-grid"></div>
@@ -417,10 +427,9 @@
         </div>
       </section>
 
-      <!-- VIEW: FORM -->
       <section class="view" id="view-form">
         <div class="panel chart-panel" style="max-width: 700px; margin: 0 auto;">
-          <h2 class="chart-title">Nova Viagem</h2>
+          <h2 class="chart-title">Novo Moment</h2>
           <form id="trip-form" style="display: flex; flex-direction: column; gap: 16px;">
             <div class="field"><label>Viagem *</label><input class="form-input" id="f-name" required></div>
             <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px;">
@@ -443,15 +452,13 @@
   </main>
 </div>
 
-<!-- MOBILE NAV -->
 <nav class="mobile-nav">
   <button class="nav-item active" data-view="dashboard"><i data-lucide="layout-dashboard"></i> Home</button>
   <button class="nav-item" data-view="map"><i data-lucide="map"></i> Mapa</button>
   <button class="nav-item" data-view="stats"><i data-lucide="bar-chart-3"></i> Stats</button>
-  <button class="nav-item" data-view="form"><i data-lucide="plus-circle"></i> Nova</button>
+  <button class="nav-item" data-view="form"><i data-lucide="plus-circle"></i> Novo</button>
 </nav>
 
-<!-- MODAL REUTILIZÁVEL -->
 <div id="trip-modal" class="modal-overlay">
   <div class="modal-content">
     <button class="modal-close" onclick="closeModal()"><i data-lucide="x"></i></button>
@@ -461,7 +468,6 @@
 </div>
 
 <script>
-// A tua URL do CSV mantém-se
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRNecMUqxdEaBZw6QzMixrnF-o7n4Ldu5eaOVsLR8vWT0QhxalCbImnUNqJhPshjLyIW5a2Yf6F-Gvb/pub?output=csv";
 
 const UF_CENTROIDS = {
@@ -476,7 +482,7 @@ const UF_CENTROIDS = {
 
 const state = {
   trips: [], filtered: [],
-  filters: { search: "", year: "", uf: "", tag: "", sort: "recent" }, // Tipo removido
+  filters: { search: "", year: "", uf: "", tag: "", sort: "recent" }, 
   activeView: "dashboard", dashboardMode: "gallery", mapType: "choropleth",
   map: null, mapLayer: null, geoData: null, loaded: false,
   chartInstance: null
@@ -509,7 +515,16 @@ function bindEvents() {
   document.querySelectorAll("[data-map-type]").forEach(btn => btn.addEventListener("click", () => { state.mapType = btn.dataset.mapType; updateActiveButtons("[data-map-type]", state.mapType); renderMapLayer(); }));
 
   document.getElementById("trip-form").addEventListener("submit", handleFormSubmit);
+  
+  // FECHAR MODAL AO CLICAR NO FUNDO ESCURO
   els["trip-modal"].addEventListener("click", e => { if(e.target === els["trip-modal"]) closeModal(); });
+  
+  // FECHAR MODAL COM A TECLA ESC (GLOBAL)
+  document.addEventListener("keydown", function(event) {
+    if (event.key === "Escape" || event.keyCode === 27) {
+      closeModal();
+    }
+  });
 }
 
 function refreshIcons() { if (window.lucide) window.lucide.createIcons(); }
@@ -534,7 +549,6 @@ async function loadBrazilGeoJSON() {
   } catch (e) { console.error("Erro ao carregar mapa do Brasil"); }
 }
 
-// A função normalizeTrip agora lê diretamente os nomes exatos das colunas.
 function normalizeTrip(row, index) {
   const getField = (aliases) => {
     const key = Object.keys(row).find(k => aliases.some(a => k.toLowerCase() === a.toLowerCase()));
@@ -547,7 +561,6 @@ function normalizeTrip(row, index) {
   const startDate = getField(["Data de início"]);
   const endDate = getField(["Data de fim"]);
   
-  // Como o "Tipo" não existe mais como coluna independente, agrupamos tudo em "Motivo" (Tags)
   const tags = getField(["Motivo"]).split(",").map(t => t.trim()).filter(Boolean);
   const artists = getField(["Artistas"]).split(",").map(a => a.trim()).filter(Boolean);
   const travelers = getField(["Acompanhantes"]).split(",").map(v => v.trim()).filter(Boolean);
@@ -569,7 +582,7 @@ function populateFilters() {
   };
   fill("filter-year", "Todos os anos", t => t.year);
   fill("filter-uf", "Todas as UFs", t => t.uf);
-  fill("filter-tag", "Todos os motivos", t => t.tags); // Lê da coluna Motivo
+  fill("filter-tag", "Todos os motivos", t => t.tags);
 }
 
 function applyFilters() {
@@ -588,7 +601,7 @@ function applyFilters() {
 }
 
 function clearFilters() {
-  state.filters = { search: "", year: "", uf: "", tag: "", sort: "recent" }; // Tipo foi removido daqui
+  state.filters = { search: "", year: "", uf: "", tag: "", sort: "recent" };
   ["filter-search", "filter-year", "filter-uf", "filter-tag"].forEach(id => els[id].value = "");
   els["sort-order"].value = "recent"; applyFilters();
 }
@@ -632,7 +645,6 @@ function renderDashboardResults() {
   if (state.dashboardMode === "gallery") {
     els["dashboard-results"].innerHTML = `<div class="gallery-grid">${state.filtered.map(renderTripCard).join("")}</div>`;
   } else {
-    // Tabela atualizada sem a coluna "Tipo"
     els["dashboard-results"].innerHTML = `
       <div class="table-wrap"><table>
         <thead><tr><th>Viagem</th><th>Local</th><th>Data</th><th>Motivo</th></tr></thead>
@@ -648,7 +660,6 @@ function renderDashboardResults() {
 }
 
 function renderTripCard(trip) {
-  // Removido o badge extra do "Tipo" no cartão
   return `
     <article class="trip-card" onclick="openTripModal('${trip.id}')">
       <div class="trip-topline">
@@ -664,14 +675,12 @@ function renderTripCard(trip) {
     </article>`;
 }
 
-// Abre modal com DETALHES DA VIAGEM
 function openTripModal(tripId) {
   if (tripId === 'Viagens Registradas') return;
   
   const trip = state.trips.find(t => t.id === tripId);
   if (!trip) return;
 
-  // Removida a referência visual ao 'tipo' no Modal
   els["modal-header"].innerHTML = `
     <div style="display:flex; gap:8px; margin-bottom:8px;">
       <span class="uf-badge">${trip.uf}</span>
@@ -717,7 +726,9 @@ function openListModal(title, listItems, iconName) {
   refreshIcons();
 }
 
-function closeModal() { els["trip-modal"].classList.remove("open"); }
+function closeModal() { 
+  els["trip-modal"].classList.remove("open"); 
+}
 
 function switchView(view) {
   document.querySelectorAll(".view").forEach(el => el.classList.remove("active"));
@@ -752,16 +763,19 @@ function renderMapLayer() {
       style: f => {
         const count = ufCounts[f.properties.sigla] || 0;
         return {
-          color: "#ffffff", weight: 1.5, opacity: 1,
-          fillColor: count ? (count/max > 0.5 ? "var(--accent)" : "var(--accent-soft)") : "var(--paper-2)",
-          fillOpacity: count ? 0.9 : 0.6
+          /* NOVO CONTRASTE: Bordas na cor Azul Escuro e fundo Cinza Azul para estados não visitados */
+          color: "var(--blue-dark)", 
+          weight: 1.5, 
+          opacity: 0.7,
+          fillColor: count ? (count/max > 0.5 ? "var(--accent)" : "var(--accent-soft)") : "#cbd5e1",
+          fillOpacity: count ? 0.9 : 0.4
         };
       },
       onEachFeature: (f, layer) => {
         const uf = f.properties.sigla;
         layer.bindTooltip(`<b>${f.properties.name}</b><br>Clique para ver cidades`);
         layer.on({
-          mouseover: (e) => { e.target.setStyle({ weight: 3, color: 'var(--blue-dark)' }); e.target.bringToFront(); },
+          mouseover: (e) => { e.target.setStyle({ weight: 3, opacity: 1, color: 'var(--blue-dark)' }); e.target.bringToFront(); },
           mouseout: (e) => { state.mapLayer.getLayers()[0].resetStyle(e.target); },
           click: () => {
             const citiesInUF = [...new Set(state.filtered.filter(t => t.uf === uf).map(t => t.city))].sort();
@@ -772,7 +786,14 @@ function renderMapLayer() {
     }).addTo(state.mapLayer);
   } else {
     L.geoJSON(state.geoData, {
-      style: { color: "var(--line-strong)", weight: 1, fillColor: "var(--paper-2)", fillOpacity: 0.3 },
+      /* NOVO CONTRASTE (BOLHAS): Bordas Azul Escuro definem a silhueta do país */
+      style: { 
+        color: "var(--blue-dark)", 
+        weight: 1.2, 
+        opacity: 0.6,
+        fillColor: "#e2e8f0", 
+        fillOpacity: 0.4 
+      },
       onEachFeature: (f, layer) => {
         layer.on('click', () => {
           const uf = f.properties.sigla;
@@ -786,7 +807,7 @@ function renderMapLayer() {
       const coords = UF_CENTROIDS[uf];
       if(coords && count > 0) {
         L.circleMarker(coords, {
-          radius: 8 + (count/max)*15, color: "#fff", weight: 2, fillColor: "var(--accent)", fillOpacity: 0.8
+          radius: 8 + (count/max)*15, color: "#fff", weight: 2, fillColor: "var(--accent)", fillOpacity: 0.9
         }).bindTooltip(`<b>${uf}</b><br>${count} viagens`).addTo(state.mapLayer);
       }
     });
@@ -800,7 +821,6 @@ function renderMapLayer() {
 
 function renderStats() {
   const getTop = (mapFn) => Object.entries(state.filtered.reduce((acc, t) => { 
-    // Agrupa e conta cada item que a função de mapeamento retornar (caso seja um array, mapeia um por um)
     const values = Array.isArray(mapFn(t)) ? mapFn(t) : [mapFn(t)];
     values.forEach(v => {
       if(v) acc[v] = (acc[v] || 0) + 1;
@@ -815,7 +835,6 @@ function renderStats() {
 
   draw("stat-ufs", getTop(t => t.uf));
   draw("stat-cities", getTop(t => t.city));
-  // Agora Tags extrai as listas usando o mapFn t => t.tags corretamente:
   draw("stat-tags", getTop(t => t.tags).slice(0,8)); 
 
   const yearsData = Object.entries(state.filtered.reduce((acc, t) => { 
