@@ -4,135 +4,117 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nomade Hub</title>
+
+<!-- Bibliotecas Externas -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<!-- Adicionamos o Chart.js para os gráficos temporais -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
+    /* NOVA PALETA DE CORES BASEADA NA IMAGEM */
+    --blue-dark: #0c3c60;   /* Azul escuro da lateral esquerda da paleta */
+    --blue-med: #097599;    /* Azul médio */
+    --blue-light: #26b9dd;  /* Azul claro vibrante */
+    --blue-pale: #7bd4f1;   /* Azul bebê */
+    
+    --accent: #d4461c;      /* Laranja escuro/avermelhado */
+    --accent-soft: #f37321; /* Laranja vibrante */
+    --accent-bg: #fff0e6;   /* Fundo claro para tags laranja */
+    
     --ink: #1d1b17;
     --ink-2: #4f4a43;
     --ink-3: #8b857b;
     --line: #e2ded6;
-    --line-strong: #d5cec2;
-    --paper: #fbfaf7;
-    --paper-2: #f4f1eb;
-    --paper-3: #ebe6dd;
+    --line-strong: #cbd5e1;
+    --paper: #f8fafc;
+    --paper-2: #f1f5f9;
     --white: #ffffff;
-    --accent: #b94f2a;
-    --accent-soft: #f8e9e1;
-    --green: #2f6f5e;
-    --green-soft: #e7f2ed;
-    --blue: #476a96;
-    --blue-soft: #e9eff7;
-    --gold: #9b7626;
-    --gold-soft: #f5edd8;
-    --danger: #a33a34;
-    --danger-soft: #f8e7e4;
+    
     --sidebar-w: 268px;
     --radius: 12px;
-    --shadow: 0 16px 40px rgba(31, 28, 22, 0.08);
-    --shadow-hover: 0 20px 48px rgba(31, 28, 22, 0.12);
+    --shadow: 0 16px 40px rgba(12, 60, 96, 0.08);
+    --shadow-hover: 0 20px 48px rgba(12, 60, 96, 0.15);
     --transition: 0.2s cubic-bezier(.4,0,.2,1);
   }
 
   * { box-sizing: border-box; }
 
   body {
-    margin: 0;
-    min-height: 100vh;
-    overflow: hidden;
-    background: var(--paper);
-    color: var(--ink);
+    margin: 0; min-height: 100vh; overflow: hidden;
+    background: var(--paper); color: var(--ink);
     font-family: "DM Sans", system-ui, -apple-system, sans-serif;
   }
 
   button, input, select, textarea { font: inherit; }
   button { border: 0; cursor: pointer; }
 
-  .app-shell { display: flex; min-height: 100vh; }
+  .app-shell { display: flex; min-height: 100vh; width: 100vw; }
 
-  /* SIDEBAR */
+  /* SIDEBAR: Agora usando o Azul Escuro da paleta */
   .sidebar {
-    width: var(--sidebar-w);
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    padding: 24px 18px;
-    background: #1f1c18;
-    color: #f7f2e9;
-    border-right: 1px solid rgba(255,255,255,0.06);
-    z-index: 10;
+    width: var(--sidebar-w); flex-shrink: 0; display: flex; flex-direction: column; gap: 24px;
+    padding: 24px 18px; background: var(--blue-dark); color: #f7f2e9;
+    border-right: 1px solid rgba(255,255,255,0.1); z-index: 10;
   }
 
   .brand { display: flex; align-items: center; gap: 10px; min-height: 40px; padding: 0 4px; }
   .brand-mark {
-    width: 34px; height: 34px;
-    display: grid; place-items: center;
-    border: 1px solid rgba(255,255,255,0.16);
-    border-radius: 8px; background: rgba(255,255,255,0.05);
-    color: var(--accent-soft); font-family: "DM Serif Display", serif; font-size: 18px;
+    width: 34px; height: 34px; display: grid; place-items: center;
+    border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;
+    background: var(--accent-soft); color: var(--white); 
+    font-family: "DM Serif Display", serif; font-size: 18px;
   }
   .brand-name { display: flex; flex-direction: column; line-height: 1.05; }
   .brand-name strong { font-family: "DM Serif Display", serif; font-size: 20px; font-weight: 400; }
-  .brand-name span { color: #aba397; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+  .brand-name span { color: var(--blue-pale); font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
 
   .nav-block { display: flex; flex-direction: column; gap: 6px; }
-  .nav-label, .panel-label { color: var(--ink-3); font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
-  .nav-label { padding: 0 10px 4px; color: #82796d; }
+  .nav-label { color: var(--blue-pale); font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 0 10px 4px; opacity: 0.7; }
   
   .nav-item {
-    width: 100%; min-height: 40px;
-    display: flex; align-items: center; gap: 10px;
-    padding: 10px 12px; border-radius: 8px;
-    background: transparent; color: #d3cabe;
+    width: 100%; min-height: 40px; display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 8px; background: transparent; color: #d3cabe;
     text-align: left; transition: var(--transition);
   }
-  .nav-item svg { width: 17px; height: 17px; color: #9f968b; }
-  .nav-item:hover { background: rgba(255,255,255,0.07); color: #fffaf0; }
-  .nav-item.active { background: #f7f2e9; color: var(--ink); font-weight: 700; }
-  .nav-item.active svg { color: var(--accent); }
-
-  .sidebar-note {
-    margin-top: auto; padding: 14px;
-    border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;
-    background: rgba(255,255,255,0.04);
-  }
-  .sidebar-note p { margin: 6px 0 12px; color: #bdb4a8; font-size: 12px; line-height: 1.45; }
-  .sheet-link { display: inline-flex; align-items: center; gap: 8px; color: #f7f2e9; font-size: 12px; font-weight: 700; text-decoration: none; }
+  .nav-item svg { width: 17px; height: 17px; color: var(--blue-pale); }
+  .nav-item:hover { background: rgba(255,255,255,0.1); color: #fffaf0; }
+  .nav-item.active { background: var(--blue-light); color: var(--blue-dark); font-weight: 700; }
+  .nav-item.active svg { color: var(--blue-dark); }
 
   /* MAIN AREA */
-  .main { flex: 1; min-width: 0; display: flex; flex-direction: column; position: relative; }
+  .main { flex: 1; min-width: 0; display: flex; flex-direction: column; position: relative; max-width: 100%; }
 
   .topbar {
     min-height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 20px;
     padding: 18px 32px; border-bottom: 1px solid var(--line);
-    background: rgba(251,250,247,0.94); backdrop-filter: blur(12px); z-index: 5;
+    background: rgba(248,250,252,0.94); backdrop-filter: blur(12px); z-index: 5;
   }
   .page-kicker { color: var(--ink-3); font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
   .page-title { margin: 2px 0 0; font-family: "DM Serif Display", serif; font-size: 28px; font-weight: 400; line-height: 1.1; }
   .page-title em { color: var(--accent); font-style: italic; }
+  
   .top-actions { display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
-
   .sync-pill {
     min-height: 36px; display: inline-flex; align-items: center; gap: 8px;
     padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px;
     background: var(--white); color: var(--ink-2); font-size: 13px; white-space: nowrap;
   }
-  .sync-dot { width: 7px; height: 7px; border-radius: 999px; background: var(--gold); }
-  .sync-pill.loaded .sync-dot { background: var(--green); }
-  .sync-pill.error .sync-dot { background: var(--danger); }
+  .sync-dot { width: 7px; height: 7px; border-radius: 999px; background: var(--blue-light); }
+  .sync-pill.loaded .sync-dot { background: var(--blue-med); }
 
   .primary-action {
     min-height: 36px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    padding: 8px 16px; border-radius: 8px; background: var(--ink); color: var(--white);
+    padding: 8px 16px; border-radius: 8px; background: var(--accent); color: var(--white);
     font-size: 13px; font-weight: 700; transition: var(--transition);
   }
-  .primary-action:hover { background: var(--accent); transform: translateY(-1px); }
+  .primary-action:hover { background: var(--accent-soft); transform: translateY(-1px); }
 
-  .content { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 24px 32px 100px; }
+  .content { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 24px 32px 100px; width: 100%; }
   .content::-webkit-scrollbar { width: 8px; }
   .content::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 999px; }
 
@@ -148,10 +130,10 @@
   }
 
   .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
-  .metric-card { padding: 18px; transition: var(--transition); }
-  .metric-card:hover { border-color: var(--line-strong); transform: translateY(-2px); }
+  .metric-card { padding: 18px; transition: var(--transition); cursor: pointer; }
+  .metric-card:hover { border-color: var(--blue-light); box-shadow: 0 4px 12px rgba(38,185,221,0.1); transform: translateY(-2px); }
   .metric-label { display: flex; align-items: center; gap: 8px; color: var(--ink-3); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-  .metric-label svg { width: 16px; height: 16px; color: var(--accent); }
+  .metric-label svg { width: 16px; height: 16px; color: var(--blue-med); }
   .metric-value { margin-top: 10px; font-family: "DM Serif Display", serif; font-size: 34px; line-height: 1; color: var(--ink); }
   .metric-sub { margin-top: 6px; color: var(--ink-3); font-size: 12px; }
 
@@ -170,14 +152,14 @@
     transition: var(--transition); font-size: 14px;
   }
   .input-wrap .control { padding-left: 38px; }
-  .control:focus, .form-input:focus { border-color: var(--accent); background: var(--white); box-shadow: 0 0 0 3px var(--accent-soft); outline: none; }
+  .control:focus, .form-input:focus { border-color: var(--blue-light); background: var(--white); box-shadow: 0 0 0 3px rgba(38,185,221,0.2); outline: none; }
 
-  .clear-button, .ghost-button {
+  .clear-button {
     min-height: 42px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
     padding: 10px 16px; border: 1px solid var(--line); border-radius: 8px;
     background: var(--white); color: var(--ink-2); font-size: 13px; font-weight: 700; transition: var(--transition);
   }
-  .clear-button:hover, .ghost-button:hover { background: var(--paper-2); border-color: var(--line-strong); }
+  .clear-button:hover { background: var(--paper-2); border-color: var(--line-strong); }
 
   .view-toolbar, .map-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 4px; }
   .result-count, .map-note { color: var(--ink-3); font-size: 13px; font-weight: 500; }
@@ -187,37 +169,38 @@
     min-height: 34px; padding: 0 16px; border-radius: 6px; display: flex; align-items: center; gap: 8px;
     font-size: 13px; font-weight: 600; color: var(--ink-2); transition: var(--transition); background: transparent;
   }
-  .view-toggle.active, .map-toggle.active { background: var(--white); color: var(--ink); box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+  .view-toggle.active, .map-toggle.active { background: var(--white); color: var(--blue-dark); box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
 
   /* GALLERY TRIPS */
   .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
-  .trip-card {
-    padding: 20px; cursor: pointer; position: relative;
-    display: flex; flex-direction: column; height: 100%;
-  }
-  .trip-card:hover { border-color: var(--accent); box-shadow: var(--shadow-hover); transform: translateY(-4px); }
+  .trip-card { padding: 20px; cursor: pointer; position: relative; display: flex; flex-direction: column; height: 100%; }
+  .trip-card:hover { border-color: var(--blue-light); box-shadow: var(--shadow-hover); transform: translateY(-4px); }
   .trip-topline { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
   .uf-badge {
     display: inline-flex; align-items: center; padding: 4px 10px;
-    border-radius: 999px; background: var(--accent-soft); color: var(--accent);
+    border-radius: 999px; background: var(--accent-bg); color: var(--accent);
     font-size: 11px; font-weight: 800; letter-spacing: .08em;
   }
   .date-text { color: var(--ink-3); font-size: 12px; font-weight: 500; }
   .trip-title { margin: 0 0 8px; font-family: "DM Serif Display", serif; font-size: 22px; font-weight: 400; line-height: 1.2; color: var(--ink); }
   .trip-city { display: flex; align-items: center; gap: 6px; color: var(--ink-2); font-size: 14px; font-weight: 600; }
-  .trip-city svg { width: 16px; height: 16px; color: var(--green); }
+  .trip-city svg { width: 16px; height: 16px; color: var(--blue-med); }
   
   .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 16px 0; }
-  .tag { display: inline-flex; padding: 4px 10px; border-radius: 6px; background: var(--gold-soft); color: var(--gold); font-size: 11px; font-weight: 700; }
+  .tag { display: inline-flex; padding: 4px 10px; border-radius: 6px; background: var(--paper-2); color: var(--blue-dark); font-size: 11px; font-weight: 700; border: 1px solid var(--line); }
   
-  .trip-details { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 8px; color: var(--ink-3); font-size: 13px; }
+  .trip-details { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; color: var(--ink-3); font-size: 13px; }
   .trip-details span { display: flex; align-items: center; gap: 8px; }
-  .trip-details svg { width: 16px; height: 16px; flex-shrink: 0; }
 
-  /* TABLE */
-  .table-panel { overflow: hidden; }
-  .table-wrap { width: 100%; overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; min-width: 860px; }
+  /* CORREÇÃO DO SCROLL DA TABELA */
+  .table-panel { max-width: 100%; overflow: hidden; } /* Evita que o painel cresça infinitamente */
+  .table-wrap { 
+    width: 100%; 
+    overflow-x: auto; /* Permite rolar horizontalmente */
+    -webkit-overflow-scrolling: touch; /* Rolagem suave no iOS */
+    display: block; 
+  }
+  table { width: 100%; border-collapse: collapse; min-width: 860px; } /* min-width obriga o scroll a aparecer se o ecrã for menor */
   th, td { padding: 14px 16px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
   th { background: var(--paper-2); color: var(--ink-3); font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
   td { color: var(--ink-2); font-size: 14px; }
@@ -230,27 +213,29 @@
   .map-panel { padding: 8px; }
   #map { width: 100%; height: 60vh; min-height: 480px; border-radius: 8px; background: #e0e6ed; z-index: 1; }
   .leaflet-popup-content { font-family: "DM Sans", sans-serif; font-size: 14px; color: var(--ink-2); }
-  .leaflet-popup-content b { color: var(--ink); font-size: 15px; }
+  
   .rank-panel { padding: 18px; }
   .rank-list { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
   .rank-row { display: grid; grid-template-columns: 40px 1fr 30px; gap: 10px; align-items: center; }
   .rank-name { color: var(--ink); font-size: 14px; font-weight: 700; }
   .bar-track { height: 8px; border-radius: 999px; background: var(--paper-2); overflow: hidden; }
-  .bar-fill { height: 100%; background: var(--accent); border-radius: inherit; transition: width 0.5s ease; }
+  .bar-fill { height: 100%; background: var(--blue-light); border-radius: inherit; transition: width 0.5s ease; }
   .rank-count { color: var(--ink-3); font-size: 13px; text-align: right; font-weight: 600; }
 
-  /* STATS */
+  /* STATS & GRÁFICOS */
   .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
   .chart-panel { padding: 20px; }
-  .chart-title { margin: 0 0 16px; font-size: 16px; font-weight: 700; color: var(--ink); }
+  .chart-title { margin: 0 0 16px; font-size: 16px; font-weight: 700; color: var(--blue-dark); }
+  .chart-container { position: relative; height: 250px; width: 100%; }
+  
   .horizontal-list { display: flex; flex-direction: column; gap: 12px; }
   .horizontal-row { display: grid; grid-template-columns: minmax(100px, 140px) 1fr 30px; gap: 12px; align-items: center; }
   .horizontal-label { color: var(--ink-2); font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-  /* MODAL (NOVIDADE) */
+  /* MODAL */
   .modal-overlay {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(29, 27, 23, 0.6); backdrop-filter: blur(4px);
+    background: rgba(12, 60, 96, 0.7); backdrop-filter: blur(4px);
     display: flex; align-items: center; justify-content: center;
     z-index: 9999; opacity: 0; visibility: hidden; transition: 0.3s ease;
     padding: 20px;
@@ -261,7 +246,7 @@
     background: var(--white); width: 100%; max-width: 600px;
     border-radius: 16px; position: relative;
     transform: translateY(20px); transition: 0.3s ease;
-    box-shadow: 0 24px 60px rgba(0,0,0,0.15);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.2);
     max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column;
   }
   .modal-overlay.open .modal-content { transform: translateY(0); }
@@ -276,33 +261,38 @@
 
   .modal-header { padding: 32px 32px 24px; border-bottom: 1px solid var(--line); background: var(--paper); border-radius: 16px 16px 0 0; }
   .modal-body { padding: 32px; display: flex; flex-direction: column; gap: 20px; }
-  .modal-section { display: flex; flex-direction: column; gap: 8px; }
-  .modal-section strong { color: var(--ink); font-size: 13px; letter-spacing: 0.05em; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
-  .modal-section strong svg { width: 16px; height: 16px; color: var(--accent); }
-  .modal-section p { margin: 0; color: var(--ink-2); font-size: 15px; line-height: 1.5; }
+  
+  /* LISTAS SIMPLES NO MODAL (Cidades/UFs) */
+  .modal-list-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 0; border-bottom: 1px solid var(--paper-2);
+    font-size: 15px; color: var(--ink-2); font-weight: 500;
+  }
+  .modal-list-item:last-child { border-bottom: none; }
+  .modal-list-badge { background: var(--blue-pale); color: var(--blue-dark); padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; }
 
-  /* MOBILE NAV & RESPONSIVENESS */
+  /* MOBILE RESPONSIVENESS */
   .mobile-nav { display: none; }
 
   @media (max-width: 1024px) {
     .map-layout { grid-template-columns: 1fr; }
-    .filters-panel { flex-direction: column; align-items: stretch; }
-    .filters-panel .field, .input-wrap { width: 100%; }
   }
 
   @media (max-width: 768px) {
     .sidebar { display: none; }
     .app-shell { flex-direction: column; }
-    .main { padding-bottom: 80px; } /* Space for mobile nav */
+    .main { padding-bottom: 80px; } 
     .topbar { padding: 16px 20px; flex-direction: column; align-items: flex-start; gap: 16px; }
     .top-actions { width: 100%; justify-content: space-between; }
     .content { padding: 20px 20px 100px; }
+    
+    .filters-panel { flex-direction: column; align-items: stretch; }
+    .filters-panel .field, .input-wrap { width: 100%; }
     
     .view-toolbar, .map-toolbar { flex-direction: column; align-items: stretch; }
     .segmented { display: flex; } .view-toggle, .map-toggle { flex: 1; justify-content: center; }
     
     #map { height: 50vh; }
-    
     .modal-content { padding: 0; border-radius: 12px; }
     .modal-header { padding: 24px 20px 20px; }
     .modal-body { padding: 20px; }
@@ -318,13 +308,14 @@
       padding: 8px 4px; color: var(--ink-3); font-size: 10px; font-weight: 600; text-align: center; border-radius: 8px;
     }
     .mobile-nav .nav-item svg { width: 20px; height: 20px; margin: 0 auto; color: inherit; }
-    .mobile-nav .nav-item.active { background: var(--accent-soft); color: var(--accent); }
+    .mobile-nav .nav-item.active { background: rgba(38,185,221,0.15); color: var(--blue-med); }
   }
 </style>
 </head>
 <body>
 
 <div class="app-shell">
+  <!-- SIDEBAR (Desktop) -->
   <aside class="sidebar">
     <div class="brand">
       <div class="brand-mark">N</div>
@@ -337,12 +328,10 @@
       <button class="nav-item" data-view="stats"><i data-lucide="bar-chart-3"></i> Estatísticas</button>
       <button class="nav-item" data-view="form"><i data-lucide="plus-circle"></i> Nova viagem</button>
     </nav>
-    <div class="sidebar-note">
-      <div class="panel-label">Base de dados</div>
-      <p>Leitura via CSV publicado. Nesta versão, novos registos ficam apenas na sessão atual.</p>
-    </div>
+    <!-- Remoção da indicação do Google Sheets foi feita aqui! -->
   </aside>
 
+  <!-- MAIN -->
   <main class="main">
     <header class="topbar">
       <div>
@@ -356,6 +345,7 @@
     </header>
 
     <section class="content">
+      <!-- VIEW: DASHBOARD -->
       <section class="view active" id="view-dashboard">
         <div class="dashboard-stack">
           <div class="kpi-grid" id="kpi-grid"></div>
@@ -367,7 +357,9 @@
             </div>
             <div class="field"><label>Ano</label><select class="control" id="filter-year"></select></div>
             <div class="field"><label>UF</label><select class="control" id="filter-uf"></select></div>
-            <div class="field"><label>Tag</label><select class="control" id="filter-tag"></select></div>
+            <!-- NOVO: Filtro por Tipo -->
+            <div class="field"><label>Tipo de Viagem</label><select class="control" id="filter-tipo"></select></div>
+            
             <div class="field"><label>Ordenar</label>
               <select class="control" id="sort-order">
                 <option value="recent">Recentes</option>
@@ -390,14 +382,15 @@
         </div>
       </section>
 
+      <!-- VIEW: MAP -->
       <section class="view" id="view-map">
         <div class="dashboard-stack">
           <div class="map-toolbar">
             <div class="segmented">
-              <button class="map-toggle active" data-map-type="choropleth"><i data-lucide="map-pinned"></i> UFs (Estados)</button>
-              <button class="map-toggle" data-map-type="bubbles"><i data-lucide="circle-dot"></i> Cidades</button>
+              <button class="map-toggle active" data-map-type="choropleth"><i data-lucide="map-pinned"></i> Mapa de Calor (UFs)</button>
+              <button class="map-toggle" data-map-type="bubbles"><i data-lucide="circle-dot"></i> Bolhas (Cidades)</button>
             </div>
-            <div class="map-note" id="map-note">O mapa mostra apenas o território brasileiro.</div>
+            <div class="map-note" id="map-note">Clique num estado para ver as cidades visitadas.</div>
           </div>
           <div class="map-layout">
             <div class="panel map-panel"><div id="map"></div></div>
@@ -409,18 +402,28 @@
         </div>
       </section>
 
+      <!-- VIEW: STATS -->
       <section class="view" id="view-stats">
         <div class="dashboard-stack">
           <div class="kpi-grid" id="stats-kpi-grid"></div>
           <div class="stats-grid">
+            <!-- NOVO: Gráfico Temporal -->
+            <div class="panel chart-panel" style="grid-column: 1 / -1;">
+              <h2 class="chart-title"><i data-lucide="trending-up" style="width:18px; vertical-align:middle; margin-right:6px; color:var(--accent)"></i> Evolução de Viagens (Por Ano)</h2>
+              <div class="chart-container">
+                <canvas id="timeChart"></canvas>
+              </div>
+            </div>
+
             <div class="panel chart-panel"><h2 class="chart-title">Estados mais visitados</h2><div class="horizontal-list" id="stat-ufs"></div></div>
             <div class="panel chart-panel"><h2 class="chart-title">Cidades mais visitadas</h2><div class="horizontal-list" id="stat-cities"></div></div>
-            <div class="panel chart-panel"><h2 class="chart-title">Distribuição por ano</h2><div class="horizontal-list" id="stat-years"></div></div>
+            <div class="panel chart-panel"><h2 class="chart-title">Tipos de Viagem</h2><div class="horizontal-list" id="stat-tipos"></div></div>
             <div class="panel chart-panel"><h2 class="chart-title">Tags mais frequentes</h2><div class="horizontal-list" id="stat-tags"></div></div>
           </div>
         </div>
       </section>
 
+      <!-- VIEW: FORM -->
       <section class="view" id="view-form">
         <div class="panel chart-panel" style="max-width: 700px; margin: 0 auto;">
           <h2 class="chart-title">Nova Viagem</h2>
@@ -430,13 +433,21 @@
               <div class="field"><label>Cidade *</label><input class="form-input" id="f-city" required></div>
               <div class="field"><label>UF *</label><input class="form-input" id="f-uf" maxlength="2" required placeholder="Ex: SP"></div>
             </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
               <div class="field"><label>Início *</label><input type="date" class="form-input" id="f-start" required></div>
               <div class="field"><label>Fim</label><input type="date" class="form-input" id="f-end"></div>
+              <div class="field"><label>Tipo</label>
+                <select class="form-input" id="f-tipo">
+                  <option value="Férias">Férias</option>
+                  <option value="Evento">Evento</option>
+                  <option value="Trabalho">Trabalho</option>
+                  <option value="Outros">Outros</option>
+                </select>
+              </div>
             </div>
-            <div class="field"><label>Tags / Motivo</label><input class="form-input" id="f-tags" placeholder="Separadas por vírgula"></div>
+            <div class="field"><label>Tags</label><input class="form-input" id="f-tags" placeholder="Separadas por vírgula"></div>
             <button class="primary-action" type="submit" style="margin-top: 10px;">Adicionar à Sessão</button>
-            <div id="form-message" style="color: var(--green); font-size: 14px; font-weight: 600;"></div>
+            <div id="form-message" style="color: var(--blue-med); font-size: 14px; font-weight: 600;"></div>
           </form>
         </div>
       </section>
@@ -444,6 +455,7 @@
   </main>
 </div>
 
+<!-- MOBILE NAV -->
 <nav class="mobile-nav">
   <button class="nav-item active" data-view="dashboard"><i data-lucide="layout-dashboard"></i> Home</button>
   <button class="nav-item" data-view="map"><i data-lucide="map"></i> Mapa</button>
@@ -451,6 +463,7 @@
   <button class="nav-item" data-view="form"><i data-lucide="plus-circle"></i> Nova</button>
 </nav>
 
+<!-- MODAL REUTILIZÁVEL -->
 <div id="trip-modal" class="modal-overlay">
   <div class="modal-content">
     <button class="modal-close" onclick="closeModal()"><i data-lucide="x"></i></button>
@@ -460,7 +473,6 @@
 </div>
 
 <script>
-// Mantemos o teu CSV original
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRNecMUqxdEaBZw6QzMixrnF-o7n4Ldu5eaOVsLR8vWT0QhxalCbImnUNqJhPshjLyIW5a2Yf6F-Gvb/pub?output=csv";
 
 const UF_CENTROIDS = {
@@ -475,9 +487,10 @@ const UF_CENTROIDS = {
 
 const state = {
   trips: [], filtered: [],
-  filters: { search: "", year: "", uf: "", tag: "", sort: "recent" },
+  filters: { search: "", year: "", uf: "", tag: "", tipo: "", sort: "recent" },
   activeView: "dashboard", dashboardMode: "gallery", mapType: "choropleth",
-  map: null, mapLayer: null, geoData: null, loaded: false
+  map: null, mapLayer: null, geoData: null, loaded: false,
+  chartInstance: null // Guarda a referência do gráfico para atualizar
 };
 
 const els = {};
@@ -491,7 +504,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function cacheElements() {
-  ["sync-pill", "sync-text", "kpi-grid", "stats-kpi-grid", "filter-search", "filter-year", "filter-uf", "filter-tag", "sort-order", "clear-filters", "result-count", "dashboard-results", "map-rank", "stat-ufs", "stat-cities", "stat-years", "stat-tags", "trip-modal", "modal-header", "modal-body"].forEach(id => { els[id] = document.getElementById(id); });
+  ["sync-pill", "sync-text", "kpi-grid", "stats-kpi-grid", "filter-search", "filter-year", "filter-uf", "filter-tag", "filter-tipo", "sort-order", "clear-filters", "result-count", "dashboard-results", "map-rank", "stat-ufs", "stat-cities", "stat-tipos", "stat-tags", "trip-modal", "modal-header", "modal-body"].forEach(id => { els[id] = document.getElementById(id); });
 }
 
 function bindEvents() {
@@ -499,7 +512,7 @@ function bindEvents() {
   document.querySelector("[data-jump-form]").addEventListener("click", () => switchView("form"));
   
   els["filter-search"].addEventListener("input", e => { state.filters.search = e.target.value.trim().toLowerCase(); applyFilters(); });
-  ["filter-year", "filter-uf", "filter-tag"].forEach(id => els[id].addEventListener("change", e => { state.filters[id.replace("filter-", "")] = e.target.value; applyFilters(); }));
+  ["filter-year", "filter-uf", "filter-tag", "filter-tipo"].forEach(id => els[id].addEventListener("change", e => { state.filters[id.replace("filter-", "")] = e.target.value; applyFilters(); }));
   els["sort-order"].addEventListener("change", e => { state.filters.sort = e.target.value; applyFilters(); });
   els["clear-filters"].addEventListener("click", clearFilters);
 
@@ -507,8 +520,6 @@ function bindEvents() {
   document.querySelectorAll("[data-map-type]").forEach(btn => btn.addEventListener("click", () => { state.mapType = btn.dataset.mapType; updateActiveButtons("[data-map-type]", state.mapType); renderMapLayer(); }));
 
   document.getElementById("trip-form").addEventListener("submit", handleFormSubmit);
-
-  // Fechar Modal se clicar fora (no overlay escuro)
   els["trip-modal"].addEventListener("click", e => { if(e.target === els["trip-modal"]) closeModal(); });
 }
 
@@ -535,7 +546,6 @@ async function loadBrazilGeoJSON() {
 }
 
 function normalizeTrip(row, index) {
-  // Lógica simplificada de extração do seu código original
   const getField = (aliases) => {
     const key = Object.keys(row).find(k => aliases.some(a => k.toLowerCase().includes(a.toLowerCase())));
     return key ? row[key] : "";
@@ -546,17 +556,20 @@ function normalizeTrip(row, index) {
   const uf = getField(["uf", "estado", "sigla"]).slice(0, 2).toUpperCase();
   const startDate = getField(["início", "inicio"]);
   const endDate = getField(["fim"]);
-  const tags = getField(["motivo", "tags"]).split(",").map(t => t.trim()).filter(Boolean);
-  const artists = getField(["artistas"]).split(",").map(a => a.trim()).filter(Boolean);
+  const tags = getField(["motivo", "tags", "motivos"]).split(",").map(t => t.trim()).filter(Boolean);
   const travelers = getField(["viajantes", "pessoas"]).split(",").map(v => v.trim()).filter(Boolean);
   
+  // Extração do novo campo TIPO (Férias, Eventos, etc.)
+  let tipo = getField(["tipo", "categoria"]);
+  if(!tipo) tipo = tags.includes("Férias") ? "Férias" : (tags.includes("Show") || tags.includes("Festival") ? "Evento" : "Geral");
+
   let year = "";
   if (startDate && startDate.includes("-")) year = startDate.split("-")[0];
   else if (startDate && startDate.includes("/")) year = startDate.split("/")[2];
 
   return {
-    id: `trip-${index}`, name: name || city, city, uf, startDate, endDate, year, tags, artists, travelers,
-    searchIndex: `${name} ${city} ${uf} ${tags.join(" ")}`.toLowerCase()
+    id: `trip-${index}`, name: name || city, city, uf, startDate, endDate, year, tags, tipo, travelers,
+    searchIndex: `${name} ${city} ${uf} ${tipo} ${tags.join(" ")}`.toLowerCase()
   };
 }
 
@@ -568,15 +581,17 @@ function populateFilters() {
   fill("filter-year", "Todos os anos", t => t.year);
   fill("filter-uf", "Todas as UFs", t => t.uf);
   fill("filter-tag", "Todas as tags", t => t.tags);
+  fill("filter-tipo", "Todos os tipos", t => t.tipo);
 }
 
 function applyFilters() {
-  const { search, year, uf, tag, sort } = state.filters;
+  const { search, year, uf, tag, tipo, sort } = state.filters;
   let data = state.trips.filter(t => 
     (!search || t.searchIndex.includes(search)) &&
     (!year || t.year === year) &&
     (!uf || t.uf === uf) &&
-    (!tag || t.tags.includes(tag))
+    (!tag || t.tags.includes(tag)) &&
+    (!tipo || t.tipo === tipo)
   );
   
   if (sort === "city") data.sort((a, b) => a.city.localeCompare(b.city));
@@ -586,8 +601,8 @@ function applyFilters() {
 }
 
 function clearFilters() {
-  state.filters = { search: "", year: "", uf: "", tag: "", sort: "recent" };
-  ["filter-search", "filter-year", "filter-uf", "filter-tag"].forEach(id => els[id].value = "");
+  state.filters = { search: "", year: "", uf: "", tag: "", tipo: "", sort: "recent" };
+  ["filter-search", "filter-year", "filter-uf", "filter-tag", "filter-tipo"].forEach(id => els[id].value = "");
   els["sort-order"].value = "recent"; applyFilters();
 }
 
@@ -595,14 +610,33 @@ function renderAll() {
   renderKpis(); renderDashboardResults(); renderStats(); renderMapLayer(); refreshIcons();
 }
 
+/* LÓGICA DE CLIQUE NOS KPIs */
 function renderKpis() {
   const data = state.filtered;
-  const cities = new Set(data.map(t => t.city)).size;
-  const ufs = new Set(data.map(t => t.uf)).size;
+  const cities = [...new Set(data.map(t => t.city))].sort();
+  const ufs = [...new Set(data.map(t => t.uf))].sort();
+  
+  // Guardamos as listas no estado global para usar quando clicarem
+  state.currentCitiesList = cities;
+  state.currentUfsList = ufs;
+
+  // Repara no `onclick` que passa o tipo de lista que queremos ver
   const html = `
-    <article class="metric-card"><div class="metric-label"><i data-lucide="plane"></i> Viagens</div><div class="metric-value">${data.length}</div></article>
-    <article class="metric-card"><div class="metric-label"><i data-lucide="map-pin"></i> Cidades</div><div class="metric-value">${cities}</div></article>
-    <article class="metric-card"><div class="metric-label"><i data-lucide="map"></i> Estados</div><div class="metric-value">${ufs}</div></article>
+    <article class="metric-card" onclick="openTripModal('Viagens Registradas')">
+      <div class="metric-label"><i data-lucide="plane"></i> Viagens</div>
+      <div class="metric-value">${data.length}</div>
+      <div class="metric-sub">clique para detalhes</div>
+    </article>
+    <article class="metric-card" onclick="openListModal('Cidades Visitadas', state.currentCitiesList, 'map-pin')">
+      <div class="metric-label"><i data-lucide="map-pin"></i> Cidades</div>
+      <div class="metric-value">${cities.length}</div>
+      <div class="metric-sub">destinos únicos (clique para ver)</div>
+    </article>
+    <article class="metric-card" onclick="openListModal('UFs Visitadas', state.currentUfsList, 'map')">
+      <div class="metric-label"><i data-lucide="map"></i> Estados</div>
+      <div class="metric-value">${ufs.length}</div>
+      <div class="metric-sub">estados (clique para ver)</div>
+    </article>
   `;
   els["kpi-grid"].innerHTML = html; els["stats-kpi-grid"].innerHTML = html;
 }
@@ -614,12 +648,15 @@ function renderDashboardResults() {
   if (state.dashboardMode === "gallery") {
     els["dashboard-results"].innerHTML = `<div class="gallery-grid">${state.filtered.map(renderTripCard).join("")}</div>`;
   } else {
+    // A classe table-wrap agora cuida perfeitamente da responsividade da tabela!
     els["dashboard-results"].innerHTML = `
       <div class="table-wrap"><table>
-        <thead><tr><th>Viagem</th><th>Local</th><th>Data</th><th>Tags</th></tr></thead>
+        <thead><tr><th>Viagem</th><th>Local</th><th>Tipo</th><th>Data</th><th>Tags</th></tr></thead>
         <tbody>${state.filtered.map(t => `
-          <tr class="table-row-clickable" onclick="openModal('${t.id}')">
-            <td class="table-title">${t.name}</td><td>${t.city} - ${t.uf}</td><td>${t.startDate || '-'}</td>
+          <tr class="table-row-clickable" onclick="openTripModal('${t.id}')">
+            <td class="table-title">${t.name}</td><td>${t.city} - ${t.uf}</td>
+            <td><span class="uf-badge" style="background:var(--blue-pale); color:var(--blue-dark);">${t.tipo}</span></td>
+            <td>${t.startDate || '-'}</td>
             <td>${t.tags.join(", ")}</td>
           </tr>`).join("")}
         </tbody>
@@ -629,46 +666,77 @@ function renderDashboardResults() {
 
 function renderTripCard(trip) {
   return `
-    <article class="trip-card" onclick="openModal('${trip.id}')">
-      <div class="trip-topline"><span class="uf-badge">${trip.uf}</span><span class="date-text">${trip.year}</span></div>
+    <article class="trip-card" onclick="openTripModal('${trip.id}')">
+      <div class="trip-topline">
+        <span class="uf-badge">${trip.uf}</span>
+        <span class="uf-badge" style="background:var(--blue-pale); color:var(--blue-dark);">${trip.tipo}</span>
+      </div>
       <h2 class="trip-title">${trip.name}</h2>
       <div class="trip-city"><i data-lucide="map-pin"></i>${trip.city}</div>
-      ${trip.tags.length ? `<div class="tag-row">${trip.tags.slice(0,3).map(tag => `<span class="tag">${tag}</span>`).join("")}</div>` : ""}
-      <div class="trip-details">
-        <span><i data-lucide="users"></i>${trip.travelers.length ? trip.travelers.join(", ") : "Só eu"}</span>
+      <div class="trip-details" style="margin-top:16px;">
+        <span><i data-lucide="calendar"></i>${trip.year || '-'}</span>
+        <span><i data-lucide="users"></i>${trip.travelers.length ? trip.travelers.length + " pax" : "Solo"}</span>
       </div>
     </article>`;
 }
 
-// === NOVO: SISTEMA DE MODAL ===
-function openModal(tripId) {
+/* SISTEMA MULTIUSO DE MODAIS */
+
+// 1. Abre modal com DETALHES DA VIAGEM
+function openTripModal(tripId) {
+  if (tripId === 'Viagens Registradas') return; // Segurança caso cliquem no KPI de total de viagens
+  
   const trip = state.trips.find(t => t.id === tripId);
   if (!trip) return;
 
   els["modal-header"].innerHTML = `
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-      <span class="uf-badge" style="background:var(--paper-2); color:var(--ink-2);">${trip.uf}</span>
-      <span style="color:var(--ink-3); font-size:13px; font-weight:600;">${trip.startDate || ''} ${trip.endDate ? 'até ' + trip.endDate : ''}</span>
+    <div style="display:flex; gap:8px; margin-bottom:8px;">
+      <span class="uf-badge">${trip.uf}</span>
+      <span class="uf-badge" style="background:var(--blue-pale); color:var(--blue-dark);">${trip.tipo}</span>
     </div>
-    <h2 style="font-family:'DM Serif Display', serif; font-size:32px; margin:0; color:var(--ink);">${trip.name}</h2>
-    <div style="color:var(--ink-2); font-size:16px; margin-top:4px; font-weight:500;">
-      <i data-lucide="map-pin" style="width:16px; display:inline-block; vertical-align:middle; color:var(--green)"></i> ${trip.city}, ${trip.uf}
+    <h2 style="font-family:'DM Serif Display', serif; font-size:28px; margin:0; color:var(--blue-dark);">${trip.name}</h2>
+    <div style="color:var(--ink-2); font-size:15px; margin-top:4px; font-weight:500;">
+      <i data-lucide="map-pin" style="width:16px; vertical-align:middle; color:var(--accent)"></i> ${trip.city}, ${trip.uf}
     </div>
   `;
-
   els["modal-body"].innerHTML = `
-    ${trip.tags.length ? `<div class="modal-section"><strong><i data-lucide="tag"></i> Motivo / Tags</strong><div class="tag-row" style="margin:0;">${trip.tags.map(t => `<span class="tag">${t}</span>`).join("")}</div></div>` : ""}
-    ${trip.artists.length ? `<div class="modal-section"><strong><i data-lucide="music-2"></i> Artistas Vistos</strong><p>${trip.artists.join(", ")}</p></div>` : ""}
-    <div class="modal-section"><strong><i data-lucide="users"></i> Companhia</strong><p>${trip.travelers.length ? trip.travelers.join(", ") : "Viajei a solo"}</p></div>
+    <p><strong>Datas:</strong> ${trip.startDate} até ${trip.endDate || 'N/A'}</p>
+    <p><strong>Tags:</strong> ${trip.tags.join(", ") || 'Sem tags'}</p>
+    <p><strong>Viajantes:</strong> ${trip.travelers.join(", ") || 'Solo'}</p>
   `;
-
   els["trip-modal"].classList.add("open");
   refreshIcons();
 }
 
-function closeModal() {
-  els["trip-modal"].classList.remove("open");
+// 2. Abre modal com uma LISTA DE ITENS (ex: Cidades ou Estados)
+function openListModal(title, listItems, iconName) {
+  els["modal-header"].innerHTML = `
+    <h2 style="font-family:'DM Serif Display', serif; font-size:26px; margin:0; color:var(--blue-dark);">${title}</h2>
+    <p style="margin:4px 0 0; color:var(--ink-3); font-size:14px;">Total: ${listItems.length} registros</p>
+  `;
+  
+  // Conta quantas viagens existem para cada item da lista
+  const counts = {};
+  state.filtered.forEach(t => {
+    const key = (title.includes('Cidades')) ? t.city : t.uf;
+    counts[key] = (counts[key] || 0) + 1;
+  });
+
+  els["modal-body"].innerHTML = `
+    <div style="display:flex; flex-direction:column;">
+      ${listItems.map(item => `
+        <div class="modal-list-item">
+          <span><i data-lucide="${iconName}" style="width:16px; margin-right:8px; color:var(--accent); vertical-align:middle;"></i>${item}</span>
+          <span class="modal-list-badge">${counts[item]} viagem(ns)</span>
+        </div>
+      `).join('')}
+    </div>
+  `;
+  els["trip-modal"].classList.add("open");
+  refreshIcons();
 }
+
+function closeModal() { els["trip-modal"].classList.remove("open"); }
 
 function switchView(view) {
   document.querySelectorAll(".view").forEach(el => el.classList.remove("active"));
@@ -681,89 +749,127 @@ function updateActiveButtons(selector, value) {
   document.querySelectorAll(selector).forEach(btn => btn.classList.toggle("active", btn.dataset.view === value || btn.dataset.mode === value || btn.dataset.mapType === value));
 }
 
-// === MAPA: FOCADO NO BRASIL ===
+/* MAPA E MELHORIAS */
 function initMap() {
   if (state.map) { state.map.invalidateSize(); return; }
-
-  // Restringe o mapa APENAS ao Brasil (Latitude e Longitude extremas do país)
-  const brazilBounds = [
-    [-34.0, -74.0], // Sudoeste
-    [5.5, -34.0]    // Nordeste
-  ];
-
-  state.map = L.map("map", { 
-    zoomControl: false,
-    maxBounds: brazilBounds, // Trava o mapa neste retângulo
-    maxBoundsViscosity: 1.0, // Impede que o utilizador arraste para fora
-    minZoom: 4 // Evita afastar demasiado
-  }).fitBounds(brazilBounds);
-
+  const brazilBounds = [[-34.0, -74.0], [5.5, -34.0]];
+  state.map = L.map("map", { zoomControl: false, maxBounds: brazilBounds, maxBoundsViscosity: 1.0, minZoom: 4 }).fitBounds(brazilBounds);
   L.control.zoom({ position: "bottomright" }).addTo(state.map);
-  
-  // Mapa base mais neutro/limpo
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-    attribution: "&copy; OpenStreetMap"
-  }).addTo(state.map);
-
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", { attribution: "&copy; OSM" }).addTo(state.map);
   renderMapLayer();
 }
 
 function renderMapLayer() {
   if (!state.map || !state.geoData) return;
   if (state.mapLayer) state.map.removeLayer(state.mapLayer);
+  state.mapLayer = L.layerGroup(); // Agrupa as camadas do mapa
 
   const ufCounts = state.filtered.reduce((acc, t) => { acc[t.uf] = (acc[t.uf] || 0) + 1; return acc; }, {});
   const max = Math.max(...Object.values(ufCounts), 1);
 
   if (state.mapType === "choropleth") {
-    state.mapLayer = L.geoJSON(state.geoData, {
-      style: feature => {
-        const uf = feature.properties.sigla;
-        const count = ufCounts[uf] || 0;
+    // Mapa de Cor por UF
+    L.geoJSON(state.geoData, {
+      style: f => {
+        const count = ufCounts[f.properties.sigla] || 0;
         return {
-          color: "#ffffff", weight: 1.5, opacity: 1, // Limites de estado bem definidos e brancos
-          fillColor: count ? (count/max > 0.5 ? "#b94f2a" : "#e7ad73") : "#e0e5eb",
-          fillOpacity: count ? 0.9 : 0.4
+          color: "#ffffff", weight: 1.5, opacity: 1,
+          fillColor: count ? (count/max > 0.5 ? "var(--accent)" : "var(--accent-soft)") : "var(--paper-2)",
+          fillOpacity: count ? 0.9 : 0.6
         };
       },
-      onEachFeature: (feature, layer) => {
-        const uf = feature.properties.sigla;
-        const count = ufCounts[uf] || 0;
-        layer.bindTooltip(`<b>${feature.properties.name}</b><br>${count} viagem(ns)`, {direction: 'top', className: 'custom-tooltip'});
-        
-        // Efeito interativo ao passar o rato e clicar
+      onEachFeature: (f, layer) => {
+        const uf = f.properties.sigla;
+        layer.bindTooltip(`<b>${f.properties.name}</b><br>Clique para ver cidades`);
         layer.on({
-          mouseover: (e) => { e.target.setStyle({ weight: 3, color: '#1d1b17' }); e.target.bringToFront(); },
-          mouseout: (e) => { state.mapLayer.resetStyle(e.target); },
-          click: (e) => { state.map.fitBounds(e.target.getBounds()); } // Zoom no estado
+          mouseover: (e) => { e.target.setStyle({ weight: 3, color: 'var(--blue-dark)' }); e.target.bringToFront(); },
+          mouseout: (e) => { state.mapLayer.getLayers()[0].resetStyle(e.target); },
+          click: () => {
+            // Clicar numa UF abre o modal com as cidades dela!
+            const citiesInUF = [...new Set(state.filtered.filter(t => t.uf === uf).map(t => t.city))].sort();
+            if(citiesInUF.length > 0) openListModal(`Cidades em ${uf}`, citiesInUF, 'map-pin');
+          }
         });
       }
-    }).addTo(state.map);
+    }).addTo(state.mapLayer);
   } else {
-    // Mapa de Cidades (Bolhas)
-    state.mapLayer = L.layerGroup();
+    // Bolhas - AQUI DESENHAMOS O CONTORNO DO BRASIL POR BAIXO
+    L.geoJSON(state.geoData, {
+      style: { color: "var(--line-strong)", weight: 1, fillColor: "var(--paper-2)", fillOpacity: 0.3 },
+      onEachFeature: (f, layer) => {
+        layer.on('click', () => {
+          const uf = f.properties.sigla;
+          const citiesInUF = [...new Set(state.filtered.filter(t => t.uf === uf).map(t => t.city))].sort();
+          if(citiesInUF.length > 0) openListModal(`Cidades em ${uf}`, citiesInUF, 'map-pin');
+        });
+      }
+    }).addTo(state.mapLayer);
+
+    // Depois desenhamos as bolhas
     Object.entries(ufCounts).forEach(([uf, count]) => {
       const coords = UF_CENTROIDS[uf];
       if(coords && count > 0) {
         L.circleMarker(coords, {
-          radius: 8 + (count/max)*15, color: "#fff", weight: 2, fillColor: "#b94f2a", fillOpacity: 0.8
+          radius: 8 + (count/max)*15, color: "#fff", weight: 2, fillColor: "var(--accent)", fillOpacity: 0.8
         }).bindTooltip(`<b>${uf}</b><br>${count} viagens`).addTo(state.mapLayer);
       }
     });
-    state.mapLayer.addTo(state.map);
   }
+  
+  state.mapLayer.addTo(state.map);
+  
+  // Atualiza o ranking lateral do mapa
+  const topUfs = Object.entries(ufCounts).sort((a,b) => b[1]-a[1]).slice(0, 8);
+  els["map-rank"].innerHTML = topUfs.map(([k,v]) => `<div class="rank-row"><div class="rank-name">${k}</div><div class="bar-track"><div class="bar-fill" style="width:${(v/max)*100}%"></div></div><div class="rank-count">${v}</div></div>`).join("");
 }
 
+/* ESTATÍSTICAS E GRÁFICO (CHART.JS) */
 function renderStats() {
   const getTop = (mapFn) => Object.entries(state.filtered.reduce((acc, t) => { 
     const v = mapFn(t); if(v) acc[v] = (acc[v] || 0) + 1; return acc; 
   }, {})).sort((a,b) => b[1]-a[1]).slice(0,5);
 
-  const draw = (id, data) => { els[id].innerHTML = data.map(([k,v]) => `<div class="horizontal-row"><div class="horizontal-label">${k}</div><div class="bar-track"><div class="bar-fill" style="width:${v*20}%"></div></div><div class="rank-count">${v}</div></div>`).join(""); };
+  const draw = (id, data) => { 
+    const max = Math.max(...data.map(d => d[1]), 1);
+    els[id].innerHTML = data.map(([k,v]) => `<div class="horizontal-row"><div class="horizontal-label">${k}</div><div class="bar-track"><div class="bar-fill" style="width:${(v/max)*100}%"></div></div><div class="rank-count">${v}</div></div>`).join(""); 
+  };
 
   draw("stat-ufs", getTop(t => t.uf));
   draw("stat-cities", getTop(t => t.city));
-  draw("stat-years", getTop(t => t.year));
+  draw("stat-tipos", getTop(t => t.tipo));
+  draw("stat-tags", getTop(t => t.tags).slice(0,8)); // Mostra mais tags
+
+  // NOVO: Renderização do Gráfico Chart.js
+  const yearsData = Object.entries(state.filtered.reduce((acc, t) => { 
+    if(t.year) acc[t.year] = (acc[t.year] || 0) + 1; 
+    return acc; 
+  }, {})).sort((a,b) => a[0].localeCompare(b[0])); // Ordena por ano crescente
+
+  const ctx = document.getElementById('timeChart').getContext('2d');
+  
+  if (state.chartInstance) {
+    state.chartInstance.destroy(); // Apaga o gráfico antigo se mudarmos os filtros
+  }
+
+  state.chartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: yearsData.map(d => d[0]),
+      datasets: [{
+        label: 'Número de Viagens',
+        data: yearsData.map(d => d[1]),
+        backgroundColor: '#26b9dd', // Azul Claro
+        borderRadius: 6,
+        hoverBackgroundColor: '#097599' // Azul Médio ao passar o rato
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+      plugins: { legend: { display: false } }
+    }
+  });
 }
 
 function handleFormSubmit(e) {
