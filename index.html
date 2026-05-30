@@ -11,38 +11,38 @@
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    /* PALETA DE CORES */
-    --blue-dark: #0c3c60;
+    /* PALETA REFINADA (Mais elegante e contrastante) */
+    --blue-dark: #0A2F4C;
     --blue-med: #097599;
     --blue-light: #26b9dd;
-    --blue-pale: #7bd4f1;
+    --blue-pale: #e6f6fa;
     
     --accent: #d4461c;
     --accent-soft: #f37321;
     --accent-bg: #fff0e6;
     
-    --ink: #1d1b17;
-    --ink-2: #4f4a43;
-    --ink-3: #8b857b;
-    --line: #e2ded6;
+    --ink: #1e293b;
+    --ink-2: #475569;
+    --ink-3: #94a3b8;
+    --line: #e2e8f0;
     --line-strong: #cbd5e1;
     --paper: #f8fafc;
     --paper-2: #f1f5f9;
     --white: #ffffff;
     
-    --sidebar-w: 268px;
-    --radius: 12px;
-    --shadow: 0 16px 40px rgba(12, 60, 96, 0.08);
-    --shadow-hover: 0 20px 48px rgba(12, 60, 96, 0.15);
-    --transition: 0.2s cubic-bezier(.4,0,.2,1);
+    --sidebar-w: 280px;
+    --radius: 16px;
+    --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    --shadow-md: 0 10px 25px -5px rgba(10, 47, 76, 0.08), 0 8px 10px -6px rgba(10, 47, 76, 0.04);
+    --shadow-hover: 0 20px 30px -10px rgba(10, 47, 76, 0.15);
+    --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   * { box-sizing: border-box; }
 
-  /* Estrutura Base */
   body {
     margin: 0; height: 100vh; overflow: hidden;
     background: var(--paper); color: var(--ink);
@@ -50,206 +50,177 @@
   }
 
   button, input, select, textarea { font: inherit; }
-  button { border: 0; cursor: pointer; }
+  button { border: 0; cursor: pointer; outline: none; }
 
   .app-shell { display: flex; height: 100vh; width: 100vw; overflow: hidden; }
 
-  /* SIDEBAR */
+  /* SIDEBAR: Gradiente e visual mais limpo */
   .sidebar {
-    width: var(--sidebar-w); flex-shrink: 0; display: flex; flex-direction: column; gap: 24px;
-    padding: 24px 18px; background: var(--blue-dark); color: #f7f2e9;
-    border-right: 1px solid rgba(255,255,255,0.1); z-index: 10;
+    width: var(--sidebar-w); flex-shrink: 0; display: flex; flex-direction: column; gap: 28px;
+    padding: 32px 24px; color: #fff;
+    background: linear-gradient(180deg, var(--blue-dark) 0%, #061c2e 100%);
+    box-shadow: 4px 0 24px rgba(0,0,0,0.1); z-index: 10;
   }
 
-  .brand { display: flex; align-items: center; gap: 10px; min-height: 40px; padding: 0 4px; }
+  .brand { display: flex; align-items: center; gap: 12px; }
   .brand-mark {
-    width: 34px; height: 34px; display: grid; place-items: center;
-    border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;
-    background: var(--accent-soft); color: var(--white); 
-    font-family: "DM Serif Display", serif; font-size: 18px;
+    width: 38px; height: 38px; display: grid; place-items: center;
+    border-radius: 10px; background: linear-gradient(135deg, var(--accent-soft), var(--accent));
+    color: var(--white); font-family: "DM Serif Display", serif; font-size: 20px;
+    box-shadow: 0 4px 10px rgba(212, 70, 28, 0.3);
   }
-  .brand-name { display: flex; flex-direction: column; line-height: 1.05; }
-  .brand-name strong { font-family: "DM Serif Display", serif; font-size: 20px; font-weight: 400; }
-  .brand-name span { color: var(--blue-pale); font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+  .brand-name { display: flex; flex-direction: column; line-height: 1.1; }
+  .brand-name strong { font-family: "DM Serif Display", serif; font-size: 22px; font-weight: 400; letter-spacing: 0.5px; }
+  .brand-name span { color: var(--blue-light); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
 
-  .nav-block { display: flex; flex-direction: column; gap: 6px; }
-  .nav-label { color: var(--blue-pale); font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 0 10px 4px; opacity: 0.7; }
+  .nav-block { display: flex; flex-direction: column; gap: 8px; }
+  .nav-label { color: rgba(255,255,255,0.5); font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 0 12px 4px; }
   
   .nav-item {
-    width: 100%; min-height: 40px; display: flex; align-items: center; gap: 10px;
-    padding: 10px 12px; border-radius: 8px; background: transparent; color: #d3cabe;
-    text-align: left; transition: var(--transition);
+    width: 100%; min-height: 44px; display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px; border-radius: 12px; background: transparent; color: rgba(255,255,255,0.7);
+    font-weight: 500; font-size: 15px; text-align: left; transition: var(--transition);
   }
-  .nav-item svg { width: 17px; height: 17px; color: var(--blue-pale); }
-  .nav-item:hover { background: rgba(255,255,255,0.1); color: #fffaf0; }
+  .nav-item svg { width: 18px; height: 18px; opacity: 0.7; transition: var(--transition); }
+  .nav-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
+  .nav-item:hover svg { opacity: 1; transform: scale(1.05); }
   .nav-item.active { background: var(--blue-light); color: var(--blue-dark); font-weight: 700; }
-  .nav-item.active svg { color: var(--blue-dark); }
+  .nav-item.active svg { color: var(--blue-dark); opacity: 1; }
 
   /* MAIN AREA */
   .main { flex: 1; min-width: 0; display: flex; flex-direction: column; position: relative; height: 100vh; overflow: hidden; }
 
   .topbar {
-    min-height: 76px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; gap: 20px;
-    padding: 18px 32px; border-bottom: 1px solid var(--line);
-    background: rgba(248,250,252,0.94); backdrop-filter: blur(12px); z-index: 5;
+    min-height: 80px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; gap: 20px;
+    padding: 0 40px; background: rgba(255,255,255,0.8); backdrop-filter: blur(16px); 
+    border-bottom: 1px solid var(--line); z-index: 5;
   }
-  .page-kicker { color: var(--ink-3); font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
-  .page-title { margin: 2px 0 0; font-family: "DM Serif Display", serif; font-size: 28px; font-weight: 400; line-height: 1.1; }
+  .page-kicker { color: var(--ink-3); font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 2px;}
+  .page-title { margin: 0; font-family: "DM Serif Display", serif; font-size: 28px; font-weight: 400; color: var(--blue-dark); }
   .page-title em { color: var(--accent); font-style: italic; }
   
-  .top-actions { display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
+  .top-actions { display: flex; align-items: center; gap: 12px; }
   .sync-pill {
-    min-height: 36px; display: inline-flex; align-items: center; gap: 8px;
-    padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px;
-    background: var(--white); color: var(--ink-2); font-size: 13px; white-space: nowrap;
+    display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px;
+    border-radius: 999px; background: var(--paper-2); color: var(--ink-2); 
+    font-size: 13px; font-weight: 500; border: 1px solid var(--line);
   }
-  .sync-dot { width: 7px; height: 7px; border-radius: 999px; background: var(--blue-light); }
-  .sync-pill.loaded .sync-dot { background: var(--blue-med); }
+  .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--blue-light); box-shadow: 0 0 0 3px rgba(38,185,221,0.2); }
+  .sync-pill.loaded .sync-dot { background: var(--blue-med); box-shadow: 0 0 0 3px rgba(9,117,153,0.2); }
 
   .primary-action {
-    min-height: 36px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    padding: 8px 16px; border-radius: 8px; background: var(--accent); color: var(--white);
-    font-size: 13px; font-weight: 700; transition: var(--transition);
+    display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px;
+    border-radius: 999px; background: var(--accent); color: var(--white);
+    font-size: 14px; font-weight: 600; box-shadow: 0 4px 12px rgba(212,70,28,0.2); transition: var(--transition);
   }
-  .primary-action:hover { background: var(--accent-soft); transform: translateY(-1px); }
+  .primary-action:hover { background: var(--accent-soft); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(212,70,28,0.3); }
 
-  /* CORREÇÃO DO SCROLL: 
-     Removido o width:100% que causava quebra e forçada a visualização da barra */
-  .content { 
-    flex: 1; 
-    overflow-y: auto; 
-    overflow-x: hidden; 
-    padding: 24px 32px 100px 32px; 
-  }
-  
-  /* Estilização da barra de scroll para ficar sempre visível e bonita */
-  .content::-webkit-scrollbar { width: 12px; }
-  .content::-webkit-scrollbar-track { background: var(--paper-2); border-left: 1px solid var(--line); }
-  .content::-webkit-scrollbar-thumb { 
-    background: var(--blue-med); 
-    border-radius: 10px; 
-    border: 3px solid var(--paper-2); 
-  }
-  .content::-webkit-scrollbar-thumb:hover { background: var(--blue-dark); }
+  /* CONTENT SCROLL */
+  .content { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 32px 40px 100px 40px; }
+  .content::-webkit-scrollbar { width: 8px; }
+  .content::-webkit-scrollbar-track { background: transparent; }
+  .content::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 10px; }
+  .content::-webkit-scrollbar-thumb:hover { background: var(--ink-3); }
 
-  .view { display: none; animation: fadeIn 0.3s ease; }
+  .view { display: none; animation: fadeIn 0.4s ease; }
   .view.active { display: block; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-  .dashboard-stack { display: flex; flex-direction: column; gap: 20px; }
+  .dashboard-stack { display: flex; flex-direction: column; gap: 24px; }
 
-  /* CARDS & PANELS */
-  .metric-card, .panel, .trip-card, .empty-state, .form-panel {
-    border: 1px solid var(--line); border-radius: var(--radius); background: var(--white);
+  /* CARDS REFINADOS */
+  .metric-card, .panel, .trip-card, .form-panel {
+    background: var(--white); border-radius: var(--radius);
+    border: 1px solid var(--line); box-shadow: var(--shadow-sm);
   }
 
-  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
-  .metric-card { padding: 18px; transition: var(--transition); cursor: pointer; }
-  .metric-card:hover { border-color: var(--blue-light); box-shadow: 0 4px 12px rgba(38,185,221,0.1); transform: translateY(-2px); }
-  .metric-label { display: flex; align-items: center; gap: 8px; color: var(--ink-3); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-  .metric-label svg { width: 16px; height: 16px; color: var(--blue-med); }
-  .metric-value { margin-top: 10px; font-family: "DM Serif Display", serif; font-size: 34px; line-height: 1; color: var(--ink); }
-  .metric-sub { margin-top: 6px; color: var(--ink-3); font-size: 12px; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+  .metric-card { padding: 24px; transition: var(--transition); cursor: pointer; display: flex; flex-direction: column; justify-content: center; }
+  .metric-card:hover { border-color: var(--blue-light); box-shadow: var(--shadow-md); transform: translateY(-3px); }
+  .metric-label { display: flex; align-items: center; gap: 8px; color: var(--ink-3); font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+  .metric-label svg { width: 18px; height: 18px; color: var(--accent); }
+  .metric-value { margin-top: 12px; font-family: "DM Serif Display", serif; font-size: 42px; line-height: 1; color: var(--blue-dark); }
+  .metric-sub { margin-top: 8px; color: var(--ink-3); font-size: 13px; font-weight: 500; }
 
   /* FILTERS */
-  .filters-panel { padding: 16px; display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
-  .field { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 120px; }
-  .field label { color: var(--ink-3); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+  .filters-panel { padding: 20px; display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; }
+  .field { display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 140px; }
+  .field label { color: var(--ink-2); font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
   
   .input-wrap { position: relative; width: 100%; }
-  .input-wrap svg { position: absolute; left: 12px; top: 50%; width: 16px; height: 16px; transform: translateY(-50%); color: var(--ink-3); pointer-events: none; }
+  .input-wrap svg { position: absolute; left: 14px; top: 50%; width: 16px; height: 16px; transform: translateY(-50%); color: var(--ink-3); pointer-events: none; }
   
   .control, .form-input {
-    width: 100%; min-height: 42px; padding: 10px 14px;
-    border: 1px solid var(--line); border-radius: 8px;
+    width: 100%; min-height: 44px; padding: 10px 16px;
+    border: 1px solid var(--line); border-radius: 10px;
     background: var(--paper); color: var(--ink);
-    transition: var(--transition); font-size: 14px;
+    transition: var(--transition); font-size: 14px; font-weight: 500;
   }
-  .input-wrap .control { padding-left: 38px; }
-  .control:focus, .form-input:focus { border-color: var(--blue-light); background: var(--white); box-shadow: 0 0 0 3px rgba(38,185,221,0.2); outline: none; }
+  .input-wrap .control { padding-left: 40px; }
+  .control:focus, .form-input:focus { border-color: var(--blue-light); background: var(--white); box-shadow: 0 0 0 4px var(--blue-pale); }
 
   .clear-button {
-    min-height: 42px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    padding: 10px 16px; border: 1px solid var(--line); border-radius: 8px;
-    background: var(--white); color: var(--ink-2); font-size: 13px; font-weight: 700; transition: var(--transition);
+    min-height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 10px 20px; border: 1px solid var(--line); border-radius: 10px;
+    background: var(--white); color: var(--ink-2); font-size: 14px; font-weight: 600; transition: var(--transition);
   }
-  .clear-button:hover { background: var(--paper-2); border-color: var(--line-strong); }
-
-  .view-toolbar, .map-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 4px; }
-  .result-count, .map-note { color: var(--ink-3); font-size: 13px; font-weight: 500; }
-  
-  .segmented { display: inline-flex; padding: 4px; border: 1px solid var(--line); border-radius: 10px; background: var(--paper-2); }
-  .view-toggle, .map-toggle {
-    min-height: 34px; padding: 0 16px; border-radius: 6px; display: flex; align-items: center; gap: 8px;
-    font-size: 13px; font-weight: 600; color: var(--ink-2); transition: var(--transition); background: transparent;
-  }
-  .view-toggle.active, .map-toggle.active { background: var(--white); color: var(--blue-dark); box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+  .clear-button:hover { background: var(--paper-2); color: var(--ink); }
 
   /* GALLERY TRIPS */
-  .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
-  .trip-card { padding: 20px; cursor: pointer; position: relative; display: flex; flex-direction: column; height: 100%; }
-  .trip-card:hover { border-color: var(--blue-light); box-shadow: var(--shadow-hover); transform: translateY(-4px); }
-  .trip-topline { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+  .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+  .trip-card { padding: 24px; cursor: pointer; display: flex; flex-direction: column; height: 100%; border: 1px solid transparent; background: var(--white); box-shadow: var(--shadow-sm); }
+  .trip-card:hover { border-color: var(--line-strong); box-shadow: var(--shadow-md); transform: translateY(-4px); }
+  
+  .trip-topline { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
   .uf-badge {
-    display: inline-flex; align-items: center; padding: 4px 10px;
-    border-radius: 999px; background: var(--paper-2); color: var(--blue-dark);
-    font-size: 11px; font-weight: 800; letter-spacing: .08em; border: 1px solid var(--line);
+    display: inline-flex; align-items: center; padding: 6px 12px;
+    border-radius: 999px; background: var(--blue-pale); color: var(--blue-dark);
+    font-size: 12px; font-weight: 700; letter-spacing: .05em; 
   }
-  .date-text { color: var(--ink-3); font-size: 12px; font-weight: 500; }
-  .trip-title { margin: 0 0 8px; font-family: "DM Serif Display", serif; font-size: 22px; font-weight: 400; line-height: 1.2; color: var(--ink); }
-  .trip-city { display: flex; align-items: center; gap: 6px; color: var(--ink-2); font-size: 14px; font-weight: 600; }
-  .trip-city svg { width: 16px; height: 16px; color: var(--blue-med); }
+  .date-text { color: var(--ink-3); font-size: 13px; font-weight: 600; }
+  .trip-title { margin: 0 0 10px; font-family: "DM Serif Display", serif; font-size: 24px; line-height: 1.2; color: var(--blue-dark); }
+  .trip-city { display: flex; align-items: center; gap: 8px; color: var(--ink-2); font-size: 15px; font-weight: 500; }
+  .trip-city svg { width: 16px; height: 16px; color: var(--accent); }
   
-  .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 16px 0; }
-  .tag { display: inline-flex; padding: 4px 10px; border-radius: 6px; background: var(--accent-bg); color: var(--accent); font-size: 11px; font-weight: 700; }
+  .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0; }
+  .tag { display: inline-flex; padding: 6px 12px; border-radius: 8px; background: var(--paper-2); color: var(--ink-2); font-size: 12px; font-weight: 600; }
   
-  .trip-details { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; color: var(--ink-3); font-size: 13px; }
+  .trip-details { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; color: var(--ink-3); font-size: 13px; font-weight: 500;}
   .trip-details span { display: flex; align-items: center; gap: 8px; }
 
-  /* TABELA */
-  .table-panel { max-width: 100%; overflow: hidden; }
-  .table-wrap { 
-    width: 100%; 
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    display: block; 
-  }
-  table { width: 100%; border-collapse: collapse; min-width: 860px; }
-  th, td { padding: 14px 16px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
-  th { background: var(--paper-2); color: var(--ink-3); font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
-  td { color: var(--ink-2); font-size: 14px; }
-  .table-row-clickable { cursor: pointer; transition: var(--transition); }
-  .table-row-clickable:hover { background: var(--paper); }
-  .table-title { color: var(--ink); font-weight: 700; font-family: "DM Serif Display", serif; font-size: 16px; }
-
-  /* MAPA */
-  .map-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; align-items: start; }
-  .map-panel { padding: 8px; }
-  #map { width: 100%; height: 60vh; min-height: 480px; border-radius: 8px; background: #e0e6ed; z-index: 1; }
-  .leaflet-popup-content { font-family: "DM Sans", sans-serif; font-size: 14px; color: var(--ink-2); }
+  /* MAPA - Design Estendido e Limpo */
+  .map-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 24px; align-items: start; }
+  .map-panel { overflow: hidden; padding: 0; border: none; box-shadow: var(--shadow-md); } 
+  #map { width: 100%; height: 65vh; min-height: 500px; background: #e2e8f0; } /* Fundo que combina com o mar */
   
-  .rank-panel { padding: 18px; }
-  .rank-list { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
-  .rank-row { display: grid; grid-template-columns: 40px 1fr 30px; gap: 10px; align-items: center; }
+  .rank-panel { padding: 24px; }
+  .rank-list { display: flex; flex-direction: column; gap: 16px; margin-top: 20px; }
+  .rank-row { display: grid; grid-template-columns: 40px 1fr 35px; gap: 12px; align-items: center; }
   .rank-name { color: var(--ink); font-size: 14px; font-weight: 700; }
-  .bar-track { height: 8px; border-radius: 999px; background: var(--paper-2); overflow: hidden; }
-  .bar-fill { height: 100%; background: var(--blue-light); border-radius: inherit; transition: width 0.5s ease; }
-  .rank-count { color: var(--ink-3); font-size: 13px; text-align: right; font-weight: 600; }
+  .bar-track { height: 10px; border-radius: 999px; background: var(--paper-2); overflow: hidden; }
+  .bar-fill { height: 100%; background: var(--blue-light); border-radius: inherit; transition: width 0.8s ease; }
+  .rank-count { color: var(--ink-3); font-size: 14px; text-align: right; font-weight: 600; }
 
   /* STATS */
-  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
-  .chart-panel { padding: 20px; }
-  .chart-title { margin: 0 0 16px; font-size: 16px; font-weight: 700; color: var(--blue-dark); }
-  .chart-container { position: relative; height: 250px; width: 100%; }
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px; }
+  .chart-panel { padding: 24px; }
+  .chart-title { margin: 0 0 20px; font-size: 18px; font-family: "DM Serif Display", serif; color: var(--blue-dark); }
+  .chart-container { position: relative; height: 280px; width: 100%; }
   
-  .horizontal-list { display: flex; flex-direction: column; gap: 12px; }
-  .horizontal-row { display: grid; grid-template-columns: minmax(100px, 140px) 1fr 30px; gap: 12px; align-items: center; }
-  .horizontal-label { color: var(--ink-2); font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .horizontal-list { display: flex; flex-direction: column; gap: 16px; }
+  .horizontal-row { display: grid; grid-template-columns: minmax(100px, 140px) 1fr 30px; gap: 16px; align-items: center; }
+  .horizontal-label { color: var(--ink-2); font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* FORMULÁRIO (NOVA VIAGEM) */
+  .form-panel { max-width: 800px; margin: 0 auto; padding: 40px; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .field-full { grid-column: 1 / -1; }
+  .form-panel .primary-action { width: 100%; justify-content: center; padding: 14px; font-size: 16px; margin-top: 10px;}
 
   /* MODAL */
   .modal-overlay {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(12, 60, 96, 0.7); backdrop-filter: blur(4px);
+    background: rgba(10, 47, 76, 0.6); backdrop-filter: blur(6px);
     display: flex; align-items: center; justify-content: center;
     z-index: 9999; opacity: 0; visibility: hidden; transition: 0.3s ease;
     padding: 20px;
@@ -257,71 +228,62 @@
   .modal-overlay.open { opacity: 1; visibility: visible; }
   
   .modal-content {
-    background: var(--white); width: 100%; max-width: 600px;
-    border-radius: 16px; position: relative;
-    transform: translateY(20px); transition: 0.3s ease;
-    box-shadow: 0 24px 60px rgba(0,0,0,0.2);
+    background: var(--white); width: 100%; max-width: 540px;
+    border-radius: 24px; position: relative;
+    transform: translateY(30px) scale(0.95); transition: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column;
   }
-  .modal-overlay.open .modal-content { transform: translateY(0); }
+  .modal-overlay.open .modal-content { transform: translateY(0) scale(1); }
   
   .modal-close {
-    position: absolute; top: 16px; right: 16px; width: 36px; height: 36px;
+    position: absolute; top: 20px; right: 20px; width: 40px; height: 40px;
     background: var(--paper-2); border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     color: var(--ink-2); transition: var(--transition); z-index: 2;
   }
   .modal-close:hover { background: var(--line-strong); color: var(--ink); transform: rotate(90deg); }
 
-  .modal-header { padding: 32px 32px 24px; border-bottom: 1px solid var(--line); background: var(--paper); border-radius: 16px 16px 0 0; }
-  .modal-body { padding: 32px; display: flex; flex-direction: column; gap: 20px; }
+  .modal-header { padding: 40px 40px 24px; border-bottom: 1px solid var(--line); background: var(--paper); border-radius: 24px 24px 0 0; }
+  .modal-body { padding: 32px 40px; display: flex; flex-direction: column; gap: 20px; }
   
   .modal-list-item {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 12px 0; border-bottom: 1px solid var(--paper-2);
-    font-size: 15px; color: var(--ink-2); font-weight: 500;
+    padding: 16px 0; border-bottom: 1px solid var(--line);
+    font-size: 15px; color: var(--ink); font-weight: 600;
   }
   .modal-list-item:last-child { border-bottom: none; }
-  .modal-list-badge { background: var(--blue-pale); color: var(--blue-dark); padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+  .modal-list-badge { background: var(--accent-bg); color: var(--accent); padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 700; }
 
   /* MOBILE RESPONSIVENESS */
   .mobile-nav { display: none; }
 
   @media (max-width: 1024px) {
-    .map-layout { grid-template-columns: 1fr; }
+    .map-layout, .form-grid { grid-template-columns: 1fr; }
   }
 
   @media (max-width: 768px) {
     .sidebar { display: none; }
     .app-shell { flex-direction: column; }
-    .main { padding-bottom: 80px; } 
     .topbar { padding: 16px 20px; flex-direction: column; align-items: flex-start; gap: 16px; }
-    .top-actions { width: 100%; justify-content: space-between; }
     .content { padding: 20px 20px 100px; }
-    
     .filters-panel { flex-direction: column; align-items: stretch; }
-    .filters-panel .field, .input-wrap { width: 100%; }
+    #map { height: 50vh; min-height: 400px; }
+    .modal-header { padding: 32px 24px 20px; }
+    .modal-body { padding: 24px; }
     
-    .view-toolbar, .map-toolbar { flex-direction: column; align-items: stretch; }
-    .segmented { display: flex; } .view-toggle, .map-toggle { flex: 1; justify-content: center; }
-    
-    #map { height: 50vh; }
-    .modal-content { padding: 0; border-radius: 12px; }
-    .modal-header { padding: 24px 20px 20px; }
-    .modal-body { padding: 20px; }
-
     .mobile-nav {
-      position: fixed; bottom: 12px; left: 12px; right: 12px; z-index: 1000;
+      position: fixed; bottom: 16px; left: 16px; right: 16px; z-index: 1000;
       display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;
-      padding: 6px; border: 1px solid var(--line); border-radius: 12px;
-      background: rgba(255,255,255,0.95); box-shadow: 0 -4px 24px rgba(0,0,0,0.1); backdrop-filter: blur(12px);
+      padding: 8px; border: 1px solid var(--line); border-radius: 16px;
+      background: rgba(255,255,255,0.95); box-shadow: 0 10px 25px rgba(0,0,0,0.1); backdrop-filter: blur(12px);
     }
     .mobile-nav .nav-item {
-      flex-direction: column; gap: 4px; min-height: 52px; justify-content: center;
-      padding: 8px 4px; color: var(--ink-3); font-size: 10px; font-weight: 600; text-align: center; border-radius: 8px;
+      flex-direction: column; gap: 6px; min-height: 56px; justify-content: center;
+      padding: 8px 4px; color: var(--ink-3); font-size: 11px; font-weight: 600; text-align: center; border-radius: 12px;
     }
-    .mobile-nav .nav-item svg { width: 20px; height: 20px; margin: 0 auto; color: inherit; }
-    .mobile-nav .nav-item.active { background: rgba(38,185,221,0.15); color: var(--blue-med); }
+    .mobile-nav .nav-item svg { width: 22px; height: 22px; margin: 0 auto; }
+    .mobile-nav .nav-item.active { background: var(--blue-pale); color: var(--blue-dark); }
   }
 </style>
 </head>
@@ -338,7 +300,7 @@
       <button class="nav-item active" data-view="dashboard"><i data-lucide="layout-dashboard"></i> Dashboard</button>
       <button class="nav-item" data-view="map"><i data-lucide="map"></i> Mapa</button>
       <button class="nav-item" data-view="stats"><i data-lucide="bar-chart-3"></i> Estatísticas</button>
-      <button class="nav-item" data-view="form"><i data-lucide="plus-circle"></i> Nova viagem</button>
+      <button class="nav-item" data-view="form"><i data-lucide="plus-circle"></i> Novo moment</button>
     </nav>
   </aside>
 
@@ -361,20 +323,13 @@
           
           <div class="panel filters-panel">
             <div class="field" style="flex: 2; min-width: 200px;">
-              <label for="filter-search">Busca</label>
+              <label>Busca</label>
               <div class="input-wrap"><i data-lucide="search"></i><input class="control" id="filter-search" type="search" placeholder="Viagem, cidade, artista..."></div>
             </div>
             <div class="field"><label>Ano</label><select class="control" id="filter-year"></select></div>
             <div class="field"><label>UF</label><select class="control" id="filter-uf"></select></div>
             <div class="field"><label>Motivo</label><select class="control" id="filter-tag"></select></div>
             
-            <div class="field"><label>Ordenar</label>
-              <select class="control" id="sort-order">
-                <option value="recent">Recentes</option>
-                <option value="oldest">Antigas</option>
-                <option value="city">Cidade A-Z</option>
-              </select>
-            </div>
             <button class="clear-button" id="clear-filters"><i data-lucide="x"></i> Limpar</button>
           </div>
 
@@ -382,8 +337,7 @@
             <div class="result-count" id="result-count">0 viagens encontradas</div>
             <div class="segmented">
               <button class="view-toggle active" data-mode="gallery"><i data-lucide="grid-2x2"></i> Galeria</button>
-              <button class="view-toggle" data-mode="table"><i data-lucide="table-2"></i> Tabela</button>
-            </div>
+              </div>
           </div>
 
           <div id="dashboard-results"></div>
@@ -394,15 +348,15 @@
         <div class="dashboard-stack">
           <div class="map-toolbar">
             <div class="segmented">
-              <button class="map-toggle active" data-map-type="choropleth"><i data-lucide="map-pinned"></i> Mapa de Calor (UFs)</button>
-              <button class="map-toggle" data-map-type="bubbles"><i data-lucide="circle-dot"></i> Bolhas (Cidades)</button>
+              <button class="map-toggle active" data-map-type="choropleth"><i data-lucide="map-pinned"></i> UFs (Calor)</button>
+              <button class="map-toggle" data-map-type="bubbles"><i data-lucide="circle-dot"></i> Cidades (Pins)</button>
             </div>
-            <div class="map-note" id="map-note">Clique num estado para ver as cidades visitadas.</div>
+            <div class="map-note" id="map-note">Para que o Pin fique exato, a tua base de dados deve ter as colunas "Latitude" e "Longitude".</div>
           </div>
           <div class="map-layout">
             <div class="panel map-panel"><div id="map"></div></div>
             <aside class="panel rank-panel">
-              <div class="panel-label">Top UFs filtradas</div>
+              <div class="panel-label" style="margin-bottom:16px;">Top UFs filtradas</div>
               <div class="rank-list" id="map-rank"></div>
             </aside>
           </div>
@@ -414,37 +368,48 @@
           <div class="kpi-grid" id="stats-kpi-grid"></div>
           <div class="stats-grid">
             <div class="panel chart-panel" style="grid-column: 1 / -1;">
-              <h2 class="chart-title"><i data-lucide="trending-up" style="width:18px; vertical-align:middle; margin-right:6px; color:var(--accent)"></i> Evolução de Viagens (Por Ano)</h2>
-              <div class="chart-container">
-                <canvas id="timeChart"></canvas>
-              </div>
+              <h2 class="chart-title">Evolução no Tempo</h2>
+              <div class="chart-container"><canvas id="timeChart"></canvas></div>
             </div>
-
             <div class="panel chart-panel"><h2 class="chart-title">Estados mais visitados</h2><div class="horizontal-list" id="stat-ufs"></div></div>
             <div class="panel chart-panel"><h2 class="chart-title">Cidades mais visitadas</h2><div class="horizontal-list" id="stat-cities"></div></div>
-            <div class="panel chart-panel"><h2 class="chart-title">Motivos mais frequentes</h2><div class="horizontal-list" id="stat-tags"></div></div>
+            <div class="panel chart-panel"><h2 class="chart-title">Principais Motivos</h2><div class="horizontal-list" id="stat-tags"></div></div>
           </div>
         </div>
       </section>
 
       <section class="view" id="view-form">
-        <div class="panel chart-panel" style="max-width: 700px; margin: 0 auto;">
-          <h2 class="chart-title">Novo Moment</h2>
-          <form id="trip-form" style="display: flex; flex-direction: column; gap: 16px;">
-            <div class="field"><label>Viagem *</label><input class="form-input" id="f-name" required></div>
-            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px;">
-              <div class="field"><label>Cidade *</label><input class="form-input" id="f-city" required></div>
-              <div class="field"><label>UF *</label><input class="form-input" id="f-uf" maxlength="2" required placeholder="Ex: SP"></div>
+        <div class="panel form-panel">
+          <h2 class="chart-title" style="font-size:32px; text-align:center; margin-bottom: 32px;">Novo Moment</h2>
+          <form id="trip-form" class="form-grid">
+            <div class="field field-full"><label>Nome do Moment *</label><input class="form-input" id="f-name" required placeholder="Ex: Férias de Verão 2024"></div>
+            
+            <div class="field field-full"><label>País *</label>
+              <select class="form-input" id="f-country" disabled>
+                <option value="BR" selected>Brasil</option>
+              </select>
             </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-              <div class="field"><label>Data de início *</label><input type="date" class="form-input" id="f-start" required></div>
-              <div class="field"><label>Data de fim</label><input type="date" class="form-input" id="f-end"></div>
+            <div class="field"><label>Estado (UF) *</label>
+              <select class="form-input" id="f-uf-form" required>
+                <option value="">Carregando Estados...</option>
+              </select>
             </div>
-            <div class="field"><label>Motivo</label><input class="form-input" id="f-motivo" placeholder="Férias, Show, etc."></div>
-            <div class="field"><label>Artistas</label><input class="form-input" id="f-artistas" placeholder="Nome da banda/artista"></div>
-            <div class="field"><label>Acompanhantes</label><input class="form-input" id="f-acompanhantes" placeholder="Quem foi contigo?"></div>
-            <button class="primary-action" type="submit" style="margin-top: 10px;">Adicionar à Sessão</button>
-            <div id="form-message" style="color: var(--blue-med); font-size: 14px; font-weight: 600;"></div>
+            <div class="field"><label>Cidade *</label>
+              <select class="form-input" id="f-city" required disabled>
+                <option value="">Selecione o Estado primeiro</option>
+              </select>
+            </div>
+
+            <div class="field"><label>Data de início *</label><input type="date" class="form-input" id="f-start" required></div>
+            <div class="field"><label>Data de fim</label><input type="date" class="form-input" id="f-end"></div>
+            
+            <div class="field field-full"><label>Motivo</label><input class="form-input" id="f-motivo" placeholder="Ex: Lazer, Trabalho, Casamento..."></div>
+            <div class="field field-full"><label>Acompanhantes</label><input class="form-input" id="f-acompanhantes" placeholder="Ex: Família, Amigos (Deixe em branco se foi sozinho)"></div>
+            
+            <div class="field-full">
+              <button class="primary-action" type="submit"><i data-lucide="check"></i> Adicionar à Sessão</button>
+            </div>
+            <div id="form-message" class="field-full" style="color: var(--blue-med); text-align:center; font-weight: 600;"></div>
           </form>
         </div>
       </section>
@@ -470,6 +435,7 @@
 <script>
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRNecMUqxdEaBZw6QzMixrnF-o7n4Ldu5eaOVsLR8vWT0QhxalCbImnUNqJhPshjLyIW5a2Yf6F-Gvb/pub?output=csv";
 
+// Centróides de fallback caso não haja Latitude/Longitude no CSV
 const UF_CENTROIDS = {
   AC: [-8.77, -70.55], AL: [-9.62, -36.82], AP: [1.41, -51.77], AM: [-3.47, -65.10],
   BA: [-12.96, -38.51], CE: [-5.20, -39.53], DF: [-15.78, -47.93], ES: [-19.19, -40.34],
@@ -484,8 +450,7 @@ const state = {
   trips: [], filtered: [],
   filters: { search: "", year: "", uf: "", tag: "", sort: "recent" }, 
   activeView: "dashboard", dashboardMode: "gallery", mapType: "choropleth",
-  map: null, mapLayer: null, geoData: null, loaded: false,
-  chartInstance: null
+  map: null, mapLayer: null, geoData: null, loaded: false, chartInstance: null
 };
 
 const els = {};
@@ -496,10 +461,11 @@ document.addEventListener("DOMContentLoaded", () => {
   refreshIcons();
   loadBrazilGeoJSON();
   fetchTrips();
+  initIBGEForm(); // Inicia o formulário em cascata
 });
 
 function cacheElements() {
-  ["sync-pill", "sync-text", "kpi-grid", "stats-kpi-grid", "filter-search", "filter-year", "filter-uf", "filter-tag", "sort-order", "clear-filters", "result-count", "dashboard-results", "map-rank", "stat-ufs", "stat-cities", "stat-tags", "trip-modal", "modal-header", "modal-body"].forEach(id => { els[id] = document.getElementById(id); });
+  ["sync-pill", "sync-text", "kpi-grid", "stats-kpi-grid", "filter-search", "filter-year", "filter-uf", "filter-tag", "clear-filters", "result-count", "dashboard-results", "map-rank", "stat-ufs", "stat-cities", "stat-tags", "trip-modal", "modal-header", "modal-body"].forEach(id => { els[id] = document.getElementById(id); });
 }
 
 function bindEvents() {
@@ -508,26 +474,43 @@ function bindEvents() {
   
   els["filter-search"].addEventListener("input", e => { state.filters.search = e.target.value.trim().toLowerCase(); applyFilters(); });
   ["filter-year", "filter-uf", "filter-tag"].forEach(id => els[id].addEventListener("change", e => { state.filters[id.replace("filter-", "")] = e.target.value; applyFilters(); }));
-  els["sort-order"].addEventListener("change", e => { state.filters.sort = e.target.value; applyFilters(); });
   els["clear-filters"].addEventListener("click", clearFilters);
 
   document.querySelectorAll("[data-mode]").forEach(btn => btn.addEventListener("click", () => { state.dashboardMode = btn.dataset.mode; renderDashboardResults(); updateActiveButtons("[data-mode]", state.dashboardMode); }));
   document.querySelectorAll("[data-map-type]").forEach(btn => btn.addEventListener("click", () => { state.mapType = btn.dataset.mapType; updateActiveButtons("[data-map-type]", state.mapType); renderMapLayer(); }));
 
   document.getElementById("trip-form").addEventListener("submit", handleFormSubmit);
-  
-  // FECHAR MODAL AO CLICAR NO FUNDO ESCURO
   els["trip-modal"].addEventListener("click", e => { if(e.target === els["trip-modal"]) closeModal(); });
-  
-  // FECHAR MODAL COM A TECLA ESC (GLOBAL)
-  document.addEventListener("keydown", function(event) {
-    if (event.key === "Escape" || event.keyCode === 27) {
-      closeModal();
-    }
-  });
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && els["trip-modal"].classList.contains("open")) closeModal(); });
 }
 
 function refreshIcons() { if (window.lucide) window.lucide.createIcons(); }
+
+/* INTEGRAÇÃO IBGE (Formulário Cascata) */
+async function initIBGEForm() {
+  try {
+    const res = await fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome');
+    const ufs = await res.json();
+    const ufSelect = document.getElementById('f-uf-form');
+    ufSelect.innerHTML = '<option value="">Selecione o Estado</option>' + ufs.map(uf => `<option value="${uf.sigla}">${uf.nome}</option>`).join('');
+
+    ufSelect.addEventListener('change', async (e) => {
+      const uf = e.target.value;
+      const citySelect = document.getElementById('f-city');
+      if(!uf) { 
+        citySelect.innerHTML = '<option value="">Selecione o Estado primeiro</option>'; 
+        citySelect.disabled = true; return; 
+      }
+      citySelect.disabled = false;
+      citySelect.innerHTML = '<option value="">Carregando Cidades...</option>';
+      const resCities = await fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios`);
+      const cities = await resCities.json();
+      citySelect.innerHTML = '<option value="">Selecione a Cidade</option>' + cities.map(c => `<option value="${c.nome}">${c.nome}</option>`).join('');
+    });
+  } catch(e) {
+    console.error("Erro ao carregar dados do IBGE para o formulário.");
+  }
+}
 
 function fetchTrips() {
   els["sync-text"].textContent = "Carregando...";
@@ -535,7 +518,7 @@ function fetchTrips() {
     download: true, header: true, skipEmptyLines: true,
     complete: results => {
       state.trips = results.data.map((r, i) => normalizeTrip(r, i)).filter(t => t.city && t.uf);
-      state.loaded = true; els["sync-pill"].classList.add("loaded"); els["sync-text"].textContent = `${state.trips.length} viagens`;
+      state.loaded = true; els["sync-pill"].classList.add("loaded"); els["sync-text"].textContent = `${state.trips.length} moments`;
       populateFilters(); applyFilters();
     }
   });
@@ -560,18 +543,20 @@ function normalizeTrip(row, index) {
   const uf = getField(["UF"]).slice(0, 2).toUpperCase();
   const startDate = getField(["Data de início"]);
   const endDate = getField(["Data de fim"]);
-  
   const tags = getField(["Motivo"]).split(",").map(t => t.trim()).filter(Boolean);
-  const artists = getField(["Artistas"]).split(",").map(a => a.trim()).filter(Boolean);
   const travelers = getField(["Acompanhantes"]).split(",").map(v => v.trim()).filter(Boolean);
   
+  // Tenta extrair Latitude e Longitude do CSV para os Pins ficarem exatos
+  const lat = parseFloat(getField(["Latitude", "Lat"])) || null;
+  const lng = parseFloat(getField(["Longitude", "Lng", "Lon", "Long"])) || null;
+
   let year = "";
   if (startDate && startDate.includes("-")) year = startDate.split("-")[0];
   else if (startDate && startDate.includes("/")) year = startDate.split("/")[2];
 
   return {
-    id: `trip-${index}`, name: name || city, city, uf, startDate, endDate, year, tags, artists, travelers,
-    searchIndex: `${name} ${city} ${uf} ${tags.join(" ")} ${artists.join(" ")}`.toLowerCase()
+    id: `trip-${index}`, name: name || city, city, uf, startDate, endDate, year, tags, travelers, lat, lng,
+    searchIndex: `${name} ${city} ${uf} ${tags.join(" ")}`.toLowerCase()
   };
 }
 
@@ -586,24 +571,21 @@ function populateFilters() {
 }
 
 function applyFilters() {
-  const { search, year, uf, tag, sort } = state.filters;
+  const { search, year, uf, tag } = state.filters;
   let data = state.trips.filter(t => 
     (!search || t.searchIndex.includes(search)) &&
     (!year || t.year === year) &&
     (!uf || t.uf === uf) &&
     (!tag || t.tags.includes(tag))
   );
-  
-  if (sort === "city") data.sort((a, b) => a.city.localeCompare(b.city));
-  else if (sort === "oldest") data.reverse();
-
+  data.reverse(); // Ordem decrescente padrão
   state.filtered = data; renderAll();
 }
 
 function clearFilters() {
   state.filters = { search: "", year: "", uf: "", tag: "", sort: "recent" };
   ["filter-search", "filter-year", "filter-uf", "filter-tag"].forEach(id => els[id].value = "");
-  els["sort-order"].value = "recent"; applyFilters();
+  applyFilters();
 }
 
 function renderAll() {
@@ -620,43 +602,28 @@ function renderKpis() {
 
   const html = `
     <article class="metric-card" onclick="openTripModal('Viagens Registradas')">
-      <div class="metric-label"><i data-lucide="plane"></i> Viagens</div>
+      <div class="metric-label"><i data-lucide="plane"></i> Moments</div>
       <div class="metric-value">${data.length}</div>
-      <div class="metric-sub">clique para detalhes</div>
+      <div class="metric-sub">registos no total</div>
     </article>
     <article class="metric-card" onclick="openListModal('Cidades Visitadas', state.currentCitiesList, 'map-pin')">
       <div class="metric-label"><i data-lucide="map-pin"></i> Cidades</div>
       <div class="metric-value">${cities.length}</div>
-      <div class="metric-sub">destinos únicos (clique para ver)</div>
+      <div class="metric-sub">destinos únicos explorados</div>
     </article>
     <article class="metric-card" onclick="openListModal('UFs Visitadas', state.currentUfsList, 'map')">
       <div class="metric-label"><i data-lucide="map"></i> Estados</div>
       <div class="metric-value">${ufs.length}</div>
-      <div class="metric-sub">estados (clique para ver)</div>
+      <div class="metric-sub">estados do Brasil</div>
     </article>
   `;
   els["kpi-grid"].innerHTML = html; els["stats-kpi-grid"].innerHTML = html;
 }
 
 function renderDashboardResults() {
-  els["result-count"].textContent = `${state.filtered.length} de ${state.trips.length} viagens`;
-  if (!state.filtered.length) { els["dashboard-results"].innerHTML = `<div class="empty-state">Sem resultados</div>`; return; }
-  
-  if (state.dashboardMode === "gallery") {
-    els["dashboard-results"].innerHTML = `<div class="gallery-grid">${state.filtered.map(renderTripCard).join("")}</div>`;
-  } else {
-    els["dashboard-results"].innerHTML = `
-      <div class="table-wrap"><table>
-        <thead><tr><th>Viagem</th><th>Local</th><th>Data</th><th>Motivo</th></tr></thead>
-        <tbody>${state.filtered.map(t => `
-          <tr class="table-row-clickable" onclick="openTripModal('${t.id}')">
-            <td class="table-title">${t.name}</td><td>${t.city} - ${t.uf}</td>
-            <td>${t.startDate || '-'}</td>
-            <td>${t.tags.join(", ")}</td>
-          </tr>`).join("")}
-        </tbody>
-      </table></div>`;
-  }
+  els["result-count"].textContent = `${state.filtered.length} moments encontrados`;
+  if (!state.filtered.length) { els["dashboard-results"].innerHTML = `<div style="text-align:center; padding: 40px; color: var(--ink-3);">Sem resultados para a busca.</div>`; return; }
+  els["dashboard-results"].innerHTML = `<div class="gallery-grid">${state.filtered.map(renderTripCard).join("")}</div>`;
 }
 
 function renderTripCard(trip) {
@@ -669,32 +636,41 @@ function renderTripCard(trip) {
       <h2 class="trip-title">${trip.name}</h2>
       <div class="trip-city"><i data-lucide="map-pin"></i>${trip.city}</div>
       ${trip.tags.length ? `<div class="tag-row">${trip.tags.slice(0,3).map(tag => `<span class="tag">${tag}</span>`).join("")}</div>` : ""}
-      <div class="trip-details" style="margin-top:16px;">
-        <span><i data-lucide="users"></i>${trip.travelers.length ? trip.travelers.length + " pax" : "Solo"}</span>
+      <div class="trip-details">
+        <span><i data-lucide="users"></i>${trip.travelers.length ? trip.travelers.length + " pessoas" : "Solo"}</span>
       </div>
     </article>`;
 }
 
 function openTripModal(tripId) {
   if (tripId === 'Viagens Registradas') return;
-  
   const trip = state.trips.find(t => t.id === tripId);
   if (!trip) return;
 
   els["modal-header"].innerHTML = `
-    <div style="display:flex; gap:8px; margin-bottom:8px;">
+    <div style="display:flex; gap:8px; margin-bottom:12px;">
       <span class="uf-badge">${trip.uf}</span>
     </div>
-    <h2 style="font-family:'DM Serif Display', serif; font-size:28px; margin:0; color:var(--blue-dark);">${trip.name}</h2>
-    <div style="color:var(--ink-2); font-size:15px; margin-top:4px; font-weight:500;">
-      <i data-lucide="map-pin" style="width:16px; vertical-align:middle; color:var(--accent)"></i> ${trip.city}, ${trip.uf}
+    <h2 style="font-family:'DM Serif Display', serif; font-size:36px; margin:0; color:var(--blue-dark); line-height: 1.1;">${trip.name}</h2>
+    <div style="color:var(--ink-2); font-size:16px; margin-top:8px; font-weight:600;">
+      <i data-lucide="map-pin" style="width:18px; vertical-align:middle; color:var(--accent)"></i> ${trip.city}, ${trip.uf}
     </div>
   `;
   els["modal-body"].innerHTML = `
-    <p><strong>Datas:</strong> ${trip.startDate} até ${trip.endDate || 'N/A'}</p>
-    <p><strong>Motivos:</strong> ${trip.tags.join(", ") || 'Nenhum registado'}</p>
-    ${trip.artists.length ? `<p><strong>Artistas:</strong> ${trip.artists.join(", ")}</p>` : ""}
-    <p><strong>Acompanhantes:</strong> ${trip.travelers.join(", ") || 'Viajei a solo'}</p>
+    <div style="display:grid; grid-template-columns: 1fr; gap:16px; font-size:15px;">
+      <div style="background: var(--paper-2); padding: 16px; border-radius: 12px;">
+        <strong style="color:var(--blue-dark); display:block; margin-bottom:4px; font-size:13px; text-transform:uppercase;">Datas</strong>
+        ${trip.startDate} ${trip.endDate ? 'até ' + trip.endDate : ''}
+      </div>
+      <div style="background: var(--paper-2); padding: 16px; border-radius: 12px;">
+        <strong style="color:var(--blue-dark); display:block; margin-bottom:4px; font-size:13px; text-transform:uppercase;">Motivo(s)</strong>
+        ${trip.tags.join(", ") || 'Nenhum registado'}
+      </div>
+      <div style="background: var(--paper-2); padding: 16px; border-radius: 12px;">
+        <strong style="color:var(--blue-dark); display:block; margin-bottom:4px; font-size:13px; text-transform:uppercase;">Acompanhantes</strong>
+        ${trip.travelers.join(", ") || 'Viajei a solo'}
+      </div>
+    </div>
   `;
   els["trip-modal"].classList.add("open");
   refreshIcons();
@@ -702,21 +678,16 @@ function openTripModal(tripId) {
 
 function openListModal(title, listItems, iconName) {
   els["modal-header"].innerHTML = `
-    <h2 style="font-family:'DM Serif Display', serif; font-size:26px; margin:0; color:var(--blue-dark);">${title}</h2>
-    <p style="margin:4px 0 0; color:var(--ink-3); font-size:14px;">Total: ${listItems.length} registros</p>
+    <h2 style="font-family:'DM Serif Display', serif; font-size:32px; margin:0; color:var(--blue-dark);">${title}</h2>
+    <p style="margin:8px 0 0; color:var(--ink-3); font-size:15px; font-weight: 500;">Total de ${listItems.length} registros</p>
   `;
-  
   const counts = {};
-  state.filtered.forEach(t => {
-    const key = (title.includes('Cidades')) ? t.city : t.uf;
-    counts[key] = (counts[key] || 0) + 1;
-  });
-
+  state.filtered.forEach(t => { const key = (title.includes('Cidades')) ? t.city : t.uf; counts[key] = (counts[key] || 0) + 1; });
   els["modal-body"].innerHTML = `
     <div style="display:flex; flex-direction:column;">
       ${listItems.map(item => `
         <div class="modal-list-item">
-          <span><i data-lucide="${iconName}" style="width:16px; margin-right:8px; color:var(--accent); vertical-align:middle;"></i>${item}</span>
+          <span><i data-lucide="${iconName}" style="width:18px; margin-right:12px; color:var(--accent); vertical-align:middle;"></i>${item}</span>
           <span class="modal-list-badge">${counts[item]} viagem(ns)</span>
         </div>
       `).join('')}
@@ -726,26 +697,21 @@ function openListModal(title, listItems, iconName) {
   refreshIcons();
 }
 
-function closeModal() { 
-  els["trip-modal"].classList.remove("open"); 
-}
+function closeModal() { els["trip-modal"].classList.remove("open"); }
 
 function switchView(view) {
   document.querySelectorAll(".view").forEach(el => el.classList.remove("active"));
   document.getElementById(`view-${view}`).classList.add("active");
-  updateActiveButtons(".nav-item", view);
-  if (view === "map") setTimeout(initMap, 100);
-}
-
-function updateActiveButtons(selector, value) {
-  document.querySelectorAll(selector).forEach(btn => btn.classList.toggle("active", btn.dataset.view === value || btn.dataset.mode === value || btn.dataset.mapType === value));
+  document.querySelectorAll(".nav-item").forEach(btn => btn.classList.toggle("active", btn.dataset.view === view));
+  if (view === "map") setTimeout(initMap, 200); // Aumentado o delay para renderizar bem
 }
 
 function initMap() {
-  if (state.map) { state.map.invalidateSize(); return; }
+  if (state.map) { state.map.invalidateSize(); renderMapLayer(); return; }
   const brazilBounds = [[-34.0, -74.0], [5.5, -34.0]];
   state.map = L.map("map", { zoomControl: false, maxBounds: brazilBounds, maxBoundsViscosity: 1.0, minZoom: 4 }).fitBounds(brazilBounds);
   L.control.zoom({ position: "bottomright" }).addTo(state.map);
+  // Mapa base mais bonito e clean (CartoDB Positron)
   L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", { attribution: "&copy; OSM" }).addTo(state.map);
   renderMapLayer();
 }
@@ -759,62 +725,56 @@ function renderMapLayer() {
   const max = Math.max(...Object.values(ufCounts), 1);
 
   if (state.mapType === "choropleth") {
+    // MAPA DE ESTADOS (Calor)
     L.geoJSON(state.geoData, {
       style: f => {
         const count = ufCounts[f.properties.sigla] || 0;
         return {
-          /* NOVO CONTRASTE: Bordas na cor Azul Escuro e fundo Cinza Azul para estados não visitados */
-          color: "var(--blue-dark)", 
-          weight: 1.5, 
-          opacity: 0.7,
-          fillColor: count ? (count/max > 0.5 ? "var(--accent)" : "var(--accent-soft)") : "#cbd5e1",
-          fillOpacity: count ? 0.9 : 0.4
+          color: "var(--blue-dark)", weight: 1.5, opacity: 0.8,
+          fillColor: count ? (count/max > 0.5 ? "var(--accent)" : "var(--accent-soft)") : "#cbd5e1", fillOpacity: count ? 0.9 : 0.4
         };
       },
       onEachFeature: (f, layer) => {
-        const uf = f.properties.sigla;
-        layer.bindTooltip(`<b>${f.properties.name}</b><br>Clique para ver cidades`);
-        layer.on({
-          mouseover: (e) => { e.target.setStyle({ weight: 3, opacity: 1, color: 'var(--blue-dark)' }); e.target.bringToFront(); },
-          mouseout: (e) => { state.mapLayer.getLayers()[0].resetStyle(e.target); },
-          click: () => {
-            const citiesInUF = [...new Set(state.filtered.filter(t => t.uf === uf).map(t => t.city))].sort();
-            if(citiesInUF.length > 0) openListModal(`Cidades em ${uf}`, citiesInUF, 'map-pin');
-          }
-        });
+        layer.bindTooltip(`<b>${f.properties.name}</b>`);
       }
     }).addTo(state.mapLayer);
   } else {
+    // MAPA DE CIDADES (Bolhas baseadas em agrupamento de cidades e latitude/longitude)
+    // 1. Desenha o fundo dos Estados
     L.geoJSON(state.geoData, {
-      /* NOVO CONTRASTE (BOLHAS): Bordas Azul Escuro definem a silhueta do país */
-      style: { 
-        color: "var(--blue-dark)", 
-        weight: 1.2, 
-        opacity: 0.6,
-        fillColor: "#e2e8f0", 
-        fillOpacity: 0.4 
-      },
-      onEachFeature: (f, layer) => {
-        layer.on('click', () => {
-          const uf = f.properties.sigla;
-          const citiesInUF = [...new Set(state.filtered.filter(t => t.uf === uf).map(t => t.city))].sort();
-          if(citiesInUF.length > 0) openListModal(`Cidades em ${uf}`, citiesInUF, 'map-pin');
-        });
-      }
+      style: { color: "var(--blue-dark)", weight: 1, opacity: 0.5, fillColor: "#e2e8f0", fillOpacity: 0.4 }
     }).addTo(state.mapLayer);
 
-    Object.entries(ufCounts).forEach(([uf, count]) => {
-      const coords = UF_CENTROIDS[uf];
-      if(coords && count > 0) {
-        L.circleMarker(coords, {
-          radius: 8 + (count/max)*15, color: "#fff", weight: 2, fillColor: "var(--accent)", fillOpacity: 0.9
-        }).bindTooltip(`<b>${uf}</b><br>${count} viagens`).addTo(state.mapLayer);
+    // 2. Agrupa as viagens por cidade para criar o Pin exato
+    const cityGroups = {};
+    state.filtered.forEach(t => {
+      const key = `${t.city}-${t.uf}`;
+      if(!cityGroups[key]) { cityGroups[key] = { city: t.city, uf: t.uf, count: 0, lat: t.lat, lng: t.lng }; }
+      cityGroups[key].count++;
+    });
+
+    const maxCity = Math.max(...Object.values(cityGroups).map(c => c.count), 1);
+
+    Object.values(cityGroups).forEach(group => {
+      // Se tiver coordenadas do CSV usa. Se não, usa o centro do Estado (com um pequeno desvio aleatório para não sobrepor tudo)
+      let lat = group.lat;
+      let lng = group.lng;
+      if(!lat || !lng) {
+        const base = UF_CENTROIDS[group.uf];
+        if(base) { lat = base[0] + (Math.random() - 0.5) * 1.5; lng = base[1] + (Math.random() - 0.5) * 1.5; }
+      }
+      
+      if(lat && lng) {
+        L.circleMarker([lat, lng], {
+          radius: 6 + (group.count/maxCity)*12, 
+          color: "#fff", weight: 2, 
+          fillColor: "var(--accent)", fillOpacity: 0.85
+        }).bindTooltip(`<b>${group.city} - ${group.uf}</b><br>${group.count} moment(s)`).addTo(state.mapLayer);
       }
     });
   }
   
   state.mapLayer.addTo(state.map);
-  
   const topUfs = Object.entries(ufCounts).sort((a,b) => b[1]-a[1]).slice(0, 8);
   els["map-rank"].innerHTML = topUfs.map(([k,v]) => `<div class="rank-row"><div class="rank-name">${k}</div><div class="bar-track"><div class="bar-fill" style="width:${(v/max)*100}%"></div></div><div class="rank-count">${v}</div></div>`).join("");
 }
@@ -822,9 +782,7 @@ function renderMapLayer() {
 function renderStats() {
   const getTop = (mapFn) => Object.entries(state.filtered.reduce((acc, t) => { 
     const values = Array.isArray(mapFn(t)) ? mapFn(t) : [mapFn(t)];
-    values.forEach(v => {
-      if(v) acc[v] = (acc[v] || 0) + 1;
-    });
+    values.forEach(v => { if(v) acc[v] = (acc[v] || 0) + 1; });
     return acc; 
   }, {})).sort((a,b) => b[1]-a[1]).slice(0,5);
 
@@ -838,41 +796,29 @@ function renderStats() {
   draw("stat-tags", getTop(t => t.tags).slice(0,8)); 
 
   const yearsData = Object.entries(state.filtered.reduce((acc, t) => { 
-    if(t.year) acc[t.year] = (acc[t.year] || 0) + 1; 
-    return acc; 
+    if(t.year) acc[t.year] = (acc[t.year] || 0) + 1; return acc; 
   }, {})).sort((a,b) => a[0].localeCompare(b[0]));
 
   const ctx = document.getElementById('timeChart').getContext('2d');
-  
-  if (state.chartInstance) {
-    state.chartInstance.destroy();
-  }
+  if (state.chartInstance) { state.chartInstance.destroy(); }
 
   state.chartInstance = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: yearsData.map(d => d[0]),
       datasets: [{
-        label: 'Número de Viagens',
-        data: yearsData.map(d => d[1]),
-        backgroundColor: '#26b9dd',
-        borderRadius: 6,
-        hoverBackgroundColor: '#097599'
+        label: 'Moments', data: yearsData.map(d => d[1]),
+        backgroundColor: '#26b9dd', borderRadius: 8, hoverBackgroundColor: '#097599'
       }]
     },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
-      plugins: { legend: { display: false } }
-    }
+    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }, plugins: { legend: { display: false } } }
   });
 }
 
 function handleFormSubmit(e) {
   e.preventDefault();
-  els["form-message"].textContent = "Viagem salva na sessão com sucesso!";
-  setTimeout(() => { els["form-message"].textContent = ""; document.getElementById("trip-form").reset(); }, 3000);
+  els["form-message"].textContent = "Moment salvo na sessão com sucesso!";
+  setTimeout(() => { els["form-message"].textContent = ""; document.getElementById("trip-form").reset(); document.getElementById('f-city').disabled = true; }, 3000);
 }
 </script>
 </body>
