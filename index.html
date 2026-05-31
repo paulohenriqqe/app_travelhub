@@ -2893,10 +2893,15 @@ function renderMapMetaStrip() {
 
 function updateMapViewport(points) {
   if (!state.map || !points.length) return;
-  const bounds = L.latLngBounds(points.map(point => [point.lat, point.lng]));
-  if (bounds.isValid()) {
-    state.map.fitBounds(bounds.pad(0.28), { animate: false, maxZoom: points.length === 1 ? 7 : 5 });
-  }
+  const fit = () => {
+    const bounds = L.latLngBounds(points.map(point => [point.lat, point.lng]));
+    if (bounds.isValid()) {
+      state.map.invalidateSize();
+      state.map.fitBounds(bounds.pad(0.28), { animate: false, maxZoom: points.length === 1 ? 7 : 5 });
+    }
+  };
+  fit();
+  setTimeout(fit, 120);
 }
 
 function renderFormTaxonomies() {
@@ -3007,7 +3012,15 @@ function switchView(view) {
   };
   document.getElementById("page-kicker").textContent = kickers[view] || "";
   document.getElementById("page-title").innerHTML = titles[view] || "";
-  if (view === "map") setTimeout(initMap, 200);
+  if (view === "map") {
+    setTimeout(() => {
+      initMap();
+      if (state.map) {
+        state.map.invalidateSize();
+        renderMapLayer();
+      }
+    }, 240);
+  }
   if (view === "listas") renderListasView();
   if (view === "planejar") renderPlanningExperience();
   if (view === "form") renderConversionBanner();
