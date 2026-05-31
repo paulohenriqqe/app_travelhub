@@ -606,6 +606,16 @@
   .chart-container { position: relative; height: 280px; width: 100%; }
   .horizontal-list { display: flex; flex-direction: column; gap: 16px; }
   .horizontal-row { display: grid; grid-template-columns: minmax(100px, 140px) 1fr 30px; gap: 16px; align-items: center; }
+  button.horizontal-row {
+    width: 100%;
+    padding: 0;
+    border: none;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+  }
+  button.horizontal-row:hover .horizontal-label { color: var(--blue-dark); }
+  button.horizontal-row:hover .bar-track { box-shadow: inset 0 0 0 1px rgba(38, 185, 221, 0.2); }
   .horizontal-label {
     color: var(--ink-2);
     font-size: 14px;
@@ -2339,16 +2349,44 @@ async function fetchPlans() {
   renderPlanningExperience();
 }
 
-function parseCsv(url) {
+async function parseCsv(url) {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error("Falha ao baixar o CSV.");
+  const buffer = await response.arrayBuffer();
+  const text = decodeCsvBuffer(buffer);
   return new Promise((resolve, reject) => {
-    Papa.parse(url, {
-      download: true,
+    Papa.parse(text, {
       header: true,
       skipEmptyLines: true,
       complete: results => resolve(results.data || []),
       error: reject
     });
   });
+}
+
+function decodeCsvBuffer(buffer) {
+  const decoders = ["utf-8", "windows-1252", "iso-8859-1"];
+  const scored = decoders.map(encoding => {
+    let text = "";
+    try {
+      text = new TextDecoder(encoding).decode(buffer);
+    } catch (error) {
+      text = "";
+    }
+    return { encoding, text, score: getDecodedTextScore(text) };
+  }).filter(item => item.text);
+
+  scored.sort((a, b) => b.score - a.score);
+  return scored[0]?.text || "";
+}
+
+function getDecodedTextScore(text) {
+  if (!text) return Number.NEGATIVE_INFINITY;
+  const replacementPenalty = (text.match(/ /g) || []).length * 8;
+  const mojibakePenalty = (text.match(/[ÃÂ]/g) || []).length * 4;
+  const accentBonus = (text.match(/[À-ÿ]/g) || []).length;
+  const headerBonus = /País|Cidade|Data de início|Data de fim|Acompanhantes|Artistas|Latitude|Longitude/i.test(text) ? 30 : 0;
+  return text.length - replacementPenalty - mojibakePenalty + accentBonus + headerBonus;
 }
 
 async function loadMapGeoData() {
@@ -2643,8 +2681,25 @@ function getTripsForRegion(region) {
   return state.filtered.filter(trip => normalizeLookupKey(trip.region || trip.uf) === regionKey);
 }
 
+function getTripsForRegionScope(region) {
+  const regionKey = normalizeLookupKey(region);
+  return state.filtered.filter(trip => normalizeLookupKey(trip.region || trip.uf || trip.country) === regionKey);
+}
+
 function getTripsForJourneyKey(journeyKey) {
   return state.filtered.filter(trip => getJourneyKey(trip) === journeyKey);
+}
+
+function getTripsForTag(tag) {
+  return state.filtered.filter(trip => trip.tags.includes(tag));
+}
+
+function getTripsForCompanion(companion) {
+  return state.filtered.filter(trip => trip.travelers.includes(companion));
+}
+
+function getTripsForArtist(artist) {
+  return state.filtered.filter(trip => trip.artists.includes(artist));
 }
 
 function getUpcomingPlans(limit) {
@@ -3340,22 +3395,22 @@ function renderStats() {
     return acc;
   }, {})).sort((a, b) => b[1] - a[1]).slice(0, 6);
 
-  const draw = (id, data) => {
+  const draw = (id, data, getTrips, subtitle) => {
     const max = Math.max(...data.map(item => item[1]), 1);
     els[id].innerHTML = data.length ? data.map(([label, value]) => `
-      <div class="horizontal-row">
+      <button type="button" class="horizontal-row" onclick="openTripsCollectionModal('Viagens em ${escapeHtml(label)}', ${getTrips}(decodeURIComponent('${encodeURIComponent(label)}')), '${escapeHtml(subtitle)}')">
         <div class="horizontal-label">${escapeHtml(label)}</div>
         <div class="bar-track"><div class="bar-fill" style="width:${(value / max) * 100}%"></div></div>
         <div class="rank-count">${value}</div>
-      </div>
+      </button>
     `).join("") : `<div class="empty-state">Sem dados suficientes para esta visualização.</div>`;
   };
 
-  draw("stat-ufs", getTop(trip => trip.region || trip.uf || trip.country));
-  draw("stat-cities", getTop(trip => trip.city));
-  draw("stat-tags", getTop(trip => trip.tags));
-  draw("stat-companions", getTop(trip => trip.travelers));
-  draw("stat-artists", getTop(trip => trip.artists));
+  draw("stat-ufs", getTop(trip => trip.region || trip.uf || trip.country), "getTripsForRegionScope", "Região ou recorte territorial");
+  draw("stat-cities", getTop(trip => trip.city), "getTripsForLocationLabel", "Cidade visitada");
+  draw("stat-tags", getTop(trip => trip.tags), "getTripsForTag", "Motivo recorrente");
+  draw("stat-companions", getTop(trip => trip.travelers), "getTripsForCompanion", "Companhia recorrente");
+  draw("stat-artists", getTop(trip => trip.artists), "getTripsForArtist", "Artista recorrente");
 
   const years = [...new Set(state.filtered.map(trip => trip.year).filter(Boolean))].sort();
   const effectiveSeries = years.map(year => state.filtered.filter(trip => trip.year === year).length);
