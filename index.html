@@ -1679,6 +1679,8 @@ const LEGACY_TEXT_FIXES = {
   historia: "História"
 };
 
+const APP_VERSION = "2026-05-31-3";
+
 const state = {
   trips: [],
   filtered: [],
@@ -2350,7 +2352,7 @@ async function fetchPlans() {
 }
 
 async function parseCsv(url) {
-  const response = await fetch(url);
+  const response = await fetch(withCacheBust(url), { cache: "no-store" });
   if (!response.ok) throw new Error("Falha ao baixar o CSV.");
   const buffer = await response.arrayBuffer();
   const text = decodeCsvBuffer(buffer);
@@ -2365,7 +2367,10 @@ async function parseCsv(url) {
 }
 
 function decodeCsvBuffer(buffer) {
-  const decoders = ["utf-8", "windows-1252", "iso-8859-1"];
+  const utf8Text = new TextDecoder("utf-8").decode(buffer);
+  if (looksLikeHealthyUtf8(utf8Text)) return utf8Text;
+
+  const decoders = ["windows-1252", "iso-8859-1", "utf-8"];
   const scored = decoders.map(encoding => {
     let text = "";
     try {
@@ -2380,6 +2385,14 @@ function decodeCsvBuffer(buffer) {
   return scored[0]?.text || "";
 }
 
+function looksLikeHealthyUtf8(text) {
+  if (!text) return false;
+  const hasExpectedHeaders = /Viagem,País,Cidade|Viagem,Pais,Cidade/i.test(text);
+  const mojibakeCount = (text.match(/[ÃÂ]/g) || []).length;
+  const replacementCount = (text.match(/ /g) || []).length;
+  return hasExpectedHeaders && mojibakeCount === 0 && replacementCount === 0;
+}
+
 function getDecodedTextScore(text) {
   if (!text) return Number.NEGATIVE_INFINITY;
   const replacementPenalty = (text.match(/ /g) || []).length * 8;
@@ -2392,8 +2405,8 @@ function getDecodedTextScore(text) {
 async function loadMapGeoData() {
   try {
     const [worldResponse, brazilResponse] = await Promise.all([
-      fetch("assets/geo/world-countries.geojson"),
-      fetch("assets/geo/brazil-states.geojson")
+      fetch(withCacheBust("assets/geo/world-countries.geojson"), { cache: "no-store" }),
+      fetch(withCacheBust("assets/geo/brazil-states.geojson"), { cache: "no-store" })
     ]);
 
     if (!worldResponse.ok || !brazilResponse.ok) throw new Error("Falha ao carregar os arquivos geográficos.");
@@ -2407,6 +2420,11 @@ async function loadMapGeoData() {
     state.errors.geo = "O atlas carregou sem as camadas territoriais locais.";
     if (state.map) renderMapLayer();
   }
+}
+
+function withCacheBust(url) {
+  const separator = String(url).includes("?") ? "&" : "?";
+  return `${url}${separator}v=${APP_VERSION}`;
 }
 
 function normalizeTrip(row, index) {
