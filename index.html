@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -170,8 +170,9 @@
     background: var(--paper-2);
     color: var(--ink-2);
     font-size: 13px;
-    font-weight: 500;
+    font-weight: 700;
     border: 1px solid var(--line);
+    white-space: nowrap;
   }
   .sync-dot {
     width: 8px;
@@ -351,6 +352,7 @@
     background: var(--paper);
     border: 1px solid var(--line);
   }
+  button.summary-row { width: 100%; text-align: left; }
   .summary-row strong, .status-row strong { color: var(--ink); font-size: 14px; }
   .summary-row span, .status-row span { color: var(--ink-3); font-size: 12px; font-weight: 700; }
 
@@ -481,6 +483,37 @@
       radial-gradient(circle at top, rgba(38, 185, 221, 0.16), rgba(248, 250, 252, 0.96) 42%),
       linear-gradient(180deg, #eff6ff 0%, #f8fafc 100%);
     cursor: pointer; }
+  .map-stack { display: flex; flex-direction: column; gap: 14px; }
+  .map-meta-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+  }
+  .map-meta-card {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: linear-gradient(180deg, var(--white), var(--paper));
+    border: 1px solid var(--line);
+    text-align: left;
+    transition: var(--transition);
+  }
+  .map-meta-card:hover { border-color: var(--blue-light); box-shadow: var(--shadow-sm); transform: translateY(-2px); }
+  .map-meta-card strong {
+    display: block;
+    color: var(--blue-dark);
+    font-family: "DM Serif Display", serif;
+    font-size: 26px;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .map-meta-card span {
+    color: var(--ink-3);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
   .leaflet-tooltip.uf-label {
     background: transparent;
     border: none;
@@ -542,7 +575,10 @@
     border-radius: 12px;
     background: var(--paper);
     border: 1px solid var(--line);
+    cursor: pointer;
+    transition: var(--transition);
   }
+  .atlas-entry:hover { border-color: var(--blue-light); transform: translateY(-1px); }
   .atlas-entry + .atlas-entry { margin-top: 10px; }
   .atlas-entry strong {
     display: block;
@@ -1101,12 +1137,18 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    width: 100%;
     padding: 16px 0;
+    border: none;
     border-bottom: 1px solid var(--line);
+    background: transparent;
     font-size: 15px;
     color: var(--ink);
     font-weight: 600;
+    text-align: left;
+    cursor: pointer;
   }
+  .modal-list-item:hover { color: var(--blue-dark); }
   .modal-list-item:last-child { border-bottom: none; }
   .modal-list-badge {
     background: var(--accent-bg);
@@ -1149,19 +1191,62 @@
   }
   @media (max-width: 1024px) {
     .map-layout, .form-grid, .city-block-grid { grid-template-columns: 1fr; }
+    .map-layout { gap: 18px; }
   }
   @media (max-width: 768px) {
     .sidebar { display: none; }
     .app-shell { flex-direction: column; }
     .topbar {
-      padding: 16px 20px;
-      flex-direction: column;
+      min-height: auto;
+      padding: 14px 16px;
+      flex-direction: row;
       align-items: flex-start;
-      gap: 16px;
+      gap: 12px;
+    }
+    .page-kicker { font-size: 10px; margin-bottom: 0; }
+    .page-title { font-size: 24px; line-height: 1.05; }
+    .top-actions {
+      margin-left: auto;
+      align-items: flex-end;
+      flex-direction: column;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .sync-pill {
+      padding: 6px 10px;
+      font-size: 11px;
+      max-width: 140px;
+      justify-content: center;
+    }
+    .primary-action {
+      min-height: 38px;
+      padding: 8px 14px;
+      font-size: 12px;
+      gap: 6px;
     }
     .content { padding: 20px 20px 100px; }
+    .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .metric-card { padding: 18px; }
+    .metric-value { font-size: 32px; }
+    .metric-sub { font-size: 12px; }
     .filters-panel { flex-direction: column; align-items: stretch; }
-    #map { height: 50vh; min-height: 400px; }
+    #map { height: 52vh; min-height: 360px; }
+    .map-toolbar {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      margin-right: -4px;
+    }
+    .map-toolbar::-webkit-scrollbar { height: 4px; }
+    .segmented { flex-wrap: nowrap; }
+    .map-toggle, .view-toggle { white-space: nowrap; }
+    .map-note {
+      min-width: 220px;
+      white-space: normal;
+      line-height: 1.5;
+    }
+    .map-meta-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .rank-panel { padding: 18px; }
     .modal-header { padding: 32px 24px 20px; }
     .modal-body { padding: 24px; }
     .mobile-nav {
@@ -1211,10 +1296,10 @@
       <div class="nav-label">Explorar</div>
       <button class="nav-item active" data-view="dashboard"><i data-lucide="layout-dashboard"></i> Dashboard</button>
       <button class="nav-item" data-view="map"><i data-lucide="map"></i> Mapa</button>
-      <button class="nav-item" data-view="stats"><i data-lucide="bar-chart-3"></i> Estatisticas</button>
+      <button class="nav-item" data-view="stats"><i data-lucide="bar-chart-3"></i> Estatísticas</button>
     </nav>
     <nav class="nav-block">
-      <div class="nav-label">Operacao</div>
+      <div class="nav-label">Operação</div>
       <button class="nav-item" data-view="form"><i data-lucide="plus-circle"></i> Nova viagem</button>
       <button class="nav-item" data-view="planejar"><i data-lucide="calendar-clock"></i> Planejar roteiro</button>
       <button class="nav-item" data-view="listas"><i data-lucide="list"></i> Listas suspensas</button>
@@ -1289,8 +1374,11 @@
             </div>
             <div class="map-note" id="map-note">O atlas mostra cidades, rotas e camadas futuras no mesmo horizonte visual.</div>
           </div>
+          <div class="map-meta-strip" id="map-meta-strip"></div>
           <div class="map-layout">
-            <div class="panel map-panel"><div id="map"></div></div>
+            <div class="map-stack">
+              <div class="panel map-panel"><div id="map"></div></div>
+            </div>
             <aside class="panel rank-panel">
               <div class="panel-label" style="margin-bottom:10px;">Atlas editorial</div>
               <p class="atlas-panel-copy">Uma leitura mais sensorial do acervo: lugares revisitados, recortes recentes e os próximos destinos que já estão no radar.</p>
@@ -1557,6 +1645,24 @@ const COUNTRY_CENTROIDS = {
   inglaterra: [52.3555, -1.1743]
 };
 
+const COUNTRY_GEO_KEYS = {
+  brasil: "brazil",
+  portugal: "portugal",
+  argentina: "argentina",
+  chile: "chile",
+  paraguai: "paraguay",
+  uruguai: "uruguay",
+  estadosunidos: "unitedstatesofamerica",
+  usa: "unitedstatesofamerica",
+  eua: "unitedstatesofamerica",
+  mexico: "mexico",
+  espanha: "spain",
+  franca: "france",
+  italia: "italy",
+  reinounido: "unitedkingdom",
+  inglaterra: "unitedkingdom"
+};
+
 const LEGACY_TEXT_FIXES = {
   barbaramoreira: "Bárbara Moreira",
   saopaulo: "São Paulo",
@@ -1574,10 +1680,10 @@ const state = {
   showPlannedMap: true,
   map: null,
   mapLayer: null,
-  geoData: null,
+  geoData: { world: null, brazil: null },
   chartInstance: null,
   loaded: { trips: false, plans: false },
-  errors: { trips: "", plans: "" },
+  errors: { trips: "", plans: "", geo: "" },
   lists: { tags: [], artists: [], companions: [] },
   formCities: [],
   formTags: [],
@@ -1588,6 +1694,7 @@ const state = {
   selectedPlanId: null,
   planMetrics: { total: 0, open: 0, inProgress: 0, converted: 0, conversionRate: 0, canceled: 0 },
   pendingConversion: null,
+  currentJourneyGroups: [],
   currentCitiesList: [],
   currentCountriesList: [],
   currentUfsList: []
@@ -1693,7 +1800,7 @@ document.addEventListener("DOMContentLoaded", () => {
   cacheElements();
   bindEvents();
   refreshIcons();
-  loadBrazilGeoJSON();
+  loadMapGeoData();
   initIBGEForm();
   renderListasView();
   addCityBlock();
@@ -1703,7 +1810,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function cacheElements() {
   [
     "sync-pill", "sync-text", "kpi-grid", "stats-kpi-grid", "journey-mini-stats", "dashboard-status-list", "dashboard-plan-list", "dashboard-summary-list",
-    "filter-search", "filter-year", "filter-uf", "filter-tag", "clear-filters", "result-count", "dashboard-results", "map-rank", "stat-ufs", "stat-cities",
+      "filter-search", "filter-year", "filter-uf", "filter-tag", "clear-filters", "result-count", "dashboard-results", "map-rank", "map-meta-strip", "stat-ufs", "stat-cities",
     "stat-tags", "stat-companions", "stat-artists", "stat-upcoming-plans", "trip-modal", "modal-header", "modal-body", "city-blocks", "add-city-btn", "name-suggestions", "lista-grid",
     "form-message", "plan-conversion-banner", "conversion-banner-title", "conversion-banner-copy", "planning-source-note", "planning-mini-stats",
     "plan-list", "plan-detail-panel", "plan-draft-summary", "plan-grid-container", "plan-grid-title", "itinerary-table-wrapper", "plan-message",
@@ -2244,12 +2351,24 @@ function parseCsv(url) {
   });
 }
 
-async function loadBrazilGeoJSON() {
+async function loadMapGeoData() {
   try {
-    const response = await fetch("https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson");
-    state.geoData = await response.json();
+    const [worldResponse, brazilResponse] = await Promise.all([
+      fetch("assets/geo/world-countries.geojson"),
+      fetch("assets/geo/brazil-states.geojson")
+    ]);
+
+    if (!worldResponse.ok || !brazilResponse.ok) throw new Error("Falha ao carregar os arquivos geográficos.");
+
+    const [world, brazil] = await Promise.all([worldResponse.json(), brazilResponse.json()]);
+    state.geoData = { world, brazil };
+    state.errors.geo = "";
     if (state.map) renderMapLayer();
-  } catch (error) {}
+  } catch (error) {
+    state.geoData = { world: null, brazil: null };
+    state.errors.geo = "O atlas carregou sem as camadas territoriais locais.";
+    if (state.map) renderMapLayer();
+  }
 }
 
 function normalizeTrip(row, index) {
@@ -2416,6 +2535,118 @@ function getJourneyCount(trips) {
   return new Set((trips || []).map(getJourneyKey)).size;
 }
 
+function getJourneyGroups(trips) {
+  const map = new Map();
+  (trips || []).forEach(trip => {
+    const key = getJourneyKey(trip);
+    if (!map.has(key)) {
+      map.set(key, {
+        key,
+        id: trip.id,
+        name: trip.name,
+        country: trip.country,
+        region: trip.region || trip.uf,
+        year: trip.year,
+        startDate: trip.startDate,
+        endDate: trip.endDate,
+        tags: [...trip.tags],
+        artists: [...trip.artists],
+        travelers: [...trip.travelers],
+        trips: []
+      });
+    }
+    const group = map.get(key);
+    group.trips.push(trip);
+    if (!group.startDate || (trip.startDate && trip.startDate < group.startDate)) group.startDate = trip.startDate;
+    if (!group.endDate || (trip.endDate && trip.endDate > group.endDate)) group.endDate = trip.endDate;
+    if (!group.city && trip.city) group.city = trip.city;
+    if (!group.lat && Number.isFinite(trip.lat)) group.lat = trip.lat;
+    if (!group.lng && Number.isFinite(trip.lng)) group.lng = trip.lng;
+  });
+  return [...map.values()]
+    .map(group => ({
+      ...group,
+      cities: [...new Set(group.trips.map(trip => trip.city).filter(Boolean))],
+      count: group.trips.length
+    }))
+    .sort((a, b) => (b.startDate || "").localeCompare(a.startDate || ""));
+}
+
+function getGeoCountryKey(country) {
+  const key = normalizeLookupKey(country || "Brasil");
+  return COUNTRY_GEO_KEYS[key] || key;
+}
+
+function getWorldFeatureKey(feature) {
+  const props = feature?.properties || {};
+  return getGeoCountryKey(props.name || props.iso3 || props.iso2);
+}
+
+function getBrazilFeatureKey(feature) {
+  const props = feature?.properties || {};
+  return normalizeLookupKey(props.sigla || props.name);
+}
+
+function getJourneyScopeLabel(group) {
+  const country = group.country || "Brasil";
+  if (group.cities?.length > 1) return `${group.cities.length} cidades | ${country}`;
+  if (group.cities?.[0]) return formatLocationLabel({ city: group.cities[0], region: group.region, country }) || group.cities[0];
+  return country;
+}
+
+function buildMapCollections() {
+  const journeys = getJourneyGroups(state.filtered);
+  const countries = new Map();
+  const regions = new Map();
+  const cities = new Map();
+
+  state.filtered.forEach(trip => {
+    const countryKey = getGeoCountryKey(trip.country);
+    if (!countries.has(countryKey)) countries.set(countryKey, { label: trip.country, trips: [] });
+    countries.get(countryKey).trips.push(trip);
+
+    if (isBrazilCountry(trip.country) && (trip.region || trip.uf)) {
+      const regionKey = normalizeLookupKey(trip.region || trip.uf);
+      if (!regions.has(regionKey)) regions.set(regionKey, { label: trip.region || trip.uf, trips: [] });
+      regions.get(regionKey).trips.push(trip);
+    }
+
+    if (trip.city) {
+      const cityKey = `${getGeoCountryKey(trip.country)}|${normalizeLookupKey(trip.region || trip.uf)}|${normalizeLookupKey(trip.city)}`;
+      if (!cities.has(cityKey)) {
+        cities.set(cityKey, {
+          label: formatLocationLabel(trip) || trip.city,
+          city: trip.city,
+          region: trip.region || trip.uf,
+          country: trip.country,
+          trips: []
+        });
+      }
+      cities.get(cityKey).trips.push(trip);
+    }
+  });
+
+  return { journeys, countries, regions, cities };
+}
+
+function getTripsForLocationLabel(label) {
+  return state.filtered.filter(trip => (formatLocationLabel(trip) || trip.city) === label);
+}
+
+function getTripsForCountry(country) {
+  const geoKey = getGeoCountryKey(country);
+  return state.filtered.filter(trip => getGeoCountryKey(trip.country) === geoKey);
+}
+
+function getTripsForRegion(region) {
+  const regionKey = normalizeLookupKey(region);
+  return state.filtered.filter(trip => normalizeLookupKey(trip.region || trip.uf) === regionKey);
+}
+
+function getTripsForJourneyKey(journeyKey) {
+  return state.filtered.filter(trip => getJourneyKey(trip) === journeyKey);
+}
+
 function getUpcomingPlans(limit) {
   const today = new Date().toISOString().slice(0, 10);
   return state.plans
@@ -2528,6 +2759,7 @@ function buildCoverageGroups() {
 }
 
 function renderAtlasSidebar() {
+  const collections = buildMapCollections();
   const revisits = getTopEntries(state.filtered.map(trip => formatLocationLabel(trip) || trip.city).filter(Boolean), 4);
   const recentTrips = getRecentTrips(4);
   const nextPlans = getUpcomingPlans(4);
@@ -2541,7 +2773,7 @@ function renderAtlasSidebar() {
 
   els["map-rank"].innerHTML = [
     renderSection("Mais revisitados", revisits, ([label, count]) => `
-      <div class="atlas-entry">
+      <div class="atlas-entry" onclick="openTripsCollectionModal('Viagens em ${escapeHtml(label)}', getTripsForLocationLabel(decodeURIComponent('${encodeURIComponent(label)}')), 'Cidade ou recorte recorrente')">
         <div>
           <strong>${escapeHtml(label)}</strong>
           <span>Presença recorrente no atlas</span>
@@ -2568,6 +2800,40 @@ function renderAtlasSidebar() {
       </div>
     `)
   ].join("");
+}
+
+function renderMapMetaStrip() {
+  if (!els["map-meta-strip"]) return;
+  const collections = buildMapCollections();
+  const items = [
+    {
+      label: "Viagens",
+      value: collections.journeys.length,
+      action: `openJourneyGroupsModal('Viagens registradas', state.currentJourneyGroups)`
+    },
+    {
+      label: "Cidades",
+      value: state.currentCitiesList.length,
+      action: `openListModal('Cidades visitadas', state.currentCitiesList)`
+    },
+    {
+      label: "Países",
+      value: state.currentCountriesList.length,
+      action: `openListModal('Países visitados', state.currentCountriesList)`
+    },
+    {
+      label: "Regiões",
+      value: state.currentUfsList.length,
+      action: `openListModal('Regiões visitadas', state.currentUfsList)`
+    }
+  ];
+
+  els["map-meta-strip"].innerHTML = items.map(item => `
+    <button type="button" class="map-meta-card" onclick="${item.action}">
+      <strong>${item.value}</strong>
+      <span>${item.label}</span>
+    </button>
+  `).join("");
 }
 
 function updateMapViewport(points) {
@@ -2704,7 +2970,8 @@ function renderAll() {
 }
 
 function renderKpis() {
-  const journeyCount = getJourneyCount(state.filtered);
+  const journeyGroups = getJourneyGroups(state.filtered);
+  const journeyCount = journeyGroups.length;
   const cities = [...new Set(state.filtered.map(trip => trip.city).filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR"));
   const countries = [...new Set(state.filtered.map(trip => trip.country).filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR"));
   const regions = [...new Set(state.filtered.map(trip => trip.region || trip.uf).filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR"));
@@ -2712,17 +2979,18 @@ function renderKpis() {
   const uniqueTags = [...new Set(state.filtered.flatMap(trip => trip.tags))];
   const uniqueCompanions = [...new Set(state.filtered.flatMap(trip => trip.travelers))];
   const uniqueArtists = [...new Set(state.filtered.flatMap(trip => trip.artists))];
+  state.currentJourneyGroups = journeyGroups;
   state.currentCitiesList = cities;
   state.currentCountriesList = countries;
   state.currentUfsList = regions;
 
   const homeHtml = `
-    <article class="metric-card">
+    <article class="metric-card" onclick="openJourneyGroupsModal('Viagens registradas', state.currentJourneyGroups)">
       <div class="metric-label"><i data-lucide="plane"></i> Viagens</div>
       <div class="metric-value">${journeyCount}</div>
       <div class="metric-sub">jornadas agrupadas a partir da base oficial</div>
     </article>
-    <article class="metric-card">
+    <article class="metric-card" onclick="openListModal('Cidades visitadas', state.currentCitiesList)">
       <div class="metric-label"><i data-lucide="map-pin"></i> Cidades</div>
       <div class="metric-value">${cities.length}</div>
       <div class="metric-sub">destinos únicos explorados</div>
@@ -2873,104 +3141,155 @@ function initMap() {
   renderMapLayer();
 }
 
+function renderCoverageSidebar(collections) {
+  const countries = [...collections.countries.values()].sort((a, b) => b.trips.length - a.trips.length).slice(0, 5);
+  const regions = [...collections.regions.values()].sort((a, b) => b.trips.length - a.trips.length).slice(0, 5);
+  const upcomingPlans = getUpcomingPlans(4);
+
+  els["map-rank"].innerHTML = `
+    <section class="atlas-section">
+      <h3 class="atlas-section-title">Países destacados</h3>
+      ${countries.length ? countries.map(item => `
+        <div class="atlas-entry" onclick="openTripsCollectionModal('Viagens em ${escapeHtml(item.label)}', getTripsForCountry(decodeURIComponent('${encodeURIComponent(item.label)}')), 'País visitado')">
+          <div>
+            <strong>${escapeHtml(item.label)}</strong>
+            <span>${item.trips.length} registro(s) reais nesse território</span>
+          </div>
+          <div class="atlas-entry-badge">${item.trips.length}</div>
+        </div>
+      `).join("") : `<div class="inline-note">Nenhum país com dados suficientes para destacar.</div>`}
+    </section>
+    <section class="atlas-section">
+      <h3 class="atlas-section-title">UFs brasileiras</h3>
+      ${regions.length ? regions.map(item => `
+        <div class="atlas-entry" onclick="openTripsCollectionModal('Viagens em ${escapeHtml(item.label)}', getTripsForRegion(decodeURIComponent('${encodeURIComponent(item.label)}')), 'UF brasileira visitada')">
+          <div>
+            <strong>${escapeHtml(item.label)}</strong>
+            <span>${item.trips.length} registro(s) no Brasil</span>
+          </div>
+          <div class="atlas-entry-badge">${item.trips.length}</div>
+        </div>
+      `).join("") : `<div class="inline-note">As UFs visitadas aparecem aqui quando houver viagens brasileiras.</div>`}
+    </section>
+    <section class="atlas-section">
+      <h3 class="atlas-section-title">Próximos destinos</h3>
+      ${upcomingPlans.length ? upcomingPlans.map(plan => `
+        <div class="atlas-entry" onclick="selectPlan(decodeURIComponent('${encodeURIComponent(plan.id)}')); switchView('planejar')">
+          <div>
+            <strong>${escapeHtml(plan.destination)}</strong>
+            <span>${escapeHtml(getPlanLocationLabel(plan))} | ${formatDateRange(plan.startDate, plan.endDate)}</span>
+          </div>
+          <div class="atlas-entry-badge">${STATUS_META[plan.status]?.label?.slice(0, 3) || ""}</div>
+        </div>
+      `).join("") : `<div class="inline-note">Nenhum plano com contexto suficiente para aparecer aqui.</div>`}
+    </section>
+  `;
+}
+
 function renderMapLayer() {
   if (!state.map) return;
   if (state.mapLayer) state.map.removeLayer(state.mapLayer);
   state.mapLayer = L.layerGroup();
+  renderMapMetaStrip();
+
+  const atlasMode = state.mapType === "atlas";
+  const collections = buildMapCollections();
   const viewportPoints = [];
 
-  if (state.mapType === "coverage") {
-    const coverageGroups = buildCoverageGroups();
-    const maxCoverage = Math.max(...coverageGroups.map(group => group.count), 1);
-    coverageGroups.forEach(group => {
-      viewportPoints.push({ lat: group.lat, lng: group.lng });
-      L.circleMarker([group.lat, group.lng], {
-        radius: 10 + (group.count / maxCoverage) * 16,
-        color: "rgba(10,47,76,0.94)",
-        weight: 2,
-        fillColor: isBrazilCountry(group.country) ? "rgba(38,185,221,0.72)" : "rgba(212,70,28,0.78)",
-        fillOpacity: 0.72
-      }).bindTooltip(`<b>${escapeHtml(group.label)}</b><br>${group.count} viagem(ns) mapeada(s)`)
-        .addTo(state.mapLayer);
-    });
+  const baseLayer = L.layerGroup();
+  const routeLayer = L.layerGroup();
+  const cityMarkerLayer = L.layerGroup();
+  const planLayer = L.layerGroup();
 
-    const upcomingPlans = getUpcomingPlans(4);
-    els["map-rank"].innerHTML = `
-      <section class="atlas-section">
-        <h3 class="atlas-section-title">Cobertura territorial</h3>
-        ${coverageGroups.length ? coverageGroups.sort((a, b) => b.count - a.count).slice(0, 5).map(group => `
-          <div class="atlas-entry">
-            <div>
-              <strong>${escapeHtml(group.label)}</strong>
-              <span>${escapeHtml(group.subtitle)} | ${group.count} registro(s)</span>
-            </div>
-            <div class="atlas-entry-badge">${group.count}</div>
-          </div>
-        `).join("") : `<div class="inline-note">Ainda não há massa crítica suficiente para ler a cobertura.</div>`}
-      </section>
-      <section class="atlas-section">
-        <h3 class="atlas-section-title">Próximos destinos</h3>
-        ${upcomingPlans.length ? upcomingPlans.map(plan => `
-          <div class="atlas-entry" onclick="selectPlan(decodeURIComponent('${encodeURIComponent(plan.id)}')); switchView('planejar')">
-            <div>
-              <strong>${escapeHtml(plan.destination)}</strong>
-              <span>${escapeHtml(getPlanLocationLabel(plan))} | ${formatDateRange(plan.startDate, plan.endDate)}</span>
-            </div>
-            <div class="atlas-entry-badge">${STATUS_META[plan.status]?.label?.slice(0, 3) || ""}</div>
-          </div>
-        `).join("") : `<div class="inline-note">Nenhum plano com contexto suficiente para aparecer aqui.</div>`}
-      </section>
-    `;
-    els["map-note"].textContent = "Cobertura resume UFs brasileiras e países futuros em uma única leitura territorial.";
-  } else {
-    const cityGroups = {};
-    state.filtered.forEach(trip => {
-      const key = `${normalizeLookupKey(trip.country)}|${normalizeLookupKey(trip.region || trip.uf)}|${normalizeLookupKey(trip.city)}`;
-      if (!cityGroups[key]) {
-        cityGroups[key] = {
-          city: trip.city,
-          region: trip.region || trip.uf,
-          country: trip.country,
-          count: 0,
-          lat: trip.lat,
-          lng: trip.lng
-        };
+  const addBoundsCenter = layer => {
+    try {
+      const bounds = layer.getBounds?.();
+      if (bounds && bounds.isValid()) {
+        const center = bounds.getCenter();
+        viewportPoints.push({ lat: center.lat, lng: center.lng });
       }
-      cityGroups[key].count++;
-    });
+    } catch (error) {}
+  };
 
-    const maxCity = Math.max(...Object.values(cityGroups).map(group => group.count), 1);
+  if (state.geoData.world?.features?.length) {
+    const worldLayer = L.geoJSON(state.geoData.world, {
+      style: feature => {
+        const key = getWorldFeatureKey(feature);
+        const item = collections.countries.get(key);
+        const visited = !!item?.trips.length;
+        return {
+          color: visited ? "rgba(10,47,76,0.98)" : "rgba(148,163,184,0.48)",
+          weight: visited ? (atlasMode ? 2.8 : 3.2) : 0.9,
+          fillColor: visited ? (atlasMode ? "rgba(38,185,221,0.12)" : "rgba(38,185,221,0.32)") : "rgba(248,250,252,0.02)",
+          fillOpacity: visited ? (atlasMode ? 0.16 : 0.4) : 0.03
+        };
+      },
+      onEachFeature: (feature, layer) => {
+        const key = getWorldFeatureKey(feature);
+        const item = collections.countries.get(key);
+        if (!item?.trips.length) return;
+        const label = item.label || feature.properties?.name || "País";
+        layer.bindTooltip(`<b>${escapeHtml(label)}</b><br>${item.trips.length} registro(s) reais`);
+        layer.on("click", () => openTripsCollectionModal(`Viagens em ${label}`, item.trips, "País visitado"));
+        addBoundsCenter(layer);
+      }
+    });
+    worldLayer.addTo(baseLayer);
+  }
+
+  if (state.geoData.brazil?.features?.length) {
+    const brazilLayer = L.geoJSON(state.geoData.brazil, {
+      style: feature => {
+        const key = getBrazilFeatureKey(feature);
+        const item = collections.regions.get(key);
+        const visited = !!item?.trips.length;
+        return {
+          color: visited ? "rgba(10,47,76,0.92)" : "rgba(148,163,184,0.42)",
+          weight: visited ? (atlasMode ? 1.8 : 2.4) : 0.75,
+          fillColor: visited ? (atlasMode ? "rgba(212,70,28,0.08)" : "rgba(212,70,28,0.28)") : "rgba(255,255,255,0)",
+          fillOpacity: visited ? (atlasMode ? 0.18 : 0.36) : 0
+        };
+      },
+      onEachFeature: (feature, layer) => {
+        const key = getBrazilFeatureKey(feature);
+        const item = collections.regions.get(key);
+        if (!item?.trips.length) return;
+        layer.bindTooltip(`<b>${escapeHtml(item.label)}</b><br>${item.trips.length} registro(s) reais`);
+        layer.on("click", () => openTripsCollectionModal(`Viagens em ${item.label}`, item.trips, "UF brasileira visitada"));
+        addBoundsCenter(layer);
+      }
+    });
+    brazilLayer.addTo(baseLayer);
+  }
+
+  if (atlasMode) {
     buildTripRoutes(state.filtered).forEach(route => {
       if (route.points.length > 1) {
         L.polyline(route.points, {
-          color: "rgba(10,47,76,0.26)",
+          color: "rgba(10,47,76,0.30)",
           weight: 3,
-          opacity: 0.9,
+          opacity: 0.92,
           dashArray: "10 10"
-        }).addTo(state.mapLayer);
+        }).addTo(routeLayer);
       }
     });
 
-    Object.values(cityGroups).forEach(group => {
-      const coords = getMapCoordinates(group);
+    const cityGroups = [...collections.cities.values()];
+    const maxCity = Math.max(...cityGroups.map(group => group.trips.length), 1);
+    cityGroups.forEach(group => {
+      const seedTrip = group.trips.find(trip => Number.isFinite(trip.lat) && Number.isFinite(trip.lng)) || group.trips[0] || group;
+      const coords = getMapCoordinates(seedTrip || group);
       if (!coords) return;
       viewportPoints.push(coords);
-      const placeLabel = formatLocationLabel(group) || group.city;
-      const relatedTrips = state.filtered.filter(trip =>
-        normalizeLookupKey(trip.city) === normalizeLookupKey(group.city) &&
-        normalizeLookupKey(trip.country) === normalizeLookupKey(group.country) &&
-        normalizeLookupKey(trip.region || trip.uf) === normalizeLookupKey(group.region)
-      );
-
       L.circleMarker([coords.lat, coords.lng], {
-        radius: 7 + (group.count / maxCity) * 14,
+        radius: 7 + (group.trips.length / maxCity) * 13,
         color: "rgba(255,255,255,0.96)",
         weight: 2,
-        fillColor: "var(--accent)",
-        fillOpacity: 0.84
-      }).bindTooltip(`<b>${escapeHtml(placeLabel)}</b><br>${group.count} viagem(ns) realizada(s)`)
-        .on("click", () => openTripsCollectionModal(placeLabel, relatedTrips))
-        .addTo(state.mapLayer);
+        fillColor: "#d4461c",
+        fillOpacity: 0.86
+      }).bindTooltip(`<b>${escapeHtml(group.label)}</b><br>${group.trips.length} registro(s) nessa cidade`)
+        .on("click", () => openTripsCollectionModal(`Viagens em ${group.label}`, group.trips, "Cidade visitada"))
+        .addTo(cityMarkerLayer);
     });
 
     if (state.showPlannedMap) {
@@ -2982,18 +3301,32 @@ function renderMapLayer() {
           viewportPoints.push(coords);
           L.circleMarker([coords.lat, coords.lng], {
             radius: 8,
-            color: "rgba(9,117,153,0.95)",
+            color: "rgba(9,117,153,0.96)",
             weight: 2,
             fillColor: "rgba(38,185,221,0.22)",
-            fillOpacity: 0.68
+            fillOpacity: 0.7
           }).bindTooltip(`<b>${escapeHtml(plan.destination)}</b><br>${escapeHtml(getPlanLocationLabel(plan))}`)
             .on("click", () => { selectPlan(plan.id); switchView("planejar"); })
-            .addTo(state.mapLayer);
+            .addTo(planLayer);
         });
     }
 
     renderAtlasSidebar();
-    els["map-note"].textContent = "O atlas combina cidades reais, rotas suaves e futuros destinos sem separar lembrança e planejamento em mundos diferentes.";
+    els["map-note"].textContent = state.errors.geo
+      ? "O atlas está usando marcadores e rotas, mas as geometrias territoriais não carregaram totalmente."
+      : "O atlas cruza países, UFs, cidades e rotas no mesmo plano de leitura.";
+  } else {
+    renderCoverageSidebar(collections);
+    els["map-note"].textContent = state.errors.geo
+      ? "Cobertura parcial: a base carregou, mas as camadas territoriais locais ainda não chegaram."
+      : "Cobertura destaca países visitados e, dentro do Brasil, reforça as UFs com memória real.";
+  }
+
+  baseLayer.addTo(state.mapLayer);
+  if (atlasMode) {
+    routeLayer.addTo(state.mapLayer);
+    cityMarkerLayer.addTo(state.mapLayer);
+    if (state.showPlannedMap) planLayer.addTo(state.mapLayer);
   }
 
   state.mapLayer.addTo(state.map);
@@ -3615,6 +3948,30 @@ function openTripsCollectionModal(title, trips, subtitle) {
   refreshIcons();
 }
 
+function openJourneyGroupsModal(title, journeyGroups) {
+  const items = journeyGroups || [];
+  els["modal-header"].innerHTML = `
+    <h2 style="font-family:'DM Serif Display',serif;font-size:32px;margin:0;color:var(--blue-dark);">${escapeHtml(title)}</h2>
+    <p style="margin:8px 0 0;color:var(--ink-3);font-size:15px;font-weight:500;">Jornadas agrupadas por nome, datas e país.</p>
+    <p style="margin:8px 0 0;color:var(--ink-3);font-size:15px;font-weight:500;">Total: ${items.length} viagem(ns)</p>
+  `;
+  els["modal-body"].innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      ${items.map(group => `
+        <button type="button" class="summary-row" onclick="openTripsCollectionModal('Viagem: ${escapeHtml(group.name)}', getTripsForJourneyKey(decodeURIComponent('${encodeURIComponent(group.key)}')), 'Jornada com ${group.count} registro(s)')">
+          <div>
+            <strong>${escapeHtml(group.name)}</strong>
+            <span>${escapeHtml(getJourneyScopeLabel(group))} | ${formatDateRange(group.startDate, group.endDate)}</span>
+          </div>
+          <span>${group.count} linha(s)</span>
+        </button>
+      `).join("")}
+    </div>
+  `;
+  els["trip-modal"].classList.add("open");
+  refreshIcons();
+}
+
 function openTripModal(tripId) {
   const trip = state.trips.find(item => item.id === tripId);
   if (!trip) return;
@@ -3678,7 +4035,20 @@ function openListModal(title, listItems) {
   `;
   els["modal-body"].innerHTML = `
     <div style="display:flex;flex-direction:column;">
-      ${listItems.map(item => `<div class="modal-list-item"><span>${escapeHtml(item)}</span><span class="modal-list-badge">${counts[item] || 0}</span></div>`).join("")}
+      ${listItems.map(item => `
+        <button type="button" class="modal-list-item" onclick="${
+          title.includes("País")
+            ? `openTripsCollectionModal('Viagens em ${escapeHtml(item)}', getTripsForCountry(decodeURIComponent('${encodeURIComponent(item)}')), 'País visitado')`
+            : title.includes("Regi")
+              ? `openTripsCollectionModal('Viagens em ${escapeHtml(item)}', getTripsForRegion(decodeURIComponent('${encodeURIComponent(item)}')), 'Região brasileira')`
+              : title.includes("Cidade")
+                ? `openTripsCollectionModal('Viagens em ${escapeHtml(item)}', getTripsForLocationLabel(decodeURIComponent('${encodeURIComponent(item)}')), 'Cidade visitada')`
+                : ""
+        }">
+          <span>${escapeHtml(item)}</span>
+          <span class="modal-list-badge">${counts[item] || 0}</span>
+        </button>
+      `).join("")}
     </div>
   `;
   els["trip-modal"].classList.add("open");
@@ -3695,22 +4065,31 @@ function updateSyncPill() {
 
   const loading = !state.loaded.trips || !state.loaded.plans;
   pill.classList.toggle("loaded", !loading && !state.errors.trips);
-  pill.classList.toggle("warning", !!state.errors.trips || !!state.errors.plans);
+  pill.classList.toggle("warning", !!state.errors.trips || !!state.errors.geo);
 
   if (loading) {
-    els["sync-text"].textContent = "Carregando viagens e planos...";
+    els["sync-text"].textContent = "Sincronizando";
     return;
   }
 
-  const messages = [];
-  if (state.errors.trips) messages.push("Base principal com erro");
-  else messages.push(`${state.trips.length} registros reais`);
+  if (state.errors.trips) {
+    els["sync-text"].textContent = "Base com erro";
+    return;
+  }
 
-  if (state.errors.plans) messages.push("planejamento sem leitura oficial");
-  else messages.push(`${state.plans.length} planos de apoio`);
+  if (state.errors.geo) {
+    els["sync-text"].textContent = "Atlas parcial";
+    return;
+  }
 
-  if (!isConfiguredUrl(GOOGLE_SCRIPT_URL, "SEU_ID_AQUI")) messages.push("salvamento externo pendente");
-  els["sync-text"].textContent = messages.join(" | ");
+  if (state.errors.plans) {
+    els["sync-text"].textContent = "Base online";
+    return;
+  }
+
+  els["sync-text"].textContent = isConfiguredUrl(GOOGLE_SCRIPT_URL, "SEU_ID_AQUI")
+    ? "Tudo online"
+    : "Base online";
 }
 
 function collectDraftItinerary(startDate, endDate) {
