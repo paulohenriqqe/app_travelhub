@@ -464,16 +464,16 @@
   .trip-details span { display: flex; align-items: center; gap: 6px; }
 
   .origin-chip.manual { background: var(--paper-2); color: var(--ink-2); }
-  .origin-chip.plan { background: var(--accent-bg); color: var(--accent); }
+  .origin-chip.plan { background: rgba(38, 185, 221, 0.12); color: var(--blue-dark); }
   .status-chip { border: 1px solid transparent; }
   .status-chip.planejado { background: var(--warning-bg); color: var(--warning); border-color: #fcd34d; }
   .status-chip.em-andamento { background: var(--blue-pale); color: var(--blue-dark); border-color: rgba(38, 185, 221, 0.45); }
   .status-chip.efetivado { background: var(--success-bg); color: var(--success); border-color: rgba(15, 118, 110, 0.26); }
-  .status-chip.cancelado { background: var(--danger-bg); color: var(--danger); border-color: rgba(185, 28, 28, 0.2); }
+  .status-chip.cancelado { background: var(--paper-2); color: var(--ink-2); border-color: var(--line); }
 
   .map-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 24px; align-items: start; }
   .map-panel { overflow: hidden; padding: 0; border: none; box-shadow: var(--shadow-md); border-radius: 16px; z-index: 1; }
-  #map { width: 100%; height: 65vh; min-height: 500px; background: #f8fafc; cursor: pointer; }
+  #map { width: 100%; height: 65vh; min-height: 500px; background: radial-gradient(circle at top, rgba(38,185,221,.12), rgba(248,250,252,1) 45%); cursor: pointer; }
   .leaflet-tooltip.uf-label {
     background: transparent;
     border: none;
@@ -493,6 +493,15 @@
   .bar-track { height: 10px; border-radius: 999px; background: var(--paper-2); overflow: hidden; }
   .bar-fill { height: 100%; background: var(--blue-light); border-radius: inherit; transition: width 0.8s ease; }
   .rank-count { color: var(--ink-3); font-size: 14px; text-align: right; font-weight: 600; }
+  .map-side-stack { display: flex; flex-direction: column; gap: 14px; margin-top: 18px; }
+  .map-side-item {
+    padding: 14px;
+    border-radius: 12px;
+    background: linear-gradient(180deg, var(--white), var(--paper));
+    border: 1px solid var(--line);
+  }
+  .map-side-item strong { display: block; color: var(--blue-dark); font-size: 14px; margin-bottom: 4px; }
+  .map-side-item span { color: var(--ink-3); font-size: 12px; font-weight: 700; }
 
   .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px; }
   .chart-panel { padding: 24px; }
@@ -781,17 +790,17 @@
   .lista-import-note {
     margin: 12px 24px 0;
     padding: 12px;
-    background: var(--accent-bg);
+    background: var(--paper);
     border-radius: 8px;
     font-size: 12px;
-    color: var(--accent);
+    color: var(--ink-2);
     font-weight: 600;
     display: flex;
     align-items: flex-start;
     gap: 8px;
-    border-bottom: 12px solid transparent;
+    border: 1px solid var(--line);
   }
-  .lista-import-note svg { width: 14px; height: 14px; flex-shrink: 0; margin-top: 1px; }
+  .lista-import-note svg { width: 14px; height: 14px; flex-shrink: 0; margin-top: 1px; color: var(--blue-med); }
 
   .plan-layout { display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: 24px; align-items: start; }
   .plan-sidebar, .plan-main { display: flex; flex-direction: column; gap: 24px; }
@@ -802,7 +811,7 @@
     font-size: 14px;
     line-height: 1.6;
   }
-  .source-note { background: var(--warning-bg); color: var(--warning); border: 1px solid rgba(180, 83, 9, 0.22); }
+  .source-note { background: linear-gradient(180deg, var(--white), var(--paper)); color: var(--ink-2); border: 1px solid var(--line); }
   .source-note.error { background: var(--danger-bg); color: var(--danger); border-color: rgba(185, 28, 28, 0.18); }
   .inline-note { background: var(--paper); color: var(--ink-2); border: 1px solid var(--line); }
   .empty-state {
@@ -890,6 +899,44 @@
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
+  .meta-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .meta-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    color: var(--ink-2);
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .meta-pill svg { width: 13px; height: 13px; color: var(--blue-med); }
+  .plan-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+  }
+  .soft-support-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .soft-support-item {
+    padding: 14px;
+    border-radius: 12px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+  }
+  .soft-support-item strong { display: block; color: var(--blue-dark); font-size: 14px; margin-bottom: 4px; }
+  .soft-support-item span { color: var(--ink-3); font-size: 12px; font-weight: 700; }
 
   .itinerary-container {
     overflow-x: auto;
@@ -1145,24 +1192,24 @@
 
           <div class="journey-grid">
             <section class="panel journey-panel">
-              <h2 class="panel-title">Jornada do planejamento</h2>
-              <p class="panel-copy">Acompanhe quantos planos estao em aberto, quantos viraram viagem realizada e onde o funil esta travando.</p>
+              <h2 class="panel-title">Seu acervo de viagens</h2>
+              <p class="panel-copy">A tela inicial volta a contar a sua história de viagem: destinos, companhias, motivos e ritmo das experiências que realmente aconteceram.</p>
               <div class="mini-stats" id="journey-mini-stats"></div>
             </section>
             <section class="panel journey-side-panel">
-              <div class="panel-label" style="margin-bottom:14px;">Status dos planos</div>
+              <div class="panel-label" style="margin-bottom:14px;">Planos no radar</div>
               <div class="status-list" id="dashboard-status-list"></div>
             </section>
           </div>
 
           <div class="journey-grid">
             <section class="panel journey-panel">
-              <div class="panel-label" style="margin-bottom:14px;">Planos mais recentes</div>
-              <div class="plan-preview-list" id="dashboard-plan-list"></div>
+              <div class="panel-label" style="margin-bottom:14px;">Companhias, artistas e motivos</div>
+              <div class="trip-summary-list" id="dashboard-summary-list"></div>
             </section>
             <section class="panel journey-side-panel">
-              <div class="panel-label" style="margin-bottom:14px;">Comparativo rapido</div>
-              <div class="trip-summary-list" id="dashboard-summary-list"></div>
+              <div class="panel-label" style="margin-bottom:14px;">Proximas viagens planejadas</div>
+              <div class="plan-preview-list" id="dashboard-plan-list"></div>
             </section>
           </div>
 
@@ -1186,16 +1233,21 @@
         <div class="dashboard-stack">
           <div class="map-toolbar">
             <div class="segmented">
-              <button class="map-toggle active" data-map-type="choropleth"><i data-lucide="map-pinned"></i> UFs (Calor)</button>
-              <button class="map-toggle" data-map-type="bubbles"><i data-lucide="circle-dot"></i> Cidades (Pins)</button>
+              <button class="map-toggle" data-map-type="choropleth"><i data-lucide="map-pinned"></i> UFs visitadas</button>
+              <button class="map-toggle active" data-map-type="bubbles"><i data-lucide="route"></i> Cidades & rotas</button>
             </div>
-            <div class="map-note" id="map-note">Clique nas areas pintadas para ver as viagens.</div>
+            <div class="segmented">
+              <button class="view-toggle active" id="toggle-planned-map"><i data-lucide="sparkles"></i> Mostrar planos</button>
+            </div>
+            <div class="map-note" id="map-note">Use o modo editorial para ver cidades revisitadas, rotas suaves e planos futuros no mesmo contexto.</div>
           </div>
           <div class="map-layout">
             <div class="panel map-panel"><div id="map"></div></div>
             <aside class="panel rank-panel">
-              <div class="panel-label" style="margin-bottom:16px;">Top UFs efetivadas</div>
+              <div class="panel-label" style="margin-bottom:16px;">Destaques do mapa</div>
               <div class="rank-list" id="map-rank"></div>
+              <div class="panel-label" style="margin:24px 0 12px;">Planos no mapa</div>
+              <div class="map-side-stack" id="map-plan-radar"></div>
             </aside>
           </div>
         </div>
@@ -1206,13 +1258,15 @@
           <div class="kpi-grid" id="stats-kpi-grid"></div>
           <div class="stats-grid">
             <div class="panel chart-panel" style="grid-column:1/-1;">
-              <h2 class="chart-title">Planejado x efetivado no tempo</h2>
+              <h2 class="chart-title">Evolucao das viagens no tempo</h2>
               <div class="chart-container"><canvas id="timeChart"></canvas></div>
             </div>
             <div class="panel chart-panel"><h2 class="chart-title">Estados mais visitados</h2><div class="horizontal-list" id="stat-ufs"></div></div>
             <div class="panel chart-panel"><h2 class="chart-title">Cidades mais visitadas</h2><div class="horizontal-list" id="stat-cities"></div></div>
             <div class="panel chart-panel"><h2 class="chart-title">Tags mais usadas</h2><div class="horizontal-list" id="stat-tags"></div></div>
-            <div class="panel chart-panel"><h2 class="chart-title">Status dos planos</h2><div class="horizontal-list" id="stat-plan-statuses"></div></div>
+            <div class="panel chart-panel"><h2 class="chart-title">Companhias mais recorrentes</h2><div class="horizontal-list" id="stat-companions"></div></div>
+            <div class="panel chart-panel"><h2 class="chart-title">Artistas mais presentes</h2><div class="horizontal-list" id="stat-artists"></div></div>
+            <div class="panel chart-panel"><h2 class="chart-title">Agenda futura</h2><div class="soft-support-list" id="stat-upcoming-plans"></div></div>
           </div>
         </div>
       </section>
@@ -1234,7 +1288,7 @@
             <div class="form-section">
               <div class="form-section-title"><i data-lucide="tag"></i> Nome da viagem</div>
               <div class="field field-full">
-                <input class="form-input" id="f-name" required placeholder="Ex: Nordeste 2026 · Praia">
+                <input class="form-input" id="f-name" required placeholder="Ex: Nordeste 2026 | Praia">
                 <div class="name-suggestions" id="name-suggestions"></div>
               </div>
             </div>
@@ -1294,7 +1348,7 @@
 
       <section class="view" id="view-planejar">
         <div class="dashboard-stack">
-          <div class="source-note" id="planning-source-note">Configure o link publicado da aba Planejamento para carregar os dados oficiais.</div>
+          <div class="source-note" id="planning-source-note">A area de planejamento agora funciona como um pre-cadastro rico da viagem futura, espelhando a leitura da base principal.</div>
 
           <div class="plan-layout">
             <aside class="plan-sidebar">
@@ -1312,15 +1366,35 @@
             <div class="plan-main">
               <section class="panel plan-panel">
                 <h2 class="panel-title">Criar novo plano</h2>
-                <p class="panel-copy">Monte o roteiro diario, salve no Google Sheets e mantenha o status pronto para virar viagem efetivada.</p>
+                <p class="panel-copy">Cadastre o plano como uma viagem futura: contexto, cidade, companhia, motivo e roteiro. O status continua existindo, mas deixa de ser a estrela da tela.</p>
 
-                <div class="form-grid" style="margin-top:20px;">
+                <div class="plan-form-grid">
                   <div class="field field-full">
-                    <label>Destino da viagem</label>
-                    <input type="text" class="form-input" id="plan-dest" placeholder="Ex: Berlim, Alemanha">
+                    <label>Nome da viagem</label>
+                    <input type="text" class="form-input" id="plan-name" placeholder="Ex: Fim de semana em Ouro Preto">
+                  </div>
+                  <div class="field">
+                    <label>Cidade principal</label>
+                    <input type="text" class="form-input" id="plan-dest" placeholder="Ex: Ouro Preto">
+                  </div>
+                  <div class="field">
+                    <label>UF</label>
+                    <input type="text" class="form-input" id="plan-uf" maxlength="2" placeholder="Ex: MG">
                   </div>
                   <div class="field"><label>Data de inicio</label><input type="date" class="form-input" id="plan-start"></div>
                   <div class="field"><label>Data de fim</label><input type="date" class="form-input" id="plan-end"></div>
+                  <div class="field">
+                    <label>Tags / motivo</label>
+                    <input type="text" class="form-input" id="plan-tags" placeholder="Ex: Historia, bate-volta, gastronomia">
+                  </div>
+                  <div class="field">
+                    <label>Acompanhantes</label>
+                    <input type="text" class="form-input" id="plan-companions" placeholder="Ex: Rafael Soares, Ana">
+                  </div>
+                  <div class="field field-full">
+                    <label>Artistas / contexto opcional</label>
+                    <input type="text" class="form-input" id="plan-artists" placeholder="Ex: Gilberto Gil, festival de inverno">
+                  </div>
                   <div class="field field-full">
                     <label>Status inicial</label>
                     <select class="form-input" id="plan-status">
@@ -1333,7 +1407,7 @@
                 </div>
 
                 <div class="draft-actions">
-                  <div class="draft-summary" id="plan-draft-summary">Defina as datas para gerar a grade de roteiro.</div>
+                  <div class="draft-summary" id="plan-draft-summary">Preencha cidade, periodo e contexto para transformar o planejamento em uma viagem futura completa.</div>
                   <button type="button" class="btn-outline" id="generate-plan-grid-btn"><i data-lucide="layout-grid"></i> Gerar grade diaria</button>
                 </div>
 
@@ -1421,7 +1495,8 @@ const state = {
   filteredPlans: [],
   filters: { search: "", year: "", uf: "", tag: "" },
   activeView: "dashboard",
-  mapType: "choropleth",
+  mapType: "bubbles",
+  showPlannedMap: true,
   map: null,
   mapLayer: null,
   geoData: null,
@@ -1460,11 +1535,11 @@ document.addEventListener("DOMContentLoaded", () => {
 function cacheElements() {
   [
     "sync-pill", "sync-text", "kpi-grid", "stats-kpi-grid", "journey-mini-stats", "dashboard-status-list", "dashboard-plan-list", "dashboard-summary-list",
-    "filter-search", "filter-year", "filter-uf", "filter-tag", "clear-filters", "result-count", "dashboard-results", "map-rank", "stat-ufs", "stat-cities",
-    "stat-tags", "stat-plan-statuses", "trip-modal", "modal-header", "modal-body", "city-blocks", "add-city-btn", "name-suggestions", "lista-grid",
+    "filter-search", "filter-year", "filter-uf", "filter-tag", "clear-filters", "result-count", "dashboard-results", "map-rank", "map-plan-radar", "stat-ufs", "stat-cities",
+    "stat-tags", "stat-companions", "stat-artists", "stat-upcoming-plans", "trip-modal", "modal-header", "modal-body", "city-blocks", "add-city-btn", "name-suggestions", "lista-grid",
     "form-message", "plan-conversion-banner", "conversion-banner-title", "conversion-banner-copy", "planning-source-note", "planning-mini-stats",
     "plan-list", "plan-detail-panel", "plan-draft-summary", "plan-grid-container", "plan-grid-title", "itinerary-table-wrapper", "plan-message",
-    "detail-plan-message", "plan-dest", "plan-start", "plan-end", "plan-status", "save-plan-btn"
+    "detail-plan-message", "plan-name", "plan-dest", "plan-uf", "plan-tags", "plan-companions", "plan-artists", "plan-start", "plan-end", "plan-status", "save-plan-btn", "toggle-planned-map"
   ].forEach(id => { els[id] = document.getElementById(id); });
 }
 
@@ -1482,6 +1557,11 @@ function bindEvents() {
     updateActiveButtons("[data-map-type]", state.mapType);
     renderMapLayer();
   }));
+  els["toggle-planned-map"].addEventListener("click", () => {
+    state.showPlannedMap = !state.showPlannedMap;
+    els["toggle-planned-map"].classList.toggle("active", state.showPlannedMap);
+    renderMapLayer();
+  });
   document.getElementById("trip-form").addEventListener("submit", handleFormSubmit);
   els["trip-modal"].addEventListener("click", e => { if (e.target === els["trip-modal"]) closeModal(); });
   document.addEventListener("keydown", e => { if (e.key === "Escape" && els["trip-modal"].classList.contains("open")) closeModal(); });
@@ -1842,11 +1922,11 @@ function updateNameSuggestions() {
 
   if (cities.length === 1 && year) {
     suggestions.push(`${cities[0]} ${year}`);
-    if (state.formTags.length) suggestions.push(`${cities[0]} ${year} · ${state.formTags[0]}`);
+    if (state.formTags.length) suggestions.push(`${cities[0]} ${year} | ${state.formTags[0]}`);
   }
   if (cities.length > 1 && year) suggestions.push(`${cities.slice(0, 2).join(" & ")} ${year}`);
-  if (month && year && cities.length) suggestions.push(`${cities[0]} · ${month} ${year}`);
-  if (state.pendingConversion && year) suggestions.push(`${state.pendingConversion.destination} · realizado ${year}`);
+  if (month && year && cities.length) suggestions.push(`${cities[0]} | ${month} ${year}`);
+  if (state.pendingConversion && year) suggestions.push(`${state.pendingConversion.destination} | realizado ${year}`);
 
   const unique = [...new Set(suggestions)].slice(0, 5);
   els["name-suggestions"].innerHTML = unique.map(name => `
@@ -1924,17 +2004,16 @@ function normalizeTrip(row, index) {
     const key = Object.keys(row).find(field => aliases.some(alias => field.toLowerCase() === alias.toLowerCase()));
     return key ? (row[key] || "") : "";
   };
-  const splitList = string => String(string || "").split(/[;,]/).map(item => item.trim()).filter(Boolean);
   const name = getField(["Viagem", "Trip", "Nome"]);
   const city = getField(["Cidade"]);
-  const uf = String(getField(["UF"])).slice(0, 2).toUpperCase();
+  const uf = normalizeUfValue(getField(["UF"]));
   const startDate = normalizeDateValue(getField(["Data de inicio", "Data de Início", "Data de inicio ", "Start Date"]));
   const endDate = normalizeDateValue(getField(["Data de fim", "End Date"]));
-  const tags = splitList(getField(["Tags", "Motivo"]));
-  const artists = splitList(getField(["Artistas"]));
-  const travelers = splitList(getField(["Acompanhantes"]));
-  const lat = parseFloat(getField(["Latitude", "Lat"])) || null;
-  const lng = parseFloat(getField(["Longitude", "Lng", "Lon", "Long"])) || null;
+  const tags = splitListValue(getField(["Tags", "Motivo"]));
+  const artists = splitListValue(getField(["Artistas"]));
+  const travelers = splitListValue(getField(["Acompanhantes"]));
+  const lat = safeParseFloat(getField(["Latitude", "Lat"]));
+  const lng = safeParseFloat(getField(["Longitude", "Lng", "Lon", "Long"]));
   const planId = getField(["PlanId", "PlanoId", "Plano Id", "Id do Plano"]) || "";
   const origin = planId ? "plan" : "manual";
   const year = getYearFromDate(startDate);
@@ -1965,24 +2044,40 @@ function normalizePlan(row, index) {
     return key ? (row[key] || "") : "";
   };
   const id = String(getField(["Id", "ID"])).trim() || `plan-${index + 1}`;
-  const destination = String(getField(["Destino", "Viagem", "Plano"])).trim();
+  const name = String(getField(["Viagem", "Destino/Viagem", "Nome da viagem", "Plano"])).trim();
+  const city = String(getField(["Cidade", "Destino", "Cidade principal", "Destino principal"])).trim();
+  const uf = normalizeUfValue(getField(["UF", "Estado"]));
   const startDate = normalizeDateValue(getField(["Data de Inicio", "Data de Início", "Data de Ínicio ", "Data de inicio"]));
   const endDate = normalizeDateValue(getField(["Data de Fim", "Data de fim"]));
+  const tags = splitListValue(getField(["Tags", "Motivo", "Tags/Motivo"]));
+  const artists = splitListValue(getField(["Artistas", "Artistas/Contexto"]));
+  const travelers = splitListValue(getField(["Acompanhantes", "Companhias"]));
+  const lat = safeParseFloat(getField(["Latitude", "Lat"]));
+  const lng = safeParseFloat(getField(["Longitude", "Lng", "Lon", "Long"]));
   const status = normalizeStatus(getField(["Status"]));
   const itineraryRaw = getField(["Itinerario Diario", "Itinerário Diário", "Roteiro", "Itinerario"]);
   const itinerary = parseItinerary(itineraryRaw, startDate, endDate);
   const year = getYearFromDate(startDate);
+  const destination = name || city || "Plano sem destino";
 
   return {
     id,
-    destination: destination || "Plano sem destino",
+    name,
+    destination,
+    city,
+    uf,
     startDate,
     endDate,
+    tags,
+    artists,
+    travelers,
+    lat,
+    lng,
     status,
     itinerary,
     itineraryRaw,
     year,
-    searchIndex: `${id} ${destination} ${status}`.toLowerCase()
+    searchIndex: `${id} ${destination} ${city} ${uf} ${tags.join(" ")} ${artists.join(" ")} ${travelers.join(" ")} ${status}`.toLowerCase()
   };
 }
 
@@ -2017,6 +2112,133 @@ function parseItinerary(rawValue, startDate, endDate) {
   } catch (error) {}
 
   return { ...empty, notes: String(rawValue).trim() };
+}
+
+function splitListValue(value) {
+  return String(value || "").split(/[;,]/).map(item => item.trim()).filter(Boolean);
+}
+
+function joinListValue(values) {
+  return (values || []).filter(Boolean).join("; ");
+}
+
+function normalizeUfValue(value) {
+  return String(value || "").trim().slice(0, 2).toUpperCase();
+}
+
+function safeParseFloat(value) {
+  const parsed = parseFloat(String(value || "").replace(",", "."));
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function getTopEntries(values, limit) {
+  return Object.entries((values || []).reduce((acc, value) => {
+    if (!value) return acc;
+    acc[value] = (acc[value] || 0) + 1;
+    return acc;
+  }, {})).sort((a, b) => b[1] - a[1]).slice(0, limit || 5);
+}
+
+function getUpcomingPlans(limit) {
+  const today = new Date().toISOString().slice(0, 10);
+  return state.plans
+    .filter(plan => !["cancelado", "efetivado"].includes(plan.status))
+    .sort((a, b) => {
+      const aDate = a.startDate || a.endDate || "9999-12-31";
+      const bDate = b.startDate || b.endDate || "9999-12-31";
+      const aIsPast = aDate < today;
+      const bIsPast = bDate < today;
+      if (aIsPast !== bIsPast) return aIsPast ? 1 : -1;
+      if (aDate !== bDate) return aDate.localeCompare(bDate);
+      return (a.destination || "").localeCompare(b.destination || "", "pt");
+    })
+    .slice(0, limit || 5);
+}
+
+function getPlanLocationLabel(plan) {
+  if (plan.city && plan.uf) return `${plan.city}, ${plan.uf}`;
+  if (plan.city) return plan.city;
+  if (plan.uf) return plan.uf;
+  return plan.destination && plan.destination !== "Plano sem destino"
+    ? "Destino sem cidade definida"
+    : "Destino em definicao";
+}
+
+function getMapCoordinates(entity) {
+  if (Number.isFinite(entity?.lat) && Number.isFinite(entity?.lng)) {
+    return { lat: entity.lat, lng: entity.lng };
+  }
+
+  const centroid = UF_CENTROIDS[normalizeUfValue(entity?.uf)];
+  if (!centroid) return null;
+
+  const seed = String(entity?.city || entity?.destination || entity?.name || entity?.uf || "travelhub");
+  let hash = 0;
+  for (let index = 0; index < seed.length; index++) {
+    hash = ((hash << 5) - hash) + seed.charCodeAt(index);
+    hash |= 0;
+  }
+
+  const latOffset = (((hash & 255) / 255) - 0.5) * 1.15;
+  const lngOffset = ((((hash >> 8) & 255) / 255) - 0.5) * 1.35;
+  return { lat: centroid[0] + latOffset, lng: centroid[1] + lngOffset };
+}
+
+function buildTripRoutes(trips) {
+  const routes = {};
+  (trips || []).forEach(trip => {
+    const coords = getMapCoordinates(trip);
+    if (!coords) return;
+    const key = `${trip.name || trip.city}|${trip.startDate || ""}`;
+    if (!routes[key]) routes[key] = [];
+    routes[key].push({
+      point: [coords.lat, coords.lng],
+      city: trip.city,
+      startDate: trip.startDate || "",
+      endDate: trip.endDate || ""
+    });
+  });
+
+  return Object.entries(routes).map(([key, items]) => ({
+    key,
+    points: items
+      .filter((item, index, list) => index === 0 || item.point[0] !== list[index - 1].point[0] || item.point[1] !== list[index - 1].point[1])
+      .map(item => item.point)
+  })).filter(route => route.points.length > 1);
+}
+
+function renderFormTaxonomies() {
+  renderChips("tags", document.getElementById("tags-area"), null, "tags");
+  renderChips("artists", document.getElementById("artists-area"), null, "artists");
+  renderChips("companions", document.getElementById("companions-area"), null, "companions");
+}
+
+async function fillCityBlockFromPlan(blockId, plan) {
+  if (!plan?.uf) return;
+  const ufSelect = document.getElementById(`f-uf-${blockId}`);
+  const citySelect = document.getElementById(`f-city-${blockId}`);
+  const cityObj = state.formCities.find(city => city.id === blockId);
+  if (!ufSelect || !citySelect || !cityObj) return;
+
+  ufSelect.value = plan.uf;
+  await onUFChange(blockId, plan.uf);
+
+  if (plan.city) {
+    const option = [...citySelect.options].find(item => item.value.toLowerCase() === plan.city.toLowerCase());
+    if (option) {
+      citySelect.value = option.value;
+      cityObj.city = option.value;
+    } else {
+      const customOption = new Option(plan.city, plan.city);
+      citySelect.add(customOption);
+      citySelect.value = plan.city;
+      cityObj.city = plan.city;
+    }
+  }
+
+  cityObj.lat = Number.isFinite(plan.lat) ? plan.lat : null;
+  cityObj.lng = Number.isFinite(plan.lng) ? plan.lng : null;
+  updateNameSuggestions();
 }
 
 function populateFilters() {
@@ -2128,34 +2350,42 @@ function renderAll() {
 function renderKpis() {
   const cities = [...new Set(state.filtered.map(trip => trip.city))].sort();
   const ufs = [...new Set(state.filtered.map(trip => trip.uf))].sort();
+  const uniqueTags = [...new Set(state.filtered.flatMap(trip => trip.tags))];
+  const uniqueCompanions = [...new Set(state.filtered.flatMap(trip => trip.travelers))];
+  const uniqueArtists = [...new Set(state.filtered.flatMap(trip => trip.artists))];
   state.currentCitiesList = cities;
   state.currentUfsList = ufs;
 
   const html = `
     <article class="metric-card">
-      <div class="metric-label"><i data-lucide="plane"></i> Efetivadas</div>
+      <div class="metric-label"><i data-lucide="plane"></i> Viagens</div>
       <div class="metric-value">${state.filtered.length}</div>
-      <div class="metric-sub">linhas da base oficial</div>
-    </article>
-    <article class="metric-card" onclick="switchView('planejar')">
-      <div class="metric-label"><i data-lucide="bookmark"></i> Planos</div>
-      <div class="metric-value">${state.planMetrics.total}</div>
-      <div class="metric-sub">${state.planMetrics.open} ainda em aberto</div>
+      <div class="metric-sub">memorias registradas na base oficial</div>
     </article>
     <article class="metric-card">
-      <div class="metric-label"><i data-lucide="git-branch-plus"></i> Conversao</div>
-      <div class="metric-value">${state.planMetrics.conversionRate}%</div>
-      <div class="metric-sub">${state.planMetrics.converted} planos ja viraram viagem</div>
-    </article>
-    <article class="metric-card" onclick="openListModal('Cidades Visitadas', state.currentCitiesList)">
       <div class="metric-label"><i data-lucide="map-pin"></i> Cidades</div>
       <div class="metric-value">${cities.length}</div>
-      <div class="metric-sub">destinos unicos efetivados</div>
+      <div class="metric-sub">destinos unicos explorados</div>
     </article>
     <article class="metric-card" onclick="openListModal('UFs Visitadas', state.currentUfsList)">
-      <div class="metric-label"><i data-lucide="map"></i> Estados</div>
+      <div class="metric-label"><i data-lucide="map"></i> UFs</div>
       <div class="metric-value">${ufs.length}</div>
-      <div class="metric-sub">estados do Brasil</div>
+      <div class="metric-sub">estados ja percorridos</div>
+    </article>
+    <article class="metric-card">
+      <div class="metric-label"><i data-lucide="hash"></i> Motivos</div>
+      <div class="metric-value">${uniqueTags.length}</div>
+      <div class="metric-sub">tags e contextos recorrentes</div>
+    </article>
+    <article class="metric-card">
+      <div class="metric-label"><i data-lucide="users"></i> Companhias</div>
+      <div class="metric-value">${uniqueCompanions.length}</div>
+      <div class="metric-sub">pessoas que aparecem nas viagens</div>
+    </article>
+    <article class="metric-card" onclick="switchView('planejar')">
+      <div class="metric-label"><i data-lucide="calendar-range"></i> Planejamento</div>
+      <div class="metric-value">${state.planMetrics.open}</div>
+      <div class="metric-sub">${state.planMetrics.total} plano(s), ${uniqueArtists.length} artistas no historico real</div>
     </article>
   `;
 
@@ -2165,10 +2395,10 @@ function renderKpis() {
 
 function renderDashboardCycle() {
   const miniStats = [
-    { icon: "calendar-range", label: "Planos totais", value: state.planMetrics.total },
-    { icon: "timer-reset", label: "Em aberto", value: state.planMetrics.open },
-    { icon: "check-check", label: "Convertidos", value: state.planMetrics.converted },
-    { icon: "percent", label: "Taxa de conversao", value: `${state.planMetrics.conversionRate}%` }
+    { icon: "calendar-range", label: "Anos vividos", value: [...new Set(state.filtered.map(trip => trip.year).filter(Boolean))].length },
+    { icon: "map", label: "UFs na mala", value: [...new Set(state.filtered.map(trip => trip.uf).filter(Boolean))].length },
+    { icon: "hash", label: "Motivos registrados", value: [...new Set(state.filtered.flatMap(trip => trip.tags))].length },
+    { icon: "music-2", label: "Artistas lembrados", value: [...new Set(state.filtered.flatMap(trip => trip.artists))].length }
   ];
   els["journey-mini-stats"].innerHTML = miniStats.map(stat => `
     <div class="mini-stat">
@@ -2177,40 +2407,40 @@ function renderDashboardCycle() {
     </div>
   `).join("");
 
-  const statusBreakdown = [
-    { key: "planejado", value: state.plans.filter(plan => plan.status === "planejado").length },
-    { key: "em-andamento", value: state.plans.filter(plan => plan.status === "em-andamento").length },
-    { key: "efetivado", value: state.plans.filter(plan => plan.status === "efetivado").length },
-    { key: "cancelado", value: state.plans.filter(plan => plan.status === "cancelado").length }
-  ];
-  els["dashboard-status-list"].innerHTML = statusBreakdown.map(item => `
-    <div class="status-row">
-      <strong>${STATUS_META[item.key].label}</strong>
-      <span>${item.value} plano(s)</span>
+  const nextPlans = getUpcomingPlans(4);
+  els["dashboard-status-list"].innerHTML = nextPlans.length ? nextPlans.map(plan => `
+    <div class="status-row" onclick="selectPlan(decodeURIComponent('${encodeURIComponent(plan.id)}')); switchView('planejar')">
+      <div>
+        <strong>${escapeHtml(plan.destination)}</strong>
+        <span>${escapeHtml(plan.city ? `${plan.city}${plan.uf ? `, ${plan.uf}` : ""}` : "Plano futuro")}</span>
+      </div>
+      <span>${formatDateShort(plan.startDate)}</span>
     </div>
-  `).join("");
+  `).join("") : `<div class="empty-state">Sem viagem futura com data definida. Os planos entram aqui quando tiverem periodo e contexto.</div>`;
 
-  const recentPlans = sortPlans(state.plans).slice(0, 4);
-  if (!recentPlans.length) {
-    els["dashboard-plan-list"].innerHTML = `<div class="empty-state">Nenhum plano carregado ainda. Assim que o CSV publicado da aba Planejamento estiver configurado, eles aparecerao aqui.</div>`;
+  const previewPlans = getUpcomingPlans(4);
+  if (!previewPlans.length) {
+    els["dashboard-plan-list"].innerHTML = `<div class="empty-state">Ainda nao existem proximas viagens com contexto suficiente para aparecer aqui.</div>`;
   } else {
-    els["dashboard-plan-list"].innerHTML = recentPlans.map(plan => `
+    els["dashboard-plan-list"].innerHTML = previewPlans.map(plan => `
       <div class="summary-row" onclick="selectPlan(decodeURIComponent('${encodeURIComponent(plan.id)}')); switchView('planejar')">
         <div>
           <strong>${escapeHtml(plan.destination)}</strong>
-          <span>${formatDateRange(plan.startDate, plan.endDate)}</span>
+          <span>${escapeHtml(getPlanLocationLabel(plan))} | ${formatDateRange(plan.startDate, plan.endDate)}</span>
         </div>
         ${renderStatusChip(plan.status)}
       </div>
     `).join("");
   }
 
-  const linkedIds = new Set(state.trips.map(trip => trip.planId).filter(Boolean));
+  const topTag = getTopEntries(state.filtered.flatMap(trip => trip.tags), 1)[0];
+  const topCompanion = getTopEntries(state.filtered.flatMap(trip => trip.travelers), 1)[0];
+  const topArtist = getTopEntries(state.filtered.flatMap(trip => trip.artists), 1)[0];
   const summaryRows = [
-    { label: "Linhas efetivadas sem plano", value: state.trips.filter(trip => !trip.planId).length },
-    { label: "Linhas efetivadas vindas de plano", value: state.trips.filter(trip => trip.planId).length },
-    { label: "Planos ja relacionados", value: linkedIds.size },
-    { label: "Planos em andamento", value: state.planMetrics.inProgress }
+    { label: "Motivo mais frequente", value: topTag ? `${topTag[0]} | ${topTag[1]} vez(es)` : "Sem tags ainda" },
+    { label: "Companhia mais recorrente", value: topCompanion ? `${topCompanion[0]} | ${topCompanion[1]} viagem(ns)` : "Sem acompanhantes recorrentes" },
+    { label: "Artista mais lembrado", value: topArtist ? `${topArtist[0]} | ${topArtist[1]} registro(s)` : "Sem artista recorrente" },
+    { label: "Planos em aberto", value: `${state.planMetrics.open} de ${state.planMetrics.total}` }
   ];
   els["dashboard-summary-list"].innerHTML = summaryRows.map(row => `
     <div class="summary-row">
@@ -2238,7 +2468,7 @@ function renderTripCard(trip) {
           <span class="uf-badge">${trip.uf}</span>
           <span class="origin-chip ${trip.origin === "plan" ? "plan" : "manual"}">${trip.origin === "plan" ? "Vinda de plano" : "Cadastro direto"}</span>
         </div>
-        <span class="date-text">${trip.year || "—"}</span>
+        <span class="date-text">${trip.year || "-"}</span>
       </div>
       <h2 class="trip-title">${escapeHtml(trip.name)}</h2>
       <div class="trip-city"><i data-lucide="map-pin"></i>${escapeHtml(trip.city)}</div>
@@ -2293,6 +2523,14 @@ function renderMapLayer() {
         layer.on("click", () => { if (count > 0) showMomentsByLocation("UF", sigla); });
       }
     }).addTo(state.mapLayer);
+    const topUfs = Object.entries(ufCounts).sort((a, b) => b[1] - a[1]).slice(0, 6);
+    els["map-rank"].innerHTML = topUfs.map(([uf, value]) => `
+      <div class="rank-row">
+        <div class="rank-name">${uf}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${(value / max) * 100}%"></div></div>
+        <div class="rank-count">${value}</div>
+      </div>
+    `).join("");
   } else {
     L.geoJSON(state.geoData, { style: { color: "var(--white)", weight: 1.5, fillColor: "#e2e8f0", fillOpacity: 0.6 } }).addTo(state.mapLayer);
     const cityGroups = {};
@@ -2302,39 +2540,74 @@ function renderMapLayer() {
       cityGroups[key].count++;
     });
     const maxCity = Math.max(...Object.values(cityGroups).map(group => group.count), 1);
-    Object.values(cityGroups).forEach(group => {
-      let lat = group.lat;
-      let lng = group.lng;
-      if (!lat || !lng) {
-        const base = UF_CENTROIDS[group.uf];
-        if (base) {
-          lat = base[0] + (Math.random() - 0.5) * 1.5;
-          lng = base[1] + (Math.random() - 0.5) * 1.5;
-        }
+    const routeGroups = buildTripRoutes(state.filtered);
+    routeGroups.forEach(route => {
+      if (route.points.length > 1) {
+        L.polyline(route.points, {
+          color: "rgba(9,117,153,0.42)",
+          weight: 2,
+          opacity: 0.7,
+          dashArray: "8 8"
+        }).addTo(state.mapLayer);
       }
+    });
+    Object.values(cityGroups).forEach(group => {
+      const coords = getMapCoordinates(group);
+      let lat = coords?.lat;
+      let lng = coords?.lng;
       if (lat && lng) {
         L.circleMarker([lat, lng], {
-          radius: 6 + (group.count / maxCity) * 12,
-          color: "#fff",
+          radius: 7 + (group.count / maxCity) * 13,
+          color: "rgba(255,255,255,0.95)",
           weight: 2,
           fillColor: "var(--accent)",
-          fillOpacity: 0.85
+          fillOpacity: 0.82
         }).bindTooltip(`<b>${group.city} - ${group.uf}</b><br>${group.count} viagem(ns)`)
           .on("click", () => showMomentsByLocation("Cidade", group.city))
           .addTo(state.mapLayer);
       }
     });
+
+    if (state.showPlannedMap) {
+      state.plans
+        .filter(plan => plan.city && plan.uf && plan.status !== "cancelado")
+        .forEach(plan => {
+          const coords = getMapCoordinates(plan);
+          if (!coords) return;
+          L.circleMarker([coords.lat, coords.lng], {
+            radius: 7,
+            color: "rgba(9,117,153,0.95)",
+            weight: 2,
+            fillColor: "rgba(38,185,221,0.2)",
+            fillOpacity: 0.55,
+            dashArray: "3 4"
+          }).bindTooltip(`<b>${escapeHtml(plan.destination)}</b><br>Planejado em ${plan.city}${plan.uf ? ` - ${plan.uf}` : ""}`)
+            .on("click", () => { selectPlan(plan.id); switchView("planejar"); })
+            .addTo(state.mapLayer);
+        });
+    }
+
+    const topCities = Object.values(cityGroups).sort((a, b) => b.count - a.count).slice(0, 5);
+    els["map-rank"].innerHTML = topCities.map(city => `
+      <div class="rank-row">
+        <div class="rank-name">${escapeHtml(`${city.city}, ${city.uf}`)}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${(city.count / maxCity) * 100}%"></div></div>
+        <div class="rank-count">${city.count}</div>
+      </div>
+    `).join("");
   }
 
   state.mapLayer.addTo(state.map);
-  const topUfs = Object.entries(ufCounts).sort((a, b) => b[1] - a[1]).slice(0, 8);
-  els["map-rank"].innerHTML = topUfs.map(([uf, value]) => `
-    <div class="rank-row">
-      <div class="rank-name">${uf}</div>
-      <div class="bar-track"><div class="bar-fill" style="width:${(value / max) * 100}%"></div></div>
-      <div class="rank-count">${value}</div>
+  const radarPlans = getUpcomingPlans(3).filter(plan => plan.city || plan.uf);
+  els["map-plan-radar"].innerHTML = radarPlans.length ? radarPlans.map(plan => `
+    <div class="map-side-item" onclick="selectPlan(decodeURIComponent('${encodeURIComponent(plan.id)}')); switchView('planejar')">
+      <strong>${escapeHtml(plan.destination)}</strong>
+      <span>${escapeHtml(getPlanLocationLabel(plan))} | ${formatDateShort(plan.startDate)}</span>
     </div>
-  `).join("");
+  `).join("") : `<div class="inline-note">Nenhum plano com cidade definida para aparecer no mapa.</div>`;
+  els["map-note"].textContent = state.mapType === "bubbles"
+    ? "As bolhas mostram cidades reais revisitadas; as linhas pontilhadas sugerem rotas com multiplas paradas."
+    : "O mapa por UF ajuda a enxergar distribuicao geografica sem competir com a leitura detalhada das viagens.";
 }
 
 function renderStats() {
@@ -2358,17 +2631,10 @@ function renderStats() {
   draw("stat-ufs", getTop(trip => trip.uf));
   draw("stat-cities", getTop(trip => trip.city));
   draw("stat-tags", getTop(trip => trip.tags));
-  draw("stat-plan-statuses", Object.entries(state.plans.reduce((acc, plan) => {
-    acc[STATUS_META[plan.status].label] = (acc[STATUS_META[plan.status].label] || 0) + 1;
-    return acc;
-  }, {})).sort((a, b) => b[1] - a[1]));
+  draw("stat-companions", getTop(trip => trip.travelers));
+  draw("stat-artists", getTop(trip => trip.artists));
 
-  const years = [...new Set([
-    ...state.filtered.map(trip => trip.year).filter(Boolean),
-    ...state.plans.map(plan => plan.year).filter(Boolean)
-  ])].sort();
-
-  const plannedSeries = years.map(year => state.plans.filter(plan => plan.year === year).length);
+  const years = [...new Set(state.filtered.map(trip => trip.year).filter(Boolean))].sort();
   const effectiveSeries = years.map(year => state.filtered.filter(trip => trip.year === year).length);
 
   const ctx = document.getElementById("timeChart").getContext("2d");
@@ -2379,20 +2645,7 @@ function renderStats() {
       labels: years,
       datasets: [
         {
-          label: "Planejado",
-          data: plannedSeries,
-          borderColor: "rgba(212, 70, 28, 0.95)",
-          backgroundColor: "rgba(212, 70, 28, 0.1)",
-          borderWidth: 3,
-          pointBackgroundColor: "#fff",
-          pointBorderColor: "rgba(212, 70, 28, 0.95)",
-          pointBorderWidth: 2,
-          pointRadius: 4,
-          fill: true,
-          tension: 0.35
-        },
-        {
-          label: "Efetivado",
+          label: "Viagens realizadas",
           data: effectiveSeries,
           borderColor: "rgba(38, 185, 221, 1)",
           backgroundColor: "rgba(38, 185, 221, 0.08)",
@@ -2419,6 +2672,14 @@ function renderStats() {
       }
     }
   });
+
+  const upcomingPlans = getUpcomingPlans(5);
+  els["stat-upcoming-plans"].innerHTML = upcomingPlans.length ? upcomingPlans.map(plan => `
+    <div class="soft-support-item" onclick="selectPlan(decodeURIComponent('${encodeURIComponent(plan.id)}')); switchView('planejar')">
+      <strong>${escapeHtml(plan.destination)}</strong>
+      <span>${escapeHtml(getPlanLocationLabel(plan))} | ${formatDateRange(plan.startDate, plan.endDate)}</span>
+    </div>
+  `).join("") : `<div class="empty-state">A agenda futura aparece aqui quando os planos tiverem cidade e datas definidas.</div>`;
 }
 
 function renderPlanningExperience() {
@@ -2434,7 +2695,7 @@ function renderPlanningSourceNote() {
   if (!isConfiguredUrl(GOOGLE_SCRIPT_URL, "SEU_ID_AQUI")) notes.push({ tone: "", text: "GOOGLE_SCRIPT_URL ainda esta em placeholder. Criar, atualizar status e efetivar vao exibir erro ate voce colar a URL real do Apps Script." });
   if (!notes.length) {
     els["planning-source-note"].className = "source-note";
-    els["planning-source-note"].textContent = "Leitura preparada para Google Sheets publicado e gravacao centralizada via Google Apps Script.";
+    els["planning-source-note"].textContent = "Use o planejamento como um rascunho rico da viagem futura. Quando ele tiver cidade, contexto e companhia, a efetivacao fica muito mais natural.";
     return;
   }
   els["planning-source-note"].className = `source-note ${notes.some(note => note.tone === "error") ? "error" : ""}`;
@@ -2444,10 +2705,10 @@ function renderPlanningSourceNote() {
 function renderPlanningMetrics() {
   const linkedIds = new Set(state.trips.map(trip => trip.planId).filter(Boolean));
   const metrics = [
-    { icon: "bookmark-plus", label: "Planejados", value: state.planMetrics.total },
+    { icon: "bookmark-plus", label: "Planos totais", value: state.planMetrics.total },
     { icon: "timer-reset", label: "Em aberto", value: state.planMetrics.open },
-    { icon: "git-branch-plus", label: "Com vinculo", value: linkedIds.size },
-    { icon: "percent", label: "Conversao", value: `${state.planMetrics.conversionRate}%` }
+    { icon: "map-pin", label: "Com cidade", value: state.plans.filter(plan => plan.city).length },
+    { icon: "git-branch-plus", label: "Ja conectados", value: linkedIds.size }
   ];
   els["planning-mini-stats"].innerHTML = metrics.map(metric => `
     <div class="mini-stat">
@@ -2472,9 +2733,13 @@ function renderPlanList() {
           <span class="date-text">${plan.year || "Sem ano"}</span>
         </div>
         <h3 class="plan-item-title">${escapeHtml(plan.destination)}</h3>
-        <div class="plan-item-copy">${escapeHtml(formatDateRange(plan.startDate, plan.endDate))}</div>
+        <div class="plan-item-copy">${escapeHtml(getPlanLocationLabel(plan))}</div>
+        <div class="meta-cloud">
+          ${plan.tags.slice(0, 2).map(tag => `<span class="meta-pill"><i data-lucide="hash"></i>${escapeHtml(tag)}</span>`).join("")}
+          ${plan.travelers.slice(0, 1).map(person => `<span class="meta-pill"><i data-lucide="users"></i>${escapeHtml(person)}</span>`).join("")}
+        </div>
         <div class="plan-item-meta">
-          <span><i data-lucide="calendar-range"></i>${getItineraryDayCount(plan)} dia(s)</span>
+          <span><i data-lucide="calendar-range"></i>${formatDateRange(plan.startDate, plan.endDate)}</span>
           <span><i data-lucide="git-branch-plus"></i>${linkedTrips.length} linha(s) efetivada(s)</span>
         </div>
       </article>
@@ -2503,11 +2768,17 @@ function renderSelectedPlan() {
   panel.innerHTML = `
     <div class="detail-header-top">
       <div>
-        <div class="panel-label">Plano selecionado</div>
+        <div class="panel-label">Viagem futura</div>
         <h2 class="panel-title" style="margin-top:10px;">${escapeHtml(plan.destination)}</h2>
-        <p class="detail-copy">${escapeHtml(formatDateRange(plan.startDate, plan.endDate))}</p>
+        <p class="detail-copy">${escapeHtml(getPlanLocationLabel(plan))} | ${escapeHtml(formatDateRange(plan.startDate, plan.endDate))}</p>
       </div>
       ${renderStatusChip(plan.status)}
+    </div>
+
+    <div class="meta-cloud">
+      ${plan.tags.map(tag => `<span class="meta-pill"><i data-lucide="hash"></i>${escapeHtml(tag)}</span>`).join("")}
+      ${plan.travelers.map(person => `<span class="meta-pill"><i data-lucide="users"></i>${escapeHtml(person)}</span>`).join("")}
+      ${plan.artists.map(artist => `<span class="meta-pill"><i data-lucide="music-2"></i>${escapeHtml(artist)}</span>`).join("")}
     </div>
 
     <div class="detail-actions">
@@ -2528,8 +2799,12 @@ function renderSelectedPlan() {
         <span>${linkedTrips.length}</span>
       </div>
       <div class="detail-note-box">
-        <strong>Leitura do roteiro</strong>
-        <p>${plan.itinerary.notes ? escapeHtml(plan.itinerary.notes) : itineraryDays.length ? "Roteiro estruturado pronto para comparacao e conversao." : "Plano sem roteiro detalhado."}</p>
+        <strong>Contexto da viagem</strong>
+        <p>${plan.artists.length || plan.tags.length || plan.travelers.length ? escapeHtml([
+          plan.tags.length ? `Motivos: ${plan.tags.join(", ")}` : "",
+          plan.travelers.length ? `Companhias: ${plan.travelers.join(", ")}` : "",
+          plan.artists.length ? `Artistas/contexto: ${plan.artists.join(", ")}` : ""
+        ].filter(Boolean).join(" | ")) : itineraryDays.length ? "O plano ja tem estrutura de datas e pode receber mais contexto antes da efetivacao." : "Plano sem contexto adicional por enquanto."}</p>
       </div>
     </div>
 
@@ -2568,7 +2843,7 @@ function renderItineraryTable(itinerary, editable, startDate, endDate) {
       if (editable) {
         html += `<td class="itinerary-td"><textarea class="itinerary-input" id="draft-${slot.key}-${index}" placeholder="O que acontece aqui?">${escapeHtml(value)}</textarea></td>`;
       } else {
-        html += `<td class="itinerary-td"><div class="itinerary-output">${escapeHtml(value || "—")}</div></td>`;
+        html += `<td class="itinerary-td"><div class="itinerary-output">${escapeHtml(value || "-")}</div></td>`;
       }
     });
     html += `</tr>`;
@@ -2579,7 +2854,8 @@ function renderItineraryTable(itinerary, editable, startDate, endDate) {
 }
 
 function gerarGradeRoteiro() {
-  const destination = els["plan-dest"].value.trim();
+  const tripName = els["plan-name"].value.trim();
+  const city = els["plan-dest"].value.trim();
   const startDate = els["plan-start"].value;
   const endDate = els["plan-end"].value;
   const message = els["plan-message"];
@@ -2597,7 +2873,8 @@ function gerarGradeRoteiro() {
 
   const days = getDaysBetween(startDate, endDate);
   const itinerary = { days, slots: createEmptySlots(days), notes: "" };
-  els["plan-grid-title"].textContent = destination ? `Roteiro diario: ${destination}` : "Roteiro diario";
+  const planLabel = tripName || city;
+  els["plan-grid-title"].textContent = planLabel ? `Roteiro diario: ${planLabel}` : "Roteiro diario";
   els["itinerary-table-wrapper"].innerHTML = renderItineraryTable(itinerary, true, startDate, endDate);
   els["plan-grid-container"].style.display = "block";
   els["plan-draft-summary"].textContent = `${days.length} dia(s) preparados para o planejamento.`;
@@ -2605,15 +2882,21 @@ function gerarGradeRoteiro() {
 }
 
 async function salvarPlanejamento() {
-  const destination = els["plan-dest"].value.trim();
+  const tripName = els["plan-name"].value.trim();
+  const city = els["plan-dest"].value.trim();
+  const uf = normalizeUfValue(els["plan-uf"].value);
   const startDate = els["plan-start"].value;
   const endDate = els["plan-end"].value;
+  const tags = splitListValue(els["plan-tags"].value);
+  const travelers = splitListValue(els["plan-companions"].value);
+  const artists = splitListValue(els["plan-artists"].value);
   const status = normalizeStatus(els["plan-status"].value);
   const message = els["plan-message"];
+  const destination = tripName || city;
 
   if (!destination) {
     message.style.color = "var(--danger)";
-    message.textContent = "Informe o destino do plano antes de salvar.";
+    message.textContent = "Informe ao menos o nome da viagem ou a cidade principal antes de salvar.";
     return;
   }
   if (!startDate || !endDate) {
@@ -2625,9 +2908,18 @@ async function salvarPlanejamento() {
   const itinerary = collectDraftItinerary(startDate, endDate);
   const payload = {
     id: `plan-${Date.now()}`,
+    viagem: tripName,
     destino: destination,
+    cidade: city,
+    uf,
     dataInicio: startDate,
     dataFim: endDate,
+    tags,
+    tagsTexto: joinListValue(tags),
+    acompanhantes: travelers,
+    acompanhantesTexto: joinListValue(travelers),
+    artistas: artists,
+    artistasTexto: joinListValue(artists),
     status,
     itinerarioDiario: JSON.stringify(itinerary),
     createdAt: new Date().toISOString()
@@ -2638,16 +2930,27 @@ async function salvarPlanejamento() {
 
   try {
     await postToAppsScript("create_plan", payload);
+    tags.forEach(tag => addToList("tags", tag));
+    travelers.forEach(person => addToList("companions", person));
+    artists.forEach(artist => addToList("artists", artist));
     const localPlan = {
       id: payload.id,
+      name: tripName,
       destination,
+      city,
+      uf,
       startDate,
       endDate,
+      tags,
+      artists,
+      travelers,
+      lat: null,
+      lng: null,
       status,
       itinerary,
       itineraryRaw: payload.itinerarioDiario,
       year: getYearFromDate(startDate),
-      searchIndex: `${payload.id} ${destination} ${status}`.toLowerCase()
+      searchIndex: `${payload.id} ${destination} ${city} ${uf} ${tags.join(" ")} ${artists.join(" ")} ${travelers.join(" ")} ${status}`.toLowerCase()
     };
     state.plans.push(localPlan);
     state.selectedPlanId = localPlan.id;
@@ -2702,6 +3005,11 @@ function startPlanConversion(planId) {
   document.getElementById("f-name").value = plan.destination;
   document.getElementById("f-start").value = plan.startDate || "";
   document.getElementById("f-end").value = plan.endDate || "";
+  state.formTags = [...plan.tags];
+  state.formArtists = [...plan.artists];
+  state.formCompanions = [...plan.travelers];
+  renderFormTaxonomies();
+  if (state.formCities[0]) fillCityBlockFromPlan(state.formCities[0].id, plan);
   renderConversionBanner();
   updateNameSuggestions();
   switchView("form");
@@ -2715,7 +3023,7 @@ function renderConversionBanner() {
   }
   banner.classList.add("active");
   els["conversion-banner-title"].textContent = `Efetivando o plano ${state.pendingConversion.destination}`;
-  els["conversion-banner-copy"].textContent = "As linhas salvas neste formulario vao carregar o planId e atualizar o status do plano para efetivado.";
+  els["conversion-banner-copy"].textContent = "As linhas salvas aqui vao manter o planId, reaproveitar o contexto do plano e atualizar o status para efetivado.";
 }
 
 function clearPendingConversion(keepCurrentView) {
@@ -2769,7 +3077,7 @@ async function handleFormSubmit(event) {
     const year = getYearFromDate(start);
     const newTrips = cities.map((city, index) => ({
       id: `session-${Date.now()}-${index}`,
-      name: cities.length > 1 ? `${name} · ${city.city}` : name,
+      name: cities.length > 1 ? `${name} | ${city.city}` : name,
       city: city.city,
       uf: city.uf,
       startDate: start,
@@ -2926,7 +3234,7 @@ function updateSyncPill() {
 
   const loading = !state.loaded.trips || !state.loaded.plans;
   pill.classList.toggle("loaded", !loading && !state.errors.trips);
-  pill.classList.toggle("warning", !!state.errors.plans || !isConfiguredUrl(GOOGLE_SCRIPT_URL, "SEU_ID_AQUI"));
+  pill.classList.toggle("warning", !!state.errors.trips || !!state.errors.plans);
 
   if (loading) {
     els["sync-text"].textContent = "Carregando viagens e planos...";
@@ -2935,13 +3243,13 @@ function updateSyncPill() {
 
   const messages = [];
   if (state.errors.trips) messages.push("Base principal com erro");
-  else messages.push(`${state.trips.length} linha(s) efetivada(s)`);
+  else messages.push(`${state.trips.length} registros reais`);
 
-  if (state.errors.plans) messages.push("planos sem leitura oficial");
-  else messages.push(`${state.plans.length} plano(s)`);
+  if (state.errors.plans) messages.push("planejamento sem leitura oficial");
+  else messages.push(`${state.plans.length} planos de apoio`);
 
-  if (!isConfiguredUrl(GOOGLE_SCRIPT_URL, "SEU_ID_AQUI")) messages.push("Apps Script pendente");
-  els["sync-text"].textContent = messages.join(" · ");
+  if (!isConfiguredUrl(GOOGLE_SCRIPT_URL, "SEU_ID_AQUI")) messages.push("salvamento externo pendente");
+  els["sync-text"].textContent = messages.join(" | ");
 }
 
 function collectDraftItinerary(startDate, endDate) {
