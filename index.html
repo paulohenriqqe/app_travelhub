@@ -9,6 +9,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -100,26 +101,35 @@
   .clear-button{min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 20px;border:1px solid var(--line);border-radius:10px;background:var(--white);color:var(--ink-2);font-size:14px;font-weight:600;transition:var(--transition);}
   .clear-button:hover{background:var(--paper-2);color:var(--ink);}
 
-  /* GALLERY */
-  .gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;}
-  .trip-card{padding:24px;cursor:pointer;display:flex;flex-direction:column;height:100%;border:1px solid transparent;}
+  /* GALLERY - Cards mais compactos */
+  .gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}
+  .trip-card{padding:16px;cursor:pointer;display:flex;flex-direction:column;height:100%;border:1px solid transparent;}
   .trip-card:hover{border-color:var(--line-strong);box-shadow:var(--shadow-md);transform:translateY(-4px);}
-  .trip-topline{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-  .uf-badge{display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;background:var(--blue-pale);color:var(--blue-dark);font-size:12px;font-weight:700;letter-spacing:.05em;}
-  .date-text{color:var(--ink-3);font-size:13px;font-weight:600;}
-  .trip-title{margin:0 0 10px;font-family:"DM Serif Display",serif;font-size:24px;line-height:1.2;color:var(--blue-dark);}
-  .trip-city{display:flex;align-items:center;gap:8px;color:var(--ink-2);font-size:15px;font-weight:500;}
-  .trip-city svg{width:16px;height:16px;color:var(--accent);}
-  .tag-row{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0;}
-  .tag{display:inline-flex;padding:6px 12px;border-radius:8px;background:var(--paper-2);color:var(--ink-2);font-size:12px;font-weight:600;}
-  .trip-details{margin-top:auto;padding-top:16px;border-top:1px solid var(--line);display:flex;justify-content:space-between;color:var(--ink-3);font-size:13px;font-weight:500;}
-  .trip-details span{display:flex;align-items:center;gap:8px;}
-  .multi-city-pill{font-size:11px;background:var(--accent-bg);color:var(--accent);padding:3px 10px;border-radius:999px;font-weight:700;margin-left:8px;}
-
+  .trip-topline{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .uf-badge{display:inline-flex;align-items:center;padding:4px 10px;border-radius:999px;background:var(--blue-pale);color:var(--blue-dark);font-size:11px;font-weight:700;letter-spacing:.05em;}
+  .date-text{color:var(--ink-3);font-size:12px;font-weight:700;}
+  .trip-title{margin:0 0 6px;font-family:"DM Serif Display",serif;font-size:20px;line-height:1.2;color:var(--blue-dark);}
+  .trip-city{display:flex;align-items:center;gap:6px;color:var(--ink-2);font-size:14px;font-weight:500;}
+  .trip-city svg{width:14px;height:14px;color:var(--accent);}
+  .tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0;}
+  .tag{display:inline-flex;padding:4px 10px;border-radius:6px;background:var(--paper-2);color:var(--ink-2);font-size:11px;font-weight:700;}
+  .trip-details{margin-top:auto;padding-top:12px;border-top:1px solid var(--line);display:flex;justify-content:space-between;color:var(--ink-3);font-size:12px;font-weight:600;}
+  .trip-details span{display:flex;align-items:center;gap:6px;}
+  
   /* MAP */
   .map-layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:24px;align-items:start;}
-  .map-panel{overflow:hidden;padding:0;border:none;box-shadow:var(--shadow-md);}
-  #map{width:100%;height:65vh;min-height:500px;background:#e2e8f0;}
+  .map-panel{overflow:hidden;padding:0;border:none;box-shadow:var(--shadow-md);border-radius:16px; z-index: 1;}
+  #map{width:100%;height:65vh;min-height:500px;background:#f8fafc; cursor: pointer;} /* cursor atualizado */
+  
+  /* Rótulo das UFs dentro do mapa */
+  .leaflet-tooltip.uf-label {
+      background: transparent; border: none; box-shadow: none; 
+      font-size: 11px; font-weight: 700; text-align: center;
+      text-shadow: 0 0 4px rgba(255,255,255,0.9), 0 0 2px rgba(255,255,255,0.9); 
+      padding: 0; color: var(--blue-dark);
+  }
+  .leaflet-tooltip.uf-label.visited { color: var(--white); text-shadow: none; }
+
   .rank-panel{padding:24px;}
   .rank-list{display:flex;flex-direction:column;gap:16px;margin-top:20px;}
   .rank-row{display:grid;grid-template-columns:40px 1fr 35px;gap:12px;align-items:center;}
@@ -165,7 +175,7 @@
   .add-city-btn:hover{background:var(--blue-light);color:var(--white);border-style:solid;}
   .add-city-btn svg{width:16px;height:16px;}
 
-  /* AUTOCOMPLETE (Tags, Artistas, Acompanhantes) */
+  /* AUTOCOMPLETE */
   .autocomplete-wrapper{position:relative;width:100%;}
   .tag-input-area{min-height:44px;padding:6px 10px;border:1px solid var(--line);border-radius:10px;background:var(--paper);display:flex;flex-wrap:wrap;gap:6px;align-items:center;cursor:text;transition:var(--transition);}
   .tag-input-area:focus-within{border-color:var(--blue-light);background:var(--white);box-shadow:0 0 0 4px var(--blue-pale);}
@@ -182,7 +192,7 @@
   .ac-item.new-item svg{color:var(--accent);}
   .ac-divider{height:1px;background:var(--line);margin:4px 0;}
 
-  /* ===================== LISTA SUSPENSA TAB ===================== */
+  /* LISTA SUSPENSA TAB */
   .lista-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;}
   .lista-card{background:var(--white);border-radius:var(--radius);border:1px solid var(--line);box-shadow:var(--shadow-sm);overflow:hidden;}
   .lista-card-header{padding:20px 24px;border-bottom:1px solid var(--line);background:var(--paper);display:flex;align-items:center;justify-content:space-between;}
@@ -209,7 +219,8 @@
   /* MODAL */
   .modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(10,47,76,.6);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:9999;opacity:0;visibility:hidden;transition:.3s ease;padding:20px;}
   .modal-overlay.open{opacity:1;visibility:visible;}
-  .modal-content{background:var(--white);width:100%;max-width:540px;border-radius:24px;position:relative;transform:translateY(30px) scale(.95);transition:.3s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 25px 50px -12px rgba(0,0,0,.25);max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;}
+  /* Modal levemente mais largo para acomodar os cards compactos perfeitamente */
+  .modal-content{background:var(--white);width:100%;max-width:860px;border-radius:24px;position:relative;transform:translateY(30px) scale(.95);transition:.3s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 25px 50px -12px rgba(0,0,0,.25);max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;}
   .modal-overlay.open .modal-content{transform:translateY(0) scale(1);}
   .modal-close{position:absolute;top:20px;right:20px;width:40px;height:40px;background:var(--paper-2);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--ink-2);transition:var(--transition);z-index:2;}
   .modal-close:hover{background:var(--line-strong);color:var(--ink);transform:rotate(90deg);}
@@ -281,8 +292,6 @@
     </header>
 
     <section class="content">
-
-      <!-- DASHBOARD -->
       <section class="view active" id="view-dashboard">
         <div class="dashboard-stack">
           <div class="kpi-grid" id="kpi-grid"></div>
@@ -301,7 +310,6 @@
         </div>
       </section>
 
-      <!-- MAP -->
       <section class="view" id="view-map">
         <div class="dashboard-stack">
           <div class="map-toolbar">
@@ -309,7 +317,7 @@
               <button class="map-toggle active" data-map-type="choropleth"><i data-lucide="map-pinned"></i> UFs (Calor)</button>
               <button class="map-toggle" data-map-type="bubbles"><i data-lucide="circle-dot"></i> Cidades (Pins)</button>
             </div>
-            <div class="map-note" id="map-note">Para pins exatos, inclua Latitude e Longitude na sua base de dados.</div>
+            <div class="map-note" id="map-note">Clique nas áreas pintadas para ver as viagens.</div>
           </div>
           <div class="map-layout">
             <div class="panel map-panel"><div id="map"></div></div>
@@ -321,7 +329,6 @@
         </div>
       </section>
 
-      <!-- STATS -->
       <section class="view" id="view-stats">
         <div class="dashboard-stack">
           <div class="kpi-grid" id="stats-kpi-grid"></div>
@@ -338,15 +345,11 @@
         </div>
       </section>
 
-      <!-- FORM: NOVO MOMENT -->
       <section class="view" id="view-form">
         <div class="panel form-panel">
           <h2 class="chart-title" style="font-size:32px;text-align:center;margin-bottom:8px;">Novo Moment</h2>
           <p style="text-align:center;color:var(--ink-3);margin:0 0 32px;font-size:14px;">Registre sua experiência com todos os detalhes</p>
-
           <form id="trip-form">
-
-            <!-- NOME DA VIAGEM -->
             <div class="form-section">
               <div class="form-section-title"><i data-lucide="tag"></i> Nome do Moment</div>
               <div class="field field-full">
@@ -355,7 +358,6 @@
               </div>
             </div>
 
-            <!-- DATAS -->
             <div class="form-section">
               <div class="form-section-title"><i data-lucide="calendar"></i> Período</div>
               <div class="form-grid">
@@ -364,7 +366,6 @@
               </div>
             </div>
 
-            <!-- CIDADES -->
             <div class="form-section">
               <div class="form-section-title"><i data-lucide="map-pin"></i> Cidades visitadas <span style="font-size:11px;color:var(--ink-3);font-weight:400;letter-spacing:0;text-transform:none;margin-left:8px;">Adicione quantas quiser</span></div>
               <div class="city-blocks" id="city-blocks"></div>
@@ -373,7 +374,6 @@
               </button>
             </div>
 
-            <!-- TAGS / MOTIVO -->
             <div class="form-section">
               <div class="form-section-title"><i data-lucide="hash"></i> Tags / Motivo</div>
               <div class="field field-full">
@@ -385,7 +385,6 @@
               </div>
             </div>
 
-            <!-- ARTISTAS -->
             <div class="form-section">
               <div class="form-section-title"><i data-lucide="music-2"></i> Artistas</div>
               <div class="field field-full">
@@ -396,7 +395,6 @@
               </div>
             </div>
 
-            <!-- ACOMPANHANTES -->
             <div class="form-section">
               <div class="form-section-title"><i data-lucide="users"></i> Acompanhantes</div>
               <div class="field field-full">
@@ -413,7 +411,6 @@
         </div>
       </section>
 
-      <!-- LISTAS SUSPENSAS -->
       <section class="view" id="view-listas">
         <div class="dashboard-stack">
           <div style="padding:0 0 8px;">
@@ -428,7 +425,6 @@
   </main>
 </div>
 
-<!-- MOBILE NAV -->
 <nav class="mobile-nav">
   <button class="nav-item active" data-view="dashboard"><i data-lucide="layout-dashboard"></i> Home</button>
   <button class="nav-item" data-view="map"><i data-lucide="map"></i> Mapa</button>
@@ -437,7 +433,6 @@
   <button class="nav-item" data-view="listas"><i data-lucide="list"></i> Listas</button>
 </nav>
 
-<!-- MODAL -->
 <div id="trip-modal" class="modal-overlay">
   <div class="modal-content">
     <button class="modal-close" onclick="closeModal()"><i data-lucide="x"></i></button>
@@ -447,6 +442,9 @@
 </div>
 
 <script>
+// Plugin Datalabels Global Registration
+Chart.register(ChartDataLabels);
+
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
@@ -472,23 +470,9 @@ const state = {
   mapType: "choropleth",
   map: null, mapLayer: null, geoData: null,
   loaded: false, chartInstance: null,
-
-  // Listas suspensas — armazenadas localmente
-  lists: {
-    tags: [],
-    artists: [],
-    companions: []
-  },
-
-  // Form state
-  formCities: [],       // [{uf, city, lat, lng}]
-  formTags: [],
-  formArtists: [],
-  formCompanions: [],
-
-  // IBGE cache
-  ibgeUFs: [],
-  ibgeCitiesCache: {}
+  lists: { tags: [], artists: [], companions: [] },
+  formCities: [], formTags: [], formArtists: [], formCompanions: [],
+  ibgeUFs: [], ibgeCitiesCache: {}
 };
 
 const els = {};
@@ -505,7 +489,7 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchTrips();
   initIBGEForm();
   renderListasView();
-  addCityBlock(); // Add first city block by default
+  addCityBlock();
 });
 
 function cacheElements() {
@@ -538,18 +522,15 @@ function bindEvents() {
   document.addEventListener("keydown", e => { if(e.key==="Escape"&&els["trip-modal"].classList.contains("open")) closeModal(); });
   els["add-city-btn"].addEventListener("click", addCityBlock);
 
-  // Name suggestion triggers
   document.getElementById("f-start").addEventListener("change", updateNameSuggestions);
   document.getElementById("f-end").addEventListener("change", updateNameSuggestions);
 
-  // Close dropdowns on outside click
   document.addEventListener("click", e => {
     if (!e.target.closest(".autocomplete-wrapper")) {
       document.querySelectorAll(".autocomplete-dropdown").forEach(d => d.classList.remove("open"));
     }
   });
 
-  // Autocomplete setup
   setupAutocomplete("tags", "tags-input", "tags-area", "tags-dropdown", "tags");
   setupAutocomplete("artists", "artists-input", "artists-area", "artists-dropdown", "artists");
   setupAutocomplete("companions", "companions-input", "companions-area", "companions-dropdown", "companions");
@@ -560,407 +541,85 @@ function refreshIcons() { if(window.lucide) window.lucide.createIcons(); }
 // ═══════════════════════════════════════════════════════════
 // LOCAL STORAGE FOR LISTS
 // ═══════════════════════════════════════════════════════════
-function loadListsFromStorage() {
-  try {
-    const saved = localStorage.getItem("moments_lists");
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      state.lists = { ...state.lists, ...parsed };
-    }
-  } catch(e) {}
-}
-
-function saveListsToStorage() {
-  try { localStorage.setItem("moments_lists", JSON.stringify(state.lists)); } catch(e) {}
-}
-
-function addToList(listKey, value) {
-  const v = value.trim();
-  if (!v || state.lists[listKey].includes(v)) return false;
-  state.lists[listKey].push(v);
-  state.lists[listKey].sort((a,b) => a.localeCompare(b,"pt"));
-  saveListsToStorage();
-  renderListasView();
-  return true;
-}
-
-function removeFromList(listKey, value) {
-  state.lists[listKey] = state.lists[listKey].filter(i => i !== value);
-  saveListsToStorage();
-  renderListasView();
-}
-
-function renameInList(listKey, oldVal, newVal) {
-  const idx = state.lists[listKey].indexOf(oldVal);
-  if (idx !== -1 && newVal.trim()) {
-    state.lists[listKey][idx] = newVal.trim();
-    state.lists[listKey].sort((a,b) => a.localeCompare(b,"pt"));
-    saveListsToStorage();
-  }
-}
-
-// Import from trips CSV (populate lists on load)
-function populateListsFromTrips(trips) {
-  trips.forEach(t => {
-    t.tags.forEach(tag => addToList("tags", tag));
-    t.artists.forEach(a => addToList("artists", a));
-    t.travelers.forEach(c => addToList("companions", c));
-  });
-}
+function loadListsFromStorage() { try { const saved = localStorage.getItem("moments_lists"); if (saved) { state.lists = { ...state.lists, ...JSON.parse(saved) }; } } catch(e) {} }
+function saveListsToStorage() { try { localStorage.setItem("moments_lists", JSON.stringify(state.lists)); } catch(e) {} }
+function addToList(listKey, value) { const v = value.trim(); if (!v || state.lists[listKey].includes(v)) return false; state.lists[listKey].push(v); state.lists[listKey].sort((a,b) => a.localeCompare(b,"pt")); saveListsToStorage(); renderListasView(); return true; }
+function removeFromList(listKey, value) { state.lists[listKey] = state.lists[listKey].filter(i => i !== value); saveListsToStorage(); renderListasView(); }
+function renameInList(listKey, oldVal, newVal) { const idx = state.lists[listKey].indexOf(oldVal); if (idx !== -1 && newVal.trim()) { state.lists[listKey][idx] = newVal.trim(); state.lists[listKey].sort((a,b) => a.localeCompare(b,"pt")); saveListsToStorage(); } }
+function populateListsFromTrips(trips) { trips.forEach(t => { t.tags.forEach(tag => addToList("tags", tag)); t.artists.forEach(a => addToList("artists", a)); t.travelers.forEach(c => addToList("companions", c)); }); }
 
 // ═══════════════════════════════════════════════════════════
-// LISTAS SUSPENSAS VIEW
+// LISTAS SUSPENSAS VIEW & AUTOCOMPLETE (Omitidos p/ focar no principal, mantendo funções originais minimizadas)
 // ═══════════════════════════════════════════════════════════
-const LIST_META = {
-  tags:       { label:"Tags / Motivos",  icon:"hash",    desc:"Aparece no campo Tags do formulário" },
-  artists:    { label:"Artistas",        icon:"music-2", desc:"Artistas que aparecem no autocomplete" },
-  companions: { label:"Acompanhantes",   icon:"users",   desc:"Nomes que aparecem no autocomplete" }
-};
-
-function renderListasView() {
-  if (!els["lista-grid"]) return;
-  els["lista-grid"].innerHTML = Object.entries(LIST_META).map(([key, meta]) => `
-    <div class="lista-card">
-      <div class="lista-card-header">
-        <h3 class="lista-card-title">${meta.label}</h3>
-        <span class="lista-count">${state.lists[key].length}</span>
-      </div>
-      <div class="lista-items" id="lista-items-${key}">
-        ${state.lists[key].length === 0
-          ? `<div style="color:var(--ink-3);font-size:13px;font-style:italic;text-align:center;padding:12px 0;">Nenhum item cadastrado</div>`
-          : state.lists[key].map(item => renderListaItem(key, item)).join("")
-        }
-      </div>
-      <div class="lista-add-row">
-        <div class="lista-add-input-wrap">
-          <input class="lista-add-input" id="lista-add-${key}" placeholder="Novo item..." type="text">
-          <button class="lista-add-btn" onclick="addFromListInput('${key}')">Adicionar</button>
-        </div>
-      </div>
-      <div class="lista-import-note"><i data-lucide="info"></i> ${meta.desc}. Novas entradas no formulário são salvas aqui automaticamente.</div>
-    </div>
-  `).join("");
-
-  // Bind enter key for list inputs
-  Object.keys(LIST_META).forEach(key => {
-    const input = document.getElementById(`lista-add-${key}`);
-    if (input) {
-      input.addEventListener("keydown", e => { if(e.key==="Enter") { e.preventDefault(); addFromListInput(key); } });
-    }
-  });
-
-  refreshIcons();
+const LIST_META = { tags:{label:"Tags / Motivos",icon:"hash",desc:"Aparece no campo Tags do formulário"}, artists:{label:"Artistas",icon:"music-2",desc:"Artistas que aparecem no autocomplete"}, companions:{label:"Acompanhantes",icon:"users",desc:"Nomes que aparecem no autocomplete"} };
+function renderListasView() { if (!els["lista-grid"]) return; els["lista-grid"].innerHTML = Object.entries(LIST_META).map(([key, meta]) => `
+    <div class="lista-card"><div class="lista-card-header"><h3 class="lista-card-title">${meta.label}</h3><span class="lista-count">${state.lists[key].length}</span></div>
+    <div class="lista-items" id="lista-items-${key}">${state.lists[key].length===0 ? `<div style="color:var(--ink-3);font-size:13px;font-style:italic;text-align:center;padding:12px 0;">Nenhum item cadastrado</div>`: state.lists[key].map(item => renderListaItem(key, item)).join("")}</div>
+    <div class="lista-add-row"><div class="lista-add-input-wrap"><input class="lista-add-input" id="lista-add-${key}" placeholder="Novo item..." type="text"><button class="lista-add-btn" onclick="addFromListInput('${key}')">Adicionar</button></div></div>
+    <div class="lista-import-note"><i data-lucide="info"></i> ${meta.desc}. Novas entradas no formulário são salvas aqui automaticamente.</div></div>`).join("");
+  Object.keys(LIST_META).forEach(key => { const input = document.getElementById(`lista-add-${key}`); if(input){input.addEventListener("keydown", e=>{if(e.key==="Enter"){e.preventDefault();addFromListInput(key);}});} }); refreshIcons();
 }
+function renderListaItem(listKey, item) { return `<div class="lista-item-row" id="lista-row-${listKey}-${CSS.escape(item)}"><div class="lista-item-text"><input type="text" value="${escapeHtml(item)}" onblur="handleListItemRename('${listKey}','${escapeHtml(item)}',this.value)" onkeydown="if(event.key==='Enter'){this.blur();}"></div><div class="lista-item-actions"><button class="icon-btn danger" onclick="removeFromList('${listKey}','${escapeHtml(item)}')" title="Remover"><i data-lucide="x"></i></button></div></div>`; }
+function addFromListInput(key) { const input = document.getElementById(`lista-add-${key}`); if (!input) return; const val = input.value.trim(); if (val) { addToList(key, val); input.value = ""; } }
+function handleListItemRename(listKey, oldVal, newVal) { if (newVal.trim() !== oldVal) { renameInList(listKey, oldVal, newVal); renderListasView(); } }
 
-function renderListaItem(listKey, item) {
-  return `
-    <div class="lista-item-row" id="lista-row-${listKey}-${CSS.escape(item)}">
-      <div class="lista-item-text">
-        <input type="text" value="${escapeHtml(item)}" 
-          onblur="handleListItemRename('${listKey}','${escapeHtml(item)}',this.value)"
-          onkeydown="if(event.key==='Enter'){this.blur();}"
-          style="border:0;background:transparent;font:inherit;color:inherit;width:100%;outline:none;">
-      </div>
-      <div class="lista-item-actions">
-        <button class="icon-btn danger" onclick="removeFromList('${listKey}','${escapeHtml(item)}')" title="Remover"><i data-lucide="x"></i></button>
-      </div>
-    </div>
-  `;
-}
-
-function addFromListInput(key) {
-  const input = document.getElementById(`lista-add-${key}`);
-  if (!input) return;
-  const val = input.value.trim();
-  if (val) { addToList(key, val); input.value = ""; }
-}
-
-function handleListItemRename(listKey, oldVal, newVal) {
-  if (newVal.trim() !== oldVal) { renameInList(listKey, oldVal, newVal); renderListasView(); }
-}
-
-// ═══════════════════════════════════════════════════════════
-// AUTOCOMPLETE COMPONENT
-// ═══════════════════════════════════════════════════════════
 function setupAutocomplete(stateKey, inputId, areaId, dropdownId, listKey) {
-  const input = document.getElementById(inputId);
-  const area = document.getElementById(areaId);
-  const dropdown = document.getElementById(dropdownId);
-
+  const input = document.getElementById(inputId), area = document.getElementById(areaId), dropdown = document.getElementById(dropdownId);
   area.addEventListener("click", () => input.focus());
-
   input.addEventListener("input", () => renderDropdown(input, dropdown, listKey, stateKey));
-  input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === ",") {
-      e.preventDefault();
-      const val = input.value.trim().replace(/,$/, "");
-      if (val) commitTag(stateKey, val, listKey, input, area);
-    }
-    if (e.key === "Backspace" && !input.value) {
-      const arr = state["form" + capitalize(stateKey)];
-      if (arr.length) { arr.pop(); renderChips(stateKey, area, input, listKey); }
-    }
-  });
+  input.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === ",") { e.preventDefault(); const val = input.value.trim().replace(/,$/, ""); if (val) commitTag(stateKey, val, listKey, input, area); } if (e.key === "Backspace" && !input.value) { const arr = state["form" + capitalize(stateKey)]; if (arr.length) { arr.pop(); renderChips(stateKey, area, input, listKey); } } });
   input.addEventListener("focus", () => renderDropdown(input, dropdown, listKey, stateKey));
 }
-
 function renderDropdown(input, dropdown, listKey, stateKey) {
-  const q = input.value.trim().toLowerCase();
-  const selected = state["form" + capitalize(stateKey)];
-  let items = state.lists[listKey].filter(i => !selected.includes(i));
-  if (q) items = items.filter(i => i.toLowerCase().includes(q));
-
-  let html = "";
-  if (items.length) {
-    html += items.slice(0,8).map(i => `
-      <div class="ac-item" onmousedown="event.preventDefault(); selectAcItem('${stateKey}','${escapeHtml(i)}','${listKey}')">
-        <i data-lucide="check-circle-2"></i> ${escapeHtml(i)}
-      </div>`).join("");
-  }
-  if (q && !state.lists[listKey].map(i=>i.toLowerCase()).includes(q)) {
-    if (items.length) html += `<div class="ac-divider"></div>`;
-    html += `<div class="ac-item new-item" onmousedown="event.preventDefault(); createAndSelectAcItem('${stateKey}','${escapeHtml(input.value.trim())}','${listKey}')"><i data-lucide="plus-circle"></i> Criar "${escapeHtml(input.value.trim())}"</div>`;
-  }
-
-  if (!html) { dropdown.classList.remove("open"); return; }
-  dropdown.innerHTML = html;
-  dropdown.classList.add("open");
-  refreshIcons();
+  const q = input.value.trim().toLowerCase(), selected = state["form" + capitalize(stateKey)];
+  let items = state.lists[listKey].filter(i => !selected.includes(i)); if(q) items = items.filter(i => i.toLowerCase().includes(q));
+  let html = ""; if(items.length) { html += items.slice(0,8).map(i => `<div class="ac-item" onmousedown="event.preventDefault(); selectAcItem('${stateKey}','${escapeHtml(i)}','${listKey}')"><i data-lucide="check-circle-2"></i> ${escapeHtml(i)}</div>`).join(""); }
+  if(q && !state.lists[listKey].map(i=>i.toLowerCase()).includes(q)) { if(items.length) html += `<div class="ac-divider"></div>`; html += `<div class="ac-item new-item" onmousedown="event.preventDefault(); createAndSelectAcItem('${stateKey}','${escapeHtml(input.value.trim())}','${listKey}')"><i data-lucide="plus-circle"></i> Criar "${escapeHtml(input.value.trim())}"</div>`; }
+  if(!html){ dropdown.classList.remove("open"); return; } dropdown.innerHTML = html; dropdown.classList.add("open"); refreshIcons();
 }
-
-function selectAcItem(stateKey, value, listKey) {
-  const input = document.getElementById(stateKey === "tags" ? "tags-input" : stateKey === "artists" ? "artists-input" : "companions-input");
-  const area = document.getElementById(stateKey === "tags" ? "tags-area" : stateKey === "artists" ? "artists-area" : "companions-area");
-  commitTag(stateKey, value, listKey, input, area);
-}
-
-function createAndSelectAcItem(stateKey, value, listKey) {
-  addToList(listKey, value);
-  selectAcItem(stateKey, value, listKey);
-}
-
-function commitTag(stateKey, value, listKey, input, area) {
-  const arr = state["form" + capitalize(stateKey)];
-  if (!arr.includes(value)) {
-    arr.push(value);
-    addToList(listKey, value); // auto-save to list if new
-  }
-  input.value = "";
-  renderChips(stateKey, area, input, listKey);
-  const dropdown = document.getElementById(stateKey === "tags" ? "tags-dropdown" : stateKey === "artists" ? "artists-dropdown" : "companions-dropdown");
-  if (dropdown) dropdown.classList.remove("open");
-  updateNameSuggestions();
-}
-
-function renderChips(stateKey, area, input, listKey) {
-  const arr = state["form" + capitalize(stateKey)];
-  const chips = arr.map(v => `
-    <span class="tag-chip">${escapeHtml(v)}
-      <button type="button" onclick="removeFormTag('${stateKey}','${escapeHtml(v)}','${listKey}')">×</button>
-    </span>`).join("");
-  area.innerHTML = chips + `<input class="tag-text-input" id="${stateKey === "tags" ? "tags" : stateKey === "artists" ? "artists" : "companions"}-input" placeholder="${arr.length ? "" : "Digite para buscar..."}">`;
-  const newInput = area.querySelector("input");
-  newInput.addEventListener("input", () => renderDropdown(newInput, document.getElementById(stateKey + "-dropdown"), listKey, stateKey));
-  newInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === ",") { e.preventDefault(); const val = newInput.value.trim().replace(/,$/, ""); if(val) commitTag(stateKey, val, listKey, newInput, area); }
-    if (e.key === "Backspace" && !newInput.value) { if(arr.length) { arr.pop(); renderChips(stateKey, area, newInput, listKey); } }
-  });
-  newInput.addEventListener("focus", () => renderDropdown(newInput, document.getElementById(stateKey + "-dropdown"), listKey, stateKey));
-  newInput.focus();
-}
-
-function removeFormTag(stateKey, value, listKey) {
-  const arr = state["form" + capitalize(stateKey)];
-  const idx = arr.indexOf(value);
-  if (idx !== -1) arr.splice(idx, 1);
-  const area = document.getElementById(stateKey === "tags" ? "tags-area" : stateKey === "artists" ? "artists-area" : "companions-area");
-  const input = area.querySelector("input");
-  renderChips(stateKey, area, input, listKey);
-  updateNameSuggestions();
-}
-
+function selectAcItem(stateKey, value, listKey) { commitTag(stateKey, value, listKey, document.getElementById(stateKey === "tags" ? "tags-input" : stateKey === "artists" ? "artists-input" : "companions-input"), document.getElementById(stateKey === "tags" ? "tags-area" : stateKey === "artists" ? "artists-area" : "companions-area")); }
+function createAndSelectAcItem(stateKey, value, listKey) { addToList(listKey, value); selectAcItem(stateKey, value, listKey); }
+function commitTag(stateKey, value, listKey, input, area) { const arr = state["form" + capitalize(stateKey)]; if(!arr.includes(value)){arr.push(value); addToList(listKey, value);} input.value = ""; renderChips(stateKey, area, input, listKey); const dropdown = document.getElementById(stateKey + "-dropdown"); if(dropdown) dropdown.classList.remove("open"); updateNameSuggestions(); }
+function renderChips(stateKey, area, input, listKey) { const arr = state["form" + capitalize(stateKey)]; area.innerHTML = arr.map(v => `<span class="tag-chip">${escapeHtml(v)}<button type="button" onclick="removeFormTag('${stateKey}','${escapeHtml(v)}','${listKey}')">×</button></span>`).join("") + `<input class="tag-text-input" id="${stateKey}-input" placeholder="${arr.length ? "" : "Digite para buscar..."}">`; const newInput = area.querySelector("input"); setupAutocomplete(stateKey, `${stateKey}-input`, `${stateKey}-area`, `${stateKey}-dropdown`, listKey); newInput.focus(); }
+function removeFormTag(stateKey, value, listKey) { const arr = state["form" + capitalize(stateKey)]; const idx = arr.indexOf(value); if(idx !== -1) arr.splice(idx, 1); renderChips(stateKey, document.getElementById(stateKey + "-area"), null, listKey); updateNameSuggestions(); }
 function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
 // ═══════════════════════════════════════════════════════════
-// CITY BLOCKS (Multiple cities per trip)
+// CITY BLOCKS & IBGE
 // ═══════════════════════════════════════════════════════════
 let cityBlockCounter = 0;
-
 function addCityBlock() {
-  const id = ++cityBlockCounter;
-  state.formCities.push({ id, uf:"", city:"", lat:null, lng:null });
-
-  const div = document.createElement("div");
-  div.className = "city-block";
-  div.id = `city-block-${id}`;
-  div.innerHTML = `
-    <div class="city-block-header">
-      <div class="city-block-label">Cidade ${state.formCities.length}</div>
-      ${state.formCities.length > 1 ? `<button type="button" class="remove-city-btn" onclick="removeCityBlock(${id})"><i data-lucide="x"></i></button>` : ""}
-    </div>
-    <div class="city-block-grid">
-      <div class="field">
-        <label>Estado (UF) *</label>
-        <select class="form-input" id="f-uf-${id}" onchange="onUFChange(${id}, this.value)">
-          <option value="">Carregando...</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Cidade *</label>
-        <select class="form-input" id="f-city-${id}" disabled>
-          <option value="">Selecione o Estado</option>
-        </select>
-      </div>
-    </div>
-  `;
-  els["city-blocks"].appendChild(div);
-  refreshIcons();
-
-  // Populate UF dropdown from cache
-  populateCityBlockUF(id);
-
-  // UF and city change handlers
-  document.getElementById(`f-city-${id}`).addEventListener("change", (e) => {
-    const cityObj = state.formCities.find(c => c.id === id);
-    if (cityObj) cityObj.city = e.target.value;
-    updateNameSuggestions();
-  });
+  const id = ++cityBlockCounter; state.formCities.push({ id, uf:"", city:"", lat:null, lng:null });
+  const div = document.createElement("div"); div.className = "city-block"; div.id = `city-block-${id}`;
+  div.innerHTML = `<div class="city-block-header"><div class="city-block-label">Cidade ${state.formCities.length}</div>${state.formCities.length > 1 ? `<button type="button" class="remove-city-btn" onclick="removeCityBlock(${id})"><i data-lucide="x"></i></button>` : ""}</div>
+    <div class="city-block-grid"><div class="field"><label>Estado (UF) *</label><select class="form-input" id="f-uf-${id}" onchange="onUFChange(${id}, this.value)"><option value="">Carregando...</option></select></div>
+    <div class="field"><label>Cidade *</label><select class="form-input" id="f-city-${id}" disabled><option value="">Selecione o Estado</option></select></div></div>`;
+  els["city-blocks"].appendChild(div); refreshIcons(); populateCityBlockUF(id);
+  document.getElementById(`f-city-${id}`).addEventListener("change", (e) => { const cityObj = state.formCities.find(c => c.id === id); if(cityObj) cityObj.city = e.target.value; updateNameSuggestions(); });
 }
-
-function removeCityBlock(id) {
-  const idx = state.formCities.findIndex(c => c.id === id);
-  if (idx !== -1) state.formCities.splice(idx, 1);
-  document.getElementById(`city-block-${id}`).remove();
-  // Renumber labels
-  document.querySelectorAll(".city-block").forEach((block, i) => {
-    const label = block.querySelector(".city-block-label");
-    if (label) label.textContent = `Cidade ${i + 1}`;
-  });
-  updateNameSuggestions();
-}
-
-function populateCityBlockUF(id) {
-  const select = document.getElementById(`f-uf-${id}`);
-  if (!select) return;
-  if (state.ibgeUFs.length) {
-    select.innerHTML = `<option value="">Selecione o Estado</option>` +
-      state.ibgeUFs.map(uf => `<option value="${uf.sigla}">${uf.nome}</option>`).join("");
-  } else {
-    // Wait for IBGE load
-    setTimeout(() => populateCityBlockUF(id), 500);
-  }
-}
-
+function removeCityBlock(id) { const idx = state.formCities.findIndex(c => c.id === id); if(idx !== -1) state.formCities.splice(idx, 1); document.getElementById(`city-block-${id}`).remove(); document.querySelectorAll(".city-block").forEach((block, i) => { const label = block.querySelector(".city-block-label"); if(label) label.textContent = `Cidade ${i + 1}`; }); updateNameSuggestions(); }
+function populateCityBlockUF(id) { const select = document.getElementById(`f-uf-${id}`); if(!select) return; if(state.ibgeUFs.length){select.innerHTML = `<option value="">Selecione o Estado</option>` + state.ibgeUFs.map(uf => `<option value="${uf.sigla}">${uf.nome}</option>`).join("");}else{setTimeout(()=>populateCityBlockUF(id),500);} }
 async function onUFChange(blockId, uf) {
-  const cityObj = state.formCities.find(c => c.id === blockId);
-  if (cityObj) { cityObj.uf = uf; cityObj.city = ""; }
-
-  const citySelect = document.getElementById(`f-city-${blockId}`);
-  if (!uf) { citySelect.innerHTML = `<option value="">Selecione o Estado</option>`; citySelect.disabled = true; return; }
-
-  citySelect.disabled = false;
-  citySelect.innerHTML = `<option value="">Carregando...</option>`;
-
-  // Check cache
-  if (state.ibgeCitiesCache[uf]) {
-    fillCitySelect(citySelect, state.ibgeCitiesCache[uf]);
-  } else {
-    try {
-      const res = await fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios`);
-      const cities = await res.json();
-      state.ibgeCitiesCache[uf] = cities;
-      fillCitySelect(citySelect, cities);
-    } catch(e) {
-      citySelect.innerHTML = `<option value="">Erro ao carregar</option>`;
-    }
-  }
-  updateNameSuggestions();
+  const cityObj = state.formCities.find(c => c.id === blockId); if(cityObj) { cityObj.uf = uf; cityObj.city = ""; }
+  const select = document.getElementById(`f-city-${blockId}`);
+  if(!uf) { select.innerHTML = `<option value="">Selecione o Estado</option>`; select.disabled = true; return; }
+  select.disabled = false; select.innerHTML = `<option value="">Carregando...</option>`;
+  if(state.ibgeCitiesCache[uf]) { fillCitySelect(select, state.ibgeCitiesCache[uf]); } else { try { const res = await fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios`); const cities = await res.json(); state.ibgeCitiesCache[uf] = cities; fillCitySelect(select, cities); } catch(e) { select.innerHTML = `<option value="">Erro</option>`; } } updateNameSuggestions();
 }
-
-function fillCitySelect(select, cities) {
-  select.innerHTML = `<option value="">Selecione a Cidade</option>` +
-    cities.map(c => `<option value="${c.nome}">${c.nome}</option>`).join("");
-}
-
-async function initIBGEForm() {
-  try {
-    const res = await fetch("https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome");
-    state.ibgeUFs = await res.json();
-    // Populate already rendered city blocks
-    document.querySelectorAll("[id^='f-uf-']").forEach(sel => {
-      const id = parseInt(sel.id.replace("f-uf-",""));
-      populateCityBlockUF(id);
-    });
-  } catch(e) { console.error("Erro IBGE"); }
-}
+function fillCitySelect(select, cities) { select.innerHTML = `<option value="">Selecione a Cidade</option>` + cities.map(c => `<option value="${c.nome}">${c.nome}</option>`).join(""); }
+async function initIBGEForm() { try { const res = await fetch("https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome"); state.ibgeUFs = await res.json(); document.querySelectorAll("[id^='f-uf-']").forEach(sel => populateCityBlockUF(parseInt(sel.id.replace("f-uf-","")))); } catch(e) {} }
 
 // ═══════════════════════════════════════════════════════════
 // SMART NAME SUGGESTIONS
 // ═══════════════════════════════════════════════════════════
 function updateNameSuggestions() {
-  const suggestions = [];
-  const start = document.getElementById("f-start")?.value;
-  const year = start ? start.split("-")[0] : "";
-  const month = start ? getMonthName(parseInt(start.split("-")[1])) : "";
-
-  const ufs = [...new Set(state.formCities.filter(c=>c.uf).map(c=>c.uf))];
-  const cities = state.formCities.filter(c=>c.city).map(c=>c.city);
-  const tags = state.formTags;
-  const artists = state.formArtists;
-
-  // Pattern 1: City · Year
-  if (cities.length === 1 && year) {
-    suggestions.push(`${cities[0]} ${year}`);
-    if (tags.length) suggestions.push(`${cities[0]} ${year} · ${tags[0]}`);
-    if (artists.length) suggestions.push(`${cities[0]} ${year} · ${artists[0]}`);
-  }
-  // Pattern 2: Multi-city
-  if (cities.length > 1 && year) {
-    suggestions.push(`${cities.slice(0,2).join(" & ")} ${year}`);
-  }
-  // Pattern 3: UF region
-  if (ufs.length > 0 && year) {
-    const regionName = getRegionName(ufs);
-    if (regionName) suggestions.push(`${regionName} ${year}`);
-  }
-  // Pattern 4: Month trip
-  if (month && year && cities.length) {
-    suggestions.push(`${cities[0]} · ${month} ${year}`);
-  }
-  // Pattern 5: Event-based
-  if (artists.length && cities.length) {
-    suggestions.push(`${artists[0]} em ${cities[0]}`);
-    if (year) suggestions.push(`${artists[0]} em ${cities[0]} ${year}`);
-  }
-  // Pattern 6: sequential
-  const tripCount = state.trips.filter(t => t.year === year).length + state.formCities.length;
-  if (year) suggestions.push(`Moment ${tripCount} de ${year}`);
-
-  // Deduplicate
-  const unique = [...new Set(suggestions)].slice(0, 5);
-  els["name-suggestions"].innerHTML = unique.map(s =>
-    `<span class="name-chip" onclick="document.getElementById('f-name').value='${escapeHtml(s)}'">${escapeHtml(s)}</span>`
-  ).join("");
-}
-
-function getMonthName(n) {
-  const months = ["","Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
-  return months[n] || "";
-}
-
-function getRegionName(ufs) {
-  const nordeste = ["AL","BA","CE","MA","PB","PE","PI","RN","SE"];
-  const sudeste = ["ES","MG","RJ","SP"];
-  const sul = ["PR","RS","SC"];
-  const centroOeste = ["DF","GO","MS","MT"];
-  const norte = ["AC","AM","AP","PA","RO","RR","TO"];
-
-  if (ufs.every(u => nordeste.includes(u))) return "Nordeste";
-  if (ufs.every(u => sudeste.includes(u))) return "Sudeste";
-  if (ufs.every(u => sul.includes(u))) return "Sul";
-  if (ufs.every(u => centroOeste.includes(u))) return "Centro-Oeste";
-  if (ufs.every(u => norte.includes(u))) return "Norte";
-  return null;
+  const suggestions = []; const start = document.getElementById("f-start")?.value; const year = start ? start.split("-")[0] : ""; const month = start ? ["","Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"][parseInt(start.split("-")[1])] : "";
+  const ufs = [...new Set(state.formCities.filter(c=>c.uf).map(c=>c.uf))]; const cities = state.formCities.filter(c=>c.city).map(c=>c.city);
+  if(cities.length===1&&year){ suggestions.push(`${cities[0]} ${year}`); if(state.formTags.length) suggestions.push(`${cities[0]} ${year} · ${state.formTags[0]}`); }
+  if(cities.length>1&&year) suggestions.push(`${cities.slice(0,2).join(" & ")} ${year}`);
+  if(month&&year&&cities.length) suggestions.push(`${cities[0]} · ${month} ${year}`);
+  const unique = [...new Set(suggestions)].slice(0,5);
+  els["name-suggestions"].innerHTML = unique.map(s => `<span class="name-chip" onclick="document.getElementById('f-name').value='${escapeHtml(s)}'">${escapeHtml(s)}</span>`).join("");
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -968,85 +627,37 @@ function getRegionName(ufs) {
 // ═══════════════════════════════════════════════════════════
 function fetchTrips() {
   els["sync-text"].textContent = "Carregando...";
-  Papa.parse(CSV_URL, {
-    download: true, header: true, skipEmptyLines: true,
-    complete: results => {
-      state.trips = results.data.map((r,i) => normalizeTrip(r,i)).filter(t => t.city && t.uf);
-      state.loaded = true;
-      els["sync-pill"].classList.add("loaded");
-      els["sync-text"].textContent = `${state.trips.length} moments`;
-      populateListsFromTrips(state.trips);
-      populateFilters();
-      applyFilters();
-    }
-  });
+  Papa.parse(CSV_URL, { download: true, header: true, skipEmptyLines: true, complete: results => { state.trips = results.data.map((r,i) => normalizeTrip(r,i)).filter(t => t.city && t.uf); state.loaded = true; els["sync-pill"].classList.add("loaded"); els["sync-text"].textContent = `${state.trips.length} moments`; populateListsFromTrips(state.trips); populateFilters(); applyFilters(); } });
 }
-
-async function loadBrazilGeoJSON() {
-  try {
-    const res = await fetch("https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson");
-    state.geoData = await res.json();
-    if (state.map) renderMapLayer();
-  } catch(e) { console.error("Erro GeoJSON"); }
-}
+async function loadBrazilGeoJSON() { try { const res = await fetch("https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson"); state.geoData = await res.json(); if (state.map) renderMapLayer(); } catch(e) {} }
 
 function normalizeTrip(row, index) {
-  const getField = (aliases) => {
-    const key = Object.keys(row).find(k => aliases.some(a => k.toLowerCase()===a.toLowerCase()));
-    return key ? (row[key]||"") : "";
-  };
+  const getField = (aliases) => { const key = Object.keys(row).find(k => aliases.some(a => k.toLowerCase()===a.toLowerCase())); return key ? (row[key]||"") : ""; };
   const splitList = (str) => str.split(/[;,]/).map(s=>s.trim()).filter(Boolean);
-
-  const name = getField(["Viagem"]);
-  const city = getField(["Cidade"]);
-  const uf = getField(["UF"]).slice(0,2).toUpperCase();
-  const startDate = getField(["Data de início"]);
-  const endDate = getField(["Data de fim"]);
-  const tags = splitList(getField(["Tags","Motivo"]));
-  const artists = splitList(getField(["Artistas"]));
-  const travelers = splitList(getField(["Acompanhantes"]));
-  const lat = parseFloat(getField(["Latitude","Lat"]))||null;
-  const lng = parseFloat(getField(["Longitude","Lng","Lon","Long"]))||null;
-
+  const name = getField(["Viagem"]), city = getField(["Cidade"]), uf = getField(["UF"]).slice(0,2).toUpperCase(), startDate = getField(["Data de início"]), endDate = getField(["Data de fim"]);
+  const tags = splitList(getField(["Tags","Motivo"])), artists = splitList(getField(["Artistas"])), travelers = splitList(getField(["Acompanhantes"])), lat = parseFloat(getField(["Latitude","Lat"]))||null, lng = parseFloat(getField(["Longitude","Lng","Lon","Long"]))||null;
+  
   let year = "";
   if (startDate && startDate.includes("-")) year = startDate.split("-")[0];
   else if (startDate && startDate.includes("/")) year = startDate.split("/")[2];
+  
+  // SOLUÇÃO: Garante o ano completo (E.g. 23 -> 2023)
+  if(year.length === 2) year = "20" + year;
 
-  return {
-    id: `trip-${index}`, name: name||city, city, uf, startDate, endDate, year,
-    tags, artists, travelers, lat, lng,
-    searchIndex: `${name} ${city} ${uf} ${tags.join(" ")} ${artists.join(" ")} ${travelers.join(" ")}`.toLowerCase()
-  };
+  return { id: `trip-${index}`, name: name||city, city, uf, startDate, endDate, year, tags, artists, travelers, lat, lng, searchIndex: `${name} ${city} ${uf} ${tags.join(" ")} ${artists.join(" ")} ${travelers.join(" ")}`.toLowerCase() };
 }
 
 function populateFilters() {
-  const fill = (id, label, mapFn) => {
-    const unique = [...new Set(state.trips.flatMap(mapFn).filter(Boolean))].sort();
-    els[id].innerHTML = `<option value="">${label}</option>` + unique.map(v=>`<option value="${v}">${v}</option>`).join("");
-  };
-  fill("filter-year","Todos os anos", t=>t.year);
-  fill("filter-uf","Todas as UFs", t=>t.uf);
-  fill("filter-tag","Todos os motivos", t=>t.tags);
+  const fill = (id, label, mapFn) => { const unique = [...new Set(state.trips.flatMap(mapFn).filter(Boolean))].sort(); els[id].innerHTML = `<option value="">${label}</option>` + unique.map(v=>`<option value="${v}">${v}</option>`).join(""); };
+  fill("filter-year","Todos os anos", t=>t.year); fill("filter-uf","Todas as UFs", t=>t.uf); fill("filter-tag","Todos os motivos", t=>t.tags);
 }
 
 function applyFilters() {
   const { search, year, uf, tag } = state.filters;
-  let data = state.trips.filter(t =>
-    (!search||t.searchIndex.includes(search)) &&
-    (!year||t.year===year) &&
-    (!uf||t.uf===uf) &&
-    (!tag||t.tags.includes(tag))
-  );
-  data = data.slice().reverse();
-  state.filtered = data;
-  renderAll();
+  let data = state.trips.filter(t => (!search||t.searchIndex.includes(search)) && (!year||t.year===year) && (!uf||t.uf===uf) && (!tag||t.tags.includes(tag)) );
+  state.filtered = data.slice().reverse(); renderAll();
 }
-
-function clearFilters() {
-  state.filters = { search:"", year:"", uf:"", tag:"" };
-  ["filter-search","filter-year","filter-uf","filter-tag"].forEach(id => els[id].value="");
-  applyFilters();
-}
+function clearFilters() { state.filters = { search:"", year:"", uf:"", tag:"" }; ["filter-search","filter-year","filter-uf","filter-tag"].forEach(id => els[id].value=""); applyFilters(); }
 
 // ═══════════════════════════════════════════════════════════
 // RENDER
@@ -1054,55 +665,28 @@ function clearFilters() {
 function renderAll() { renderKpis(); renderDashboardResults(); renderStats(); renderMapLayer(); refreshIcons(); }
 
 function renderKpis() {
-  const data = state.filtered;
-  const cities = [...new Set(data.map(t=>t.city))].sort();
-  const ufs = [...new Set(data.map(t=>t.uf))].sort();
-  state.currentCitiesList = cities;
-  state.currentUfsList = ufs;
-  const html = `
-    <article class="metric-card">
-      <div class="metric-label"><i data-lucide="plane"></i> Moments</div>
-      <div class="metric-value">${data.length}</div>
-      <div class="metric-sub">registros no total</div>
-    </article>
-    <article class="metric-card" onclick="openListModal('Cidades Visitadas',state.currentCitiesList,'map-pin')">
-      <div class="metric-label"><i data-lucide="map-pin"></i> Cidades</div>
-      <div class="metric-value">${cities.length}</div>
-      <div class="metric-sub">destinos únicos explorados</div>
-    </article>
-    <article class="metric-card" onclick="openListModal('UFs Visitadas',state.currentUfsList,'map')">
-      <div class="metric-label"><i data-lucide="map"></i> Estados</div>
-      <div class="metric-value">${ufs.length}</div>
-      <div class="metric-sub">estados do Brasil</div>
-    </article>
-  `;
-  els["kpi-grid"].innerHTML = html;
-  els["stats-kpi-grid"].innerHTML = html;
+  const cities = [...new Set(state.filtered.map(t=>t.city))].sort(), ufs = [...new Set(state.filtered.map(t=>t.uf))].sort();
+  state.currentCitiesList = cities; state.currentUfsList = ufs;
+  const html = `<article class="metric-card"><div class="metric-label"><i data-lucide="plane"></i> Moments</div><div class="metric-value">${state.filtered.length}</div><div class="metric-sub">registros no total</div></article>
+    <article class="metric-card" onclick="openListModal('Cidades Visitadas',state.currentCitiesList,'map-pin')"><div class="metric-label"><i data-lucide="map-pin"></i> Cidades</div><div class="metric-value">${cities.length}</div><div class="metric-sub">destinos únicos explorados</div></article>
+    <article class="metric-card" onclick="openListModal('UFs Visitadas',state.currentUfsList,'map')"><div class="metric-label"><i data-lucide="map"></i> Estados</div><div class="metric-value">${ufs.length}</div><div class="metric-sub">estados do Brasil</div></article>`;
+  els["kpi-grid"].innerHTML = html; els["stats-kpi-grid"].innerHTML = html;
 }
 
 function renderDashboardResults() {
   els["result-count"].textContent = `${state.filtered.length} moments encontrados`;
-  if (!state.filtered.length) {
-    els["dashboard-results"].innerHTML = `<div style="text-align:center;padding:60px 40px;color:var(--ink-3);">Sem resultados para a busca.</div>`;
-    return;
-  }
+  if (!state.filtered.length) { els["dashboard-results"].innerHTML = `<div style="text-align:center;padding:60px 40px;color:var(--ink-3);">Sem resultados para a busca.</div>`; return; }
   els["dashboard-results"].innerHTML = `<div class="gallery-grid">${state.filtered.map(renderTripCard).join("")}</div>`;
 }
 
 function renderTripCard(trip) {
-  return `
-    <article class="trip-card" onclick="openTripModal('${trip.id}')">
-      <div class="trip-topline">
-        <span class="uf-badge">${trip.uf}</span>
-        <span class="date-text">${trip.year||"—"}</span>
-      </div>
+  return `<article class="trip-card" onclick="openTripModal('${trip.id}')">
+      <div class="trip-topline"><span class="uf-badge">${trip.uf}</span><span class="date-text">${trip.year||"—"}</span></div>
       <h2 class="trip-title">${escapeHtml(trip.name)}</h2>
       <div class="trip-city"><i data-lucide="map-pin"></i>${escapeHtml(trip.city)}</div>
       ${trip.tags.length ? `<div class="tag-row">${trip.tags.slice(0,3).map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join("")}</div>` : ""}
-      <div class="trip-details">
-        <span><i data-lucide="users"></i>${trip.travelers.length ? trip.travelers.length+" pessoa(s)" : "Solo"}</span>
-        ${trip.artists.length ? `<span><i data-lucide="music-2"></i>${escapeHtml(trip.artists[0])}</span>` : ""}
-      </div>
+      <div class="trip-details"><span><i data-lucide="users"></i>${trip.travelers.length ? trip.travelers.length+" pessoa(s)" : "Solo"}</span>
+      ${trip.artists.length ? `<span><i data-lucide="music-2"></i>${escapeHtml(trip.artists[0])}</span>` : ""}</div>
     </article>`;
 }
 
@@ -1126,7 +710,9 @@ function initMap() {
   const brazilBounds = [[-34.0,-74.0],[5.5,-34.0]];
   state.map = L.map("map",{zoomControl:false,maxBounds:brazilBounds,maxBoundsViscosity:1.0,minZoom:4}).fitBounds(brazilBounds);
   L.control.zoom({position:"bottomright"}).addTo(state.map);
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",{attribution:"&copy; OSM"}).addTo(state.map);
+  
+  // SOLUÇÃO: Camada light_nolabels (limpa rótulos de fora do Brasil e nome)
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png",{attribution:"&copy; OSM"}).addTo(state.map);
   renderMapLayer();
 }
 
@@ -1142,12 +728,26 @@ function renderMapLayer() {
     L.geoJSON(state.geoData, {
       style: f => {
         const count = ufCounts[f.properties.sigla]||0;
-        return { color:"var(--blue-dark)",weight:1.5,opacity:.8,fillColor:count?(count/max>.5?"var(--accent)":"var(--accent-soft)"):"#cbd5e1",fillOpacity:count?.9:.4 };
+        // SOLUÇÃO: Degradê mais linear/suave
+        const intensity = count ? 0.3 + (count/max)*0.7 : 0; 
+        return { color:"var(--white)", weight:1.5, fillColor: count ? "var(--blue-med)" : "#e2e8f0", fillOpacity: count ? intensity : 0.4 };
       },
-      onEachFeature:(f,layer)=>layer.bindTooltip(`<b>${f.properties.name}</b>`)
+      onEachFeature:(f,layer)=> {
+        const sigla = f.properties.sigla;
+        const count = ufCounts[sigla]||0;
+        
+        // Rótulo da UF permanentemente visível
+        layer.bindTooltip(sigla, {
+          permanent: true, direction: "center",
+          className: `uf-label ${count > 0 ? 'visited' : ''}`
+        });
+
+        // Evento de clique para mostrar os cards da UF
+        layer.on('click', () => { if(count > 0) showMomentsByLocation('UF', sigla); });
+      }
     }).addTo(state.mapLayer);
   } else {
-    L.geoJSON(state.geoData,{style:{color:"var(--blue-dark)",weight:1,opacity:.5,fillColor:"#e2e8f0",fillOpacity:.4}}).addTo(state.mapLayer);
+    L.geoJSON(state.geoData,{style:{color:"var(--white)",weight:1.5,fillColor:"#e2e8f0",fillOpacity:.4}}).addTo(state.mapLayer);
     const cityGroups = {};
     state.filtered.forEach(t => {
       const key = `${t.city}-${t.uf}`;
@@ -1160,7 +760,10 @@ function renderMapLayer() {
       if(!lat||!lng) { const base=UF_CENTROIDS[group.uf]; if(base){lat=base[0]+(Math.random()-.5)*1.5;lng=base[1]+(Math.random()-.5)*1.5;} }
       if(lat&&lng) {
         L.circleMarker([lat,lng],{radius:6+(group.count/maxCity)*12,color:"#fff",weight:2,fillColor:"var(--accent)",fillOpacity:.85})
-          .bindTooltip(`<b>${group.city} - ${group.uf}</b><br>${group.count} moment(s)`).addTo(state.mapLayer);
+         .bindTooltip(`<b>${group.city} - ${group.uf}</b><br>${group.count} moment(s)`)
+         // Evento de clique para mostrar os cards da Cidade
+         .on('click', () => showMomentsByLocation('Cidade', group.city))
+         .addTo(state.mapLayer);
       }
     });
   }
@@ -1173,161 +776,98 @@ function renderMapLayer() {
 // STATS
 // ═══════════════════════════════════════════════════════════
 function renderStats() {
-  const getTop = (mapFn) => Object.entries(
-    state.filtered.reduce((acc,t)=>{
-      const vals = Array.isArray(mapFn(t)) ? mapFn(t) : [mapFn(t)];
-      vals.forEach(v=>{ if(v) acc[v]=(acc[v]||0)+1; });
-      return acc;
-    },{})
-  ).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const getTop = (mapFn) => Object.entries(state.filtered.reduce((acc,t)=>{ const vals = Array.isArray(mapFn(t)) ? mapFn(t) : [mapFn(t)]; vals.forEach(v=>{ if(v) acc[v]=(acc[v]||0)+1; }); return acc; },{})).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const draw = (id, data) => { const max = Math.max(...data.map(d=>d[1]),1); els[id].innerHTML = data.map(([k,v])=>`<div class="horizontal-row"><div class="horizontal-label">${escapeHtml(k)}</div><div class="bar-track"><div class="bar-fill" style="width:${(v/max)*100}%"></div></div><div class="rank-count">${v}</div></div>`).join(""); };
 
-  const draw = (id, data) => {
-    const max = Math.max(...data.map(d=>d[1]),1);
-    els[id].innerHTML = data.map(([k,v])=>`<div class="horizontal-row"><div class="horizontal-label">${escapeHtml(k)}</div><div class="bar-track"><div class="bar-fill" style="width:${(v/max)*100}%"></div></div><div class="rank-count">${v}</div></div>`).join("");
-  };
-
-  draw("stat-ufs", getTop(t=>t.uf));
-  draw("stat-cities", getTop(t=>t.city));
-  draw("stat-tags", getTop(t=>t.tags));
-  draw("stat-artists", getTop(t=>t.artists));
+  draw("stat-ufs", getTop(t=>t.uf)); draw("stat-cities", getTop(t=>t.city)); draw("stat-tags", getTop(t=>t.tags)); draw("stat-artists", getTop(t=>t.artists));
 
   const yearsData = Object.entries(state.filtered.reduce((acc,t)=>{ if(t.year) acc[t.year]=(acc[t.year]||0)+1; return acc; },{})).sort((a,b)=>a[0].localeCompare(b[0]));
   const ctx = document.getElementById("timeChart").getContext("2d");
   if (state.chartInstance) state.chartInstance.destroy();
+  
+  // SOLUÇÃO: Gráfico de Linha com Rótulos usando o Plugin Datalabels
   state.chartInstance = new Chart(ctx, {
-    type:"bar",
-    data:{ labels:yearsData.map(d=>d[0]), datasets:[{label:"Moments",data:yearsData.map(d=>d[1]),backgroundColor:"#26b9dd",borderRadius:8,hoverBackgroundColor:"#097599"}] },
-    options:{ responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,ticks:{precision:0}}},plugins:{legend:{display:false}} }
+    type: "line",
+    data: { 
+      labels: yearsData.map(d=>d[0]), 
+      datasets: [{
+        label: "Moments", 
+        data: yearsData.map(d=>d[1]), 
+        borderColor: "var(--blue-light)", 
+        backgroundColor: "rgba(38,185,221,0.15)", // preenchimento abaixo da linha
+        borderWidth: 3,
+        pointBackgroundColor: "var(--white)",
+        pointBorderColor: "var(--blue-med)",
+        pointBorderWidth: 2,
+        pointRadius: 5,
+        fill: true,
+        tension: 0.3 // Curvatura da linha
+      }] 
+    },
+    options: { 
+      responsive: true, maintainAspectRatio: false, 
+      scales: { 
+        y: { beginAtZero: true, display: false }, // oculta o eixo Y para ficar mais limpo 
+        x: { grid: { display: false } }
+      }, 
+      layout: { padding: { top: 30 } }, // Dá espaço para o rótulo acima
+      plugins: { 
+        legend: { display: false },
+        datalabels: {
+          backgroundColor: "var(--paper-2)",
+          borderColor: "var(--line-strong)",
+          borderWidth: 1,
+          borderRadius: 8,
+          color: "var(--blue-dark)",
+          font: { weight: 'bold', size: 13 },
+          padding: { top: 4, bottom: 4, left: 10, right: 10 },
+          align: 'top',
+          offset: 8
+        }
+      } 
+    }
   });
 }
 
 // ═══════════════════════════════════════════════════════════
 // MODALS
 // ═══════════════════════════════════════════════════════════
-function openTripModal(tripId) {
-  const trip = state.trips.find(t=>t.id===tripId);
-  if (!trip) return;
+function showMomentsByLocation(type, locationName) {
+  const trips = state.filtered.filter(t => type === 'UF' ? t.uf === locationName : t.city === locationName);
   els["modal-header"].innerHTML = `
-    <div style="display:flex;gap:8px;margin-bottom:12px;"><span class="uf-badge">${trip.uf}</span></div>
-    <h2 style="font-family:'DM Serif Display',serif;font-size:32px;margin:0;color:var(--blue-dark);line-height:1.1;">${escapeHtml(trip.name)}</h2>
-    <div style="color:var(--ink-2);font-size:16px;margin-top:8px;font-weight:600;">
-      <i data-lucide="map-pin" style="width:18px;vertical-align:middle;color:var(--accent)"></i> ${escapeHtml(trip.city)}, ${trip.uf}
-    </div>`;
-  els["modal-body"].innerHTML = `
-    <div style="display:grid;gap:14px;font-size:15px;">
-      ${infoBlock("calendar","Datas",`${trip.startDate}${trip.endDate?" → "+trip.endDate:""}`)}
-      ${trip.tags.length ? infoBlock("hash","Tags",trip.tags.join(", ")) : ""}
-      ${trip.artists.length ? infoBlock("music-2","Artistas",trip.artists.join(", ")) : ""}
-      ${infoBlock("users","Acompanhantes",trip.travelers.join(", ")||"Viajei a solo")}
-    </div>`;
+    <h2 style="font-family:'DM Serif Display',serif;font-size:32px;margin:0;color:var(--blue-dark);">Moments em ${locationName}</h2>
+    <p style="margin:8px 0 0;color:var(--ink-3);font-size:15px;font-weight:500;">Total: ${trips.length} registros</p>`;
+
+  els["modal-body"].innerHTML = `<div class="gallery-grid">
+    ${trips.map(renderTripCard).join("")}
+  </div>`;
   els["trip-modal"].classList.add("open");
   refreshIcons();
 }
 
-function infoBlock(icon, label, value) {
-  return `<div style="background:var(--paper-2);padding:16px;border-radius:12px;">
-    <strong style="color:var(--blue-dark);display:block;margin-bottom:4px;font-size:12px;text-transform:uppercase;letter-spacing:.06em;">${label}</strong>
-    ${escapeHtml(value)}
-  </div>`;
+function openTripModal(tripId) {
+  const trip = state.trips.find(t=>t.id===tripId); if (!trip) return;
+  els["modal-header"].innerHTML = `<div style="display:flex;gap:8px;margin-bottom:12px;"><span class="uf-badge">${trip.uf}</span></div><h2 style="font-family:'DM Serif Display',serif;font-size:32px;margin:0;color:var(--blue-dark);line-height:1.1;">${escapeHtml(trip.name)}</h2><div style="color:var(--ink-2);font-size:16px;margin-top:8px;font-weight:600;"><i data-lucide="map-pin" style="width:18px;vertical-align:middle;color:var(--accent)"></i> ${escapeHtml(trip.city)}, ${trip.uf}</div>`;
+  els["modal-body"].innerHTML = `<div style="display:grid;gap:14px;font-size:15px;">${infoBlock("calendar","Datas",`${trip.startDate}${trip.endDate?" → "+trip.endDate:""}`)}${trip.tags.length ? infoBlock("hash","Tags",trip.tags.join(", ")) : ""}${trip.artists.length ? infoBlock("music-2","Artistas",trip.artists.join(", ")) : ""}${infoBlock("users","Acompanhantes",trip.travelers.join(", ")||"Viajei a solo")}</div>`;
+  els["trip-modal"].classList.add("open"); refreshIcons();
 }
+function infoBlock(icon, label, value) { return `<div style="background:var(--paper-2);padding:16px;border-radius:12px;"><strong style="color:var(--blue-dark);display:block;margin-bottom:4px;font-size:12px;text-transform:uppercase;letter-spacing:.06em;">${label}</strong>${escapeHtml(value)}</div>`; }
 
 function openListModal(title, listItems, iconName) {
-  els["modal-header"].innerHTML = `
-    <h2 style="font-family:'DM Serif Display',serif;font-size:32px;margin:0;color:var(--blue-dark);">${title}</h2>
-    <p style="margin:8px 0 0;color:var(--ink-3);font-size:15px;font-weight:500;">Total: ${listItems.length} registros</p>`;
-  const counts = {};
-  state.filtered.forEach(t => {
-    const key = title.includes("Cidades") ? t.city : t.uf;
-    counts[key] = (counts[key]||0)+1;
-  });
-  els["modal-body"].innerHTML = `<div style="display:flex;flex-direction:column;">
-    ${listItems.map(item=>`<div class="modal-list-item">
-      <span>${escapeHtml(item)}</span>
-      <span class="modal-list-badge">${counts[item]||0}</span>
-    </div>`).join("")}
-  </div>`;
-  els["trip-modal"].classList.add("open");
-  refreshIcons();
+  els["modal-header"].innerHTML = `<h2 style="font-family:'DM Serif Display',serif;font-size:32px;margin:0;color:var(--blue-dark);">${title}</h2><p style="margin:8px 0 0;color:var(--ink-3);font-size:15px;font-weight:500;">Total: ${listItems.length} registros</p>`;
+  const counts = {}; state.filtered.forEach(t => { const key = title.includes("Cidades") ? t.city : t.uf; counts[key] = (counts[key]||0)+1; });
+  els["modal-body"].innerHTML = `<div style="display:flex;flex-direction:column;">${listItems.map(item=>`<div class="modal-list-item"><span>${escapeHtml(item)}</span><span class="modal-list-badge">${counts[item]||0}</span></div>`).join("")}</div>`;
+  els["trip-modal"].classList.add("open"); refreshIcons();
 }
-
 function closeModal() { els["trip-modal"].classList.remove("open"); }
 
 // ═══════════════════════════════════════════════════════════
 // FORM SUBMIT
 // ═══════════════════════════════════════════════════════════
-function handleFormSubmit(e) {
-  e.preventDefault();
-  const name = document.getElementById("f-name").value.trim();
-  const start = document.getElementById("f-start").value;
-  const cities = state.formCities.filter(c=>c.city&&c.uf);
+function handleFormSubmit(e) { e.preventDefault(); const name = document.getElementById("f-name").value.trim(), start = document.getElementById("f-start").value, cities = state.formCities.filter(c=>c.city&&c.uf); if(!cities.length){els["form-message"].style.color="var(--accent)";els["form-message"].textContent="⚠️ Adicione ao menos uma cidade completa.";return;} let year = start?start.split("-")[0]:""; if(year.length===2)year="20"+year; cities.forEach((cityObj,i)=>{const tripEntry={id:`session-${Date.now()}-${i}`,name:cities.length>1?`${name} · ${cityObj.city}`:name,city:cityObj.city,uf:cityObj.uf,startDate:start,endDate:document.getElementById("f-end").value,year,tags:[...state.formTags],artists:[...state.formArtists],travelers:[...state.formCompanions],lat:cityObj.lat,lng:cityObj.lng,searchIndex:`${name} ${cityObj.city} ${cityObj.uf} ${state.formTags.join(" ")} ${state.formArtists.join(" ")} ${state.formCompanions.join(" ")}`.toLowerCase()};state.trips.unshift(tripEntry);}); els["form-message"].style.color="var(--blue-med)"; els["form-message"].textContent=`✓ ${cities.length} entrada(s) salva(s) na sessão com sucesso!`; setTimeout(()=>{document.getElementById("trip-form").reset();els["form-message"].textContent="";state.formTags=[];state.formArtists=[];state.formCompanions=[];state.formCities=[];cityBlockCounter=0;els["city-blocks"].innerHTML="";["tags-area","artists-area","companions-area"].forEach(id=>{const area=document.getElementById(id);if(area)area.innerHTML=`<input class="tag-text-input" id="${id.replace('-area','-input')}" placeholder="Digite para buscar...">`;});setupAutocomplete("tags","tags-input","tags-area","tags-dropdown","tags");setupAutocomplete("artists","artists-input","artists-area","artists-dropdown","artists");setupAutocomplete("companions","companions-input","companions-area","companions-dropdown","companions");addCityBlock();els["name-suggestions"].innerHTML="";els["sync-text"].textContent=`${state.trips.length} moments`;populateFilters();applyFilters();},2000); }
 
-  if (!cities.length) {
-    els["form-message"].style.color = "var(--accent)";
-    els["form-message"].textContent = "⚠️ Adicione ao menos uma cidade completa.";
-    return;
-  }
-
-  // Build new trip entries (one per city)
-  const year = start ? start.split("-")[0] : "";
-  cities.forEach((cityObj, i) => {
-    const tripEntry = {
-      id: `session-${Date.now()}-${i}`,
-      name: cities.length > 1 ? `${name} · ${cityObj.city}` : name,
-      city: cityObj.city,
-      uf: cityObj.uf,
-      startDate: start,
-      endDate: document.getElementById("f-end").value,
-      year,
-      tags: [...state.formTags],
-      artists: [...state.formArtists],
-      travelers: [...state.formCompanions],
-      lat: cityObj.lat, lng: cityObj.lng,
-      searchIndex: `${name} ${cityObj.city} ${cityObj.uf} ${state.formTags.join(" ")} ${state.formArtists.join(" ")} ${state.formCompanions.join(" ")}`.toLowerCase()
-    };
-    state.trips.unshift(tripEntry);
-  });
-
-  els["form-message"].style.color = "var(--blue-med)";
-  els["form-message"].textContent = `✓ ${cities.length} entrada(s) salva(s) na sessão com sucesso!`;
-
-  // Reset form
-  setTimeout(() => {
-    document.getElementById("trip-form").reset();
-    els["form-message"].textContent = "";
-    state.formTags = []; state.formArtists = []; state.formCompanions = [];
-    state.formCities = []; cityBlockCounter = 0;
-    els["city-blocks"].innerHTML = "";
-    ["tags-area","artists-area","companions-area"].forEach(id => {
-      const area = document.getElementById(id);
-      if(area) area.innerHTML = `<input class="tag-text-input" id="${id.replace('-area','-input')}" placeholder="Digite para buscar...">`;
-    });
-    // Re-setup autocomplete
-    setupAutocomplete("tags","tags-input","tags-area","tags-dropdown","tags");
-    setupAutocomplete("artists","artists-input","artists-area","artists-dropdown","artists");
-    setupAutocomplete("companions","companions-input","companions-area","companions-dropdown","companions");
-    addCityBlock();
-    els["name-suggestions"].innerHTML = "";
-    els["sync-text"].textContent = `${state.trips.length} moments`;
-    populateFilters();
-    applyFilters();
-  }, 2000);
-}
-
-// ═══════════════════════════════════════════════════════════
-// UTILS
-// ═══════════════════════════════════════════════════════════
-function updateActiveButtons(selector, activeValue) {
-  document.querySelectorAll(selector).forEach(btn =>
-    btn.classList.toggle("active", btn.dataset[selector.replace("[data-","").replace("]","").replace("-","").toLowerCase()] === activeValue ||
-      btn.getAttribute("data-map-type") === activeValue ||
-      btn.getAttribute("data-mode") === activeValue)
-  );
-}
-
-function escapeHtml(str) {
-  if (!str) return "";
-  return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
-}
+function updateActiveButtons(selector, activeValue) { document.querySelectorAll(selector).forEach(btn => btn.classList.toggle("active", btn.dataset[selector.replace("[data-","").replace("]","").replace("-","").toLowerCase()] === activeValue || btn.getAttribute("data-map-type") === activeValue || btn.getAttribute("data-mode") === activeValue) ); }
+function escapeHtml(str) { if(!str) return ""; return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
 </script>
 </body>
 </html>
