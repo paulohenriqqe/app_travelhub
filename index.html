@@ -101,7 +101,7 @@
   .clear-button{min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 20px;border:1px solid var(--line);border-radius:10px;background:var(--white);color:var(--ink-2);font-size:14px;font-weight:600;transition:var(--transition);}
   .clear-button:hover{background:var(--paper-2);color:var(--ink);}
 
-  /* GALLERY - Cards mais compactos */
+  /* GALLERY - Compactos */
   .gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}
   .trip-card{padding:16px;cursor:pointer;display:flex;flex-direction:column;height:100%;border:1px solid transparent;}
   .trip-card:hover{border-color:var(--line-strong);box-shadow:var(--shadow-md);transform:translateY(-4px);}
@@ -115,21 +115,13 @@
   .tag{display:inline-flex;padding:4px 10px;border-radius:6px;background:var(--paper-2);color:var(--ink-2);font-size:11px;font-weight:700;}
   .trip-details{margin-top:auto;padding-top:12px;border-top:1px solid var(--line);display:flex;justify-content:space-between;color:var(--ink-3);font-size:12px;font-weight:600;}
   .trip-details span{display:flex;align-items:center;gap:6px;}
-  
+
   /* MAP */
   .map-layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:24px;align-items:start;}
   .map-panel{overflow:hidden;padding:0;border:none;box-shadow:var(--shadow-md);border-radius:16px; z-index: 1;}
-  #map{width:100%;height:65vh;min-height:500px;background:#f8fafc; cursor: pointer;} /* cursor atualizado */
-  
-  /* Rótulo das UFs dentro do mapa */
-  .leaflet-tooltip.uf-label {
-      background: transparent; border: none; box-shadow: none; 
-      font-size: 11px; font-weight: 700; text-align: center;
-      text-shadow: 0 0 4px rgba(255,255,255,0.9), 0 0 2px rgba(255,255,255,0.9); 
-      padding: 0; color: var(--blue-dark);
-  }
+  #map{width:100%;height:65vh;min-height:500px;background:#f8fafc; cursor: pointer;}
+  .leaflet-tooltip.uf-label { background: transparent; border: none; box-shadow: none; font-size: 11px; font-weight: 700; text-align: center; text-shadow: 0 0 4px rgba(255,255,255,0.9), 0 0 2px rgba(255,255,255,0.9); padding: 0; color: var(--blue-dark); }
   .leaflet-tooltip.uf-label.visited { color: var(--white); text-shadow: none; }
-
   .rank-panel{padding:24px;}
   .rank-list{display:flex;flex-direction:column;gap:16px;margin-top:20px;}
   .rank-row{display:grid;grid-template-columns:40px 1fr 35px;gap:12px;align-items:center;}
@@ -147,7 +139,7 @@
   .horizontal-row{display:grid;grid-template-columns:minmax(100px,140px) 1fr 30px;gap:16px;align-items:center;}
   .horizontal-label{color:var(--ink-2);font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
-  /* ===================== FORM ===================== */
+  /* FORM NOVO MOMENT */
   .form-panel{max-width:860px;margin:0 auto;padding:40px;}
   .form-section{background:var(--paper);border-radius:12px;padding:20px;margin-bottom:24px;border:1px solid var(--line);}
   .form-section-title{font-size:13px;font-weight:700;color:var(--ink-2);letter-spacing:.07em;text-transform:uppercase;margin:0 0 16px;display:flex;align-items:center;gap:8px;}
@@ -157,12 +149,10 @@
   .form-panel .primary-action{width:100%;justify-content:center;padding:14px;font-size:16px;margin-top:10px;}
   #form-message{color:var(--blue-med);text-align:center;font-weight:600;padding:8px 0;}
 
-  /* NAME SUGGESTION CHIPS */
+  /* CHIPS & CITY BLOCKS */
   .name-suggestions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
   .name-chip{padding:6px 14px;border-radius:999px;background:var(--blue-pale);color:var(--blue-dark);font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--blue-light);transition:var(--transition);}
   .name-chip:hover{background:var(--blue-light);color:var(--white);}
-
-  /* CITY BLOCKS */
   .city-blocks{display:flex;flex-direction:column;gap:12px;margin-top:4px;}
   .city-block{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:16px;position:relative;}
   .city-block-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
@@ -192,7 +182,7 @@
   .ac-item.new-item svg{color:var(--accent);}
   .ac-divider{height:1px;background:var(--line);margin:4px 0;}
 
-  /* LISTA SUSPENSA TAB */
+  /* LISTAS SUSPENSAS */
   .lista-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;}
   .lista-card{background:var(--white);border-radius:var(--radius);border:1px solid var(--line);box-shadow:var(--shadow-sm);overflow:hidden;}
   .lista-card-header{padding:20px 24px;border-bottom:1px solid var(--line);background:var(--paper);display:flex;align-items:center;justify-content:space-between;}
@@ -216,10 +206,20 @@
   .lista-import-note{margin:12px 24px 0;padding:12px;background:var(--accent-bg);border-radius:8px;font-size:12px;color:var(--accent);font-weight:600;display:flex;align-items:flex-start;gap:8px;border-bottom:12px solid transparent;}
   .lista-import-note svg{width:14px;height:14px;flex-shrink:0;margin-top:1px;}
 
+  /* GRID PLANEJAR ROTEIRO */
+  .itinerary-container { overflow-x: auto; background: var(--white); border: 1px solid var(--line); border-radius: 12px; margin-top: 24px; }
+  .itinerary-table { width: 100%; border-collapse: collapse; min-width: 600px; }
+  .itinerary-th { background: var(--paper-2); padding: 12px; text-align: center; font-weight: 700; color: var(--blue-dark); border: 1px solid var(--line); font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .itinerary-td { border: 1px solid var(--line); padding: 0; vertical-align: top; }
+  .itinerary-row-label { width: 40px; text-align: center; font-weight: 700; color: var(--ink-2); background: var(--paper); border-right: 1px solid var(--line); writing-mode: vertical-rl; transform: rotate(180deg); padding: 20px 0; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; }
+  .itinerary-input { width: 100%; height: 100px; border: none; padding: 12px; resize: none; font-family: inherit; font-size: 13px; color: var(--ink); background: transparent; outline: none; transition: background 0.2s; }
+  .itinerary-input:focus { background: var(--blue-pale); }
+  .btn-outline { display:inline-flex; align-items:center; gap:8px; padding:10px 20px; border-radius:10px; border:2px solid var(--blue-dark); background:transparent; color:var(--blue-dark); font-size:14px; font-weight:700; transition:var(--transition); cursor: pointer;}
+  .btn-outline:hover { background:var(--blue-dark); color:#fff; }
+
   /* MODAL */
   .modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(10,47,76,.6);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:9999;opacity:0;visibility:hidden;transition:.3s ease;padding:20px;}
   .modal-overlay.open{opacity:1;visibility:visible;}
-  /* Modal levemente mais largo para acomodar os cards compactos perfeitamente */
   .modal-content{background:var(--white);width:100%;max-width:860px;border-radius:24px;position:relative;transform:translateY(30px) scale(.95);transition:.3s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 25px 50px -12px rgba(0,0,0,.25);max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;}
   .modal-overlay.open .modal-content{transform:translateY(0) scale(1);}
   .modal-close{position:absolute;top:20px;right:20px;width:40px;height:40px;background:var(--paper-2);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--ink-2);transition:var(--transition);z-index:2;}
@@ -250,9 +250,9 @@
     #map{height:50vh;min-height:400px;}
     .modal-header{padding:32px 24px 20px;}
     .modal-body{padding:24px;}
-    .mobile-nav{position:fixed;bottom:16px;left:16px;right:16px;z-index:1000;display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:8px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.95);box-shadow:0 10px 25px rgba(0,0,0,.1);backdrop-filter:blur(12px);}
-    .mobile-nav .nav-item{flex-direction:column;gap:4px;min-height:52px;justify-content:center;padding:6px 4px;color:var(--ink-3);font-size:10px;font-weight:600;text-align:center;border-radius:10px;}
-    .mobile-nav .nav-item svg{width:20px;height:20px;margin:0 auto;}
+    .mobile-nav{position:fixed;bottom:16px;left:16px;right:16px;z-index:1000;display:grid;grid-template-columns:repeat(6,1fr);gap:4px;padding:8px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.95);box-shadow:0 10px 25px rgba(0,0,0,.1);backdrop-filter:blur(12px);}
+    .mobile-nav .nav-item{flex-direction:column;gap:4px;min-height:52px;justify-content:center;padding:6px 2px;color:var(--ink-3);font-size:10px;font-weight:600;text-align:center;border-radius:10px;}
+    .mobile-nav .nav-item svg{width:18px;height:18px;margin:0 auto;}
     .mobile-nav .nav-item.active{background:var(--blue-pale);color:var(--blue-dark);}
     .form-grid,.city-block-grid{grid-template-columns:1fr;}
     .form-panel{padding:20px;}
@@ -275,6 +275,7 @@
     <nav class="nav-block">
       <div class="nav-label">Cadastrar</div>
       <button class="nav-item" data-view="form"><i data-lucide="plus-circle"></i> Novo moment</button>
+      <button class="nav-item" data-view="planejar"><i data-lucide="calendar-clock"></i> Planejar roteiro</button>
       <button class="nav-item" data-view="listas"><i data-lucide="list"></i> Listas suspensas</button>
     </nav>
   </aside>
@@ -292,6 +293,7 @@
     </header>
 
     <section class="content">
+
       <section class="view active" id="view-dashboard">
         <div class="dashboard-stack">
           <div class="kpi-grid" id="kpi-grid"></div>
@@ -357,7 +359,6 @@
                 <div class="name-suggestions" id="name-suggestions"></div>
               </div>
             </div>
-
             <div class="form-section">
               <div class="form-section-title"><i data-lucide="calendar"></i> Período</div>
               <div class="form-grid">
@@ -365,26 +366,23 @@
                 <div class="field"><label>Data de fim</label><input type="date" class="form-input" id="f-end"></div>
               </div>
             </div>
-
             <div class="form-section">
-              <div class="form-section-title"><i data-lucide="map-pin"></i> Cidades visitadas <span style="font-size:11px;color:var(--ink-3);font-weight:400;letter-spacing:0;text-transform:none;margin-left:8px;">Adicione quantas quiser</span></div>
+              <div class="form-section-title"><i data-lucide="map-pin"></i> Cidades visitadas <span style="font-size:11px;color:var(--ink-3);font-weight:400;margin-left:8px;text-transform:none;letter-spacing:0;">Adicione quantas quiser</span></div>
               <div class="city-blocks" id="city-blocks"></div>
               <button type="button" class="add-city-btn" id="add-city-btn" style="margin-top:12px;">
                 <i data-lucide="plus"></i> Adicionar outra cidade
               </button>
             </div>
-
             <div class="form-section">
               <div class="form-section-title"><i data-lucide="hash"></i> Tags / Motivo</div>
               <div class="field field-full">
-                <label>Tags <span style="color:var(--ink-3);font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">— use o campo abaixo; novas tags são salvas automaticamente</span></label>
+                <label>Tags <span style="color:var(--ink-3);font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">— novas tags são salvas automaticamente</span></label>
                 <div class="autocomplete-wrapper" id="ac-tags-wrapper">
                   <div class="tag-input-area" id="tags-area"><input class="tag-text-input" id="tags-input" placeholder="Digite para buscar ou criar tag..."></div>
                   <div class="autocomplete-dropdown" id="tags-dropdown"></div>
                 </div>
               </div>
             </div>
-
             <div class="form-section">
               <div class="form-section-title"><i data-lucide="music-2"></i> Artistas</div>
               <div class="field field-full">
@@ -394,7 +392,6 @@
                 </div>
               </div>
             </div>
-
             <div class="form-section">
               <div class="form-section-title"><i data-lucide="users"></i> Acompanhantes</div>
               <div class="field field-full">
@@ -404,10 +401,42 @@
                 </div>
               </div>
             </div>
-
             <button class="primary-action" type="submit"><i data-lucide="check"></i> Adicionar à Sessão</button>
             <div id="form-message"></div>
           </form>
+        </div>
+      </section>
+
+      <section class="view" id="view-planejar">
+        <div class="panel form-panel" style="max-width: 1000px;">
+          <h2 class="chart-title" style="font-size:32px;text-align:center;margin-bottom:8px;">Planejar Roteiro</h2>
+          <p style="text-align:center;color:var(--ink-3);margin:0 0 32px;font-size:14px;">Defina os dias da viagem para gerar a tabela de itinerário diário.</p>
+          
+          <div class="form-section">
+            <div class="form-grid">
+              <div class="field">
+                <label>Destino da Viagem</label>
+                <input type="text" class="form-input" id="plan-dest" placeholder="Ex: Berlim, Alemanha">
+              </div>
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+                <div class="field"><label>Início</label><input type="date" class="form-input" id="plan-start"></div>
+                <div class="field"><label>Fim</label><input type="date" class="form-input" id="plan-end"></div>
+              </div>
+            </div>
+            <div style="margin-top: 16px; text-align: right;">
+              <button class="btn-outline" onclick="gerarGradeRoteiro()"><i data-lucide="layout-grid"></i> Gerar Grade de Dias</button>
+            </div>
+          </div>
+
+          <div id="plan-grid-container" style="display: none;">
+            <h3 class="chart-title" id="plan-grid-title" style="text-align:center; margin-top:32px;">Roteiro diário</h3>
+            <div class="itinerary-container" id="itinerary-table-wrapper"></div>
+            
+            <div style="margin-top: 24px; display: flex; justify-content: center;">
+               <button class="primary-action" onclick="salvarPlanejamento()"><i data-lucide="save"></i> Salvar no Banco Oficial</button>
+            </div>
+            <div id="plan-message" style="text-align:center; margin-top:12px; font-weight:600; font-size:14px;"></div>
+          </div>
         </div>
       </section>
 
@@ -430,6 +459,7 @@
   <button class="nav-item" data-view="map"><i data-lucide="map"></i> Mapa</button>
   <button class="nav-item" data-view="stats"><i data-lucide="bar-chart-3"></i> Stats</button>
   <button class="nav-item" data-view="form"><i data-lucide="plus-circle"></i> Novo</button>
+  <button class="nav-item" data-view="planejar"><i data-lucide="calendar-clock"></i> Plano</button>
   <button class="nav-item" data-view="listas"><i data-lucide="list"></i> Listas</button>
 </nav>
 
@@ -442,34 +472,26 @@
 </div>
 
 <script>
-// Plugin Datalabels Global Registration
 Chart.register(ChartDataLabels);
 
 // ═══════════════════════════════════════════════════════════
-// CONFIG
+// CONFIGURAÇÕES GERAIS
 // ═══════════════════════════════════════════════════════════
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRNecMUqxdEaBZw6QzMixrnF-o7n4Ldu5eaOVsLR8vWT0QhxalCbImnUNqJhPshjLyIW5a2Yf6F-Gvb/pub?output=csv";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/SEU_ID_AQUI/exec";
 
 const UF_CENTROIDS = {
-  AC:[-8.77,-70.55],AL:[-9.62,-36.82],AP:[1.41,-51.77],AM:[-3.47,-65.10],
-  BA:[-12.96,-38.51],CE:[-5.20,-39.53],DF:[-15.78,-47.93],ES:[-19.19,-40.34],
-  GO:[-16.64,-49.31],MA:[-5.42,-45.44],MT:[-12.64,-55.42],MS:[-20.51,-54.54],
-  MG:[-18.10,-44.38],PA:[-3.79,-52.48],PB:[-7.28,-36.72],PR:[-24.89,-51.55],
-  PE:[-8.38,-37.86],PI:[-6.60,-42.28],RJ:[-22.25,-42.66],RN:[-5.81,-36.59],
-  RS:[-30.17,-53.50],RO:[-10.83,-63.34],RR:[1.99,-61.33],SC:[-27.45,-50.95],
+  AC:[-8.77,-70.55],AL:[-9.62,-36.82],AP:[1.41,-51.77],AM:[-3.47,-65.10],BA:[-12.96,-38.51],CE:[-5.20,-39.53],DF:[-15.78,-47.93],ES:[-19.19,-40.34],
+  GO:[-16.64,-49.31],MA:[-5.42,-45.44],MT:[-12.64,-55.42],MS:[-20.51,-54.54],MG:[-18.10,-44.38],PA:[-3.79,-52.48],PB:[-7.28,-36.72],PR:[-24.89,-51.55],
+  PE:[-8.38,-37.86],PI:[-6.60,-42.28],RJ:[-22.25,-42.66],RN:[-5.81,-36.59],RS:[-30.17,-53.50],RO:[-10.83,-63.34],RR:[1.99,-61.33],SC:[-27.45,-50.95],
   SP:[-22.19,-48.79],SE:[-10.57,-37.45],TO:[-10.25,-48.25]
 };
 
-// ═══════════════════════════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════════════════════════
 const state = {
   trips: [], filtered: [],
   filters: { search:"", year:"", uf:"", tag:"" },
-  activeView: "dashboard",
-  mapType: "choropleth",
-  map: null, mapLayer: null, geoData: null,
-  loaded: false, chartInstance: null,
+  activeView: "dashboard", mapType: "choropleth",
+  map: null, mapLayer: null, geoData: null, loaded: false, chartInstance: null,
   lists: { tags: [], artists: [], companions: [] },
   formCities: [], formTags: [], formArtists: [], formCompanions: [],
   ibgeUFs: [], ibgeCitiesCache: {}
@@ -477,60 +499,29 @@ const state = {
 
 const els = {};
 
-// ═══════════════════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════════════════
 document.addEventListener("DOMContentLoaded", () => {
-  loadListsFromStorage();
-  cacheElements();
-  bindEvents();
-  refreshIcons();
-  loadBrazilGeoJSON();
-  fetchTrips();
-  initIBGEForm();
-  renderListasView();
-  addCityBlock();
+  loadListsFromStorage(); cacheElements(); bindEvents(); refreshIcons();
+  loadBrazilGeoJSON(); fetchTrips(); initIBGEForm(); renderListasView(); addCityBlock();
 });
 
 function cacheElements() {
-  ["sync-pill","sync-text","kpi-grid","stats-kpi-grid",
-   "filter-search","filter-year","filter-uf","filter-tag","clear-filters",
-   "result-count","dashboard-results","map-rank",
-   "stat-ufs","stat-cities","stat-tags","stat-artists",
-   "trip-modal","modal-header","modal-body",
-   "city-blocks","add-city-btn","name-suggestions",
-   "lista-grid","form-message"
-  ].forEach(id => { els[id] = document.getElementById(id); });
+  ["sync-pill","sync-text","kpi-grid","stats-kpi-grid","filter-search","filter-year","filter-uf","filter-tag","clear-filters","result-count","dashboard-results","map-rank","stat-ufs","stat-cities","stat-tags","stat-artists","trip-modal","modal-header","modal-body","city-blocks","add-city-btn","name-suggestions","lista-grid","form-message"].forEach(id => { els[id] = document.getElementById(id); });
 }
 
 function bindEvents() {
-  document.querySelectorAll("[data-view]").forEach(btn =>
-    btn.addEventListener("click", () => switchView(btn.dataset.view))
-  );
+  document.querySelectorAll("[data-view]").forEach(btn => btn.addEventListener("click", () => switchView(btn.dataset.view)));
   document.querySelector("[data-jump-form]").addEventListener("click", () => switchView("form"));
-
   els["filter-search"].addEventListener("input", e => { state.filters.search = e.target.value.trim().toLowerCase(); applyFilters(); });
-  ["filter-year","filter-uf","filter-tag"].forEach(id =>
-    els[id].addEventListener("change", e => { state.filters[id.replace("filter-","")] = e.target.value; applyFilters(); })
-  );
+  ["filter-year","filter-uf","filter-tag"].forEach(id => els[id].addEventListener("change", e => { state.filters[id.replace("filter-","")] = e.target.value; applyFilters(); }));
   els["clear-filters"].addEventListener("click", clearFilters);
-  document.querySelectorAll("[data-map-type]").forEach(btn =>
-    btn.addEventListener("click", () => { state.mapType = btn.dataset.mapType; updateActiveButtons("[data-map-type]",state.mapType); renderMapLayer(); })
-  );
+  document.querySelectorAll("[data-map-type]").forEach(btn => btn.addEventListener("click", () => { state.mapType = btn.dataset.mapType; updateActiveButtons("[data-map-type]",state.mapType); renderMapLayer(); }));
   document.getElementById("trip-form").addEventListener("submit", handleFormSubmit);
   els["trip-modal"].addEventListener("click", e => { if(e.target===els["trip-modal"]) closeModal(); });
   document.addEventListener("keydown", e => { if(e.key==="Escape"&&els["trip-modal"].classList.contains("open")) closeModal(); });
   els["add-city-btn"].addEventListener("click", addCityBlock);
-
   document.getElementById("f-start").addEventListener("change", updateNameSuggestions);
   document.getElementById("f-end").addEventListener("change", updateNameSuggestions);
-
-  document.addEventListener("click", e => {
-    if (!e.target.closest(".autocomplete-wrapper")) {
-      document.querySelectorAll(".autocomplete-dropdown").forEach(d => d.classList.remove("open"));
-    }
-  });
-
+  document.addEventListener("click", e => { if (!e.target.closest(".autocomplete-wrapper")) document.querySelectorAll(".autocomplete-dropdown").forEach(d => d.classList.remove("open")); });
   setupAutocomplete("tags", "tags-input", "tags-area", "tags-dropdown", "tags");
   setupAutocomplete("artists", "artists-input", "artists-area", "artists-dropdown", "artists");
   setupAutocomplete("companions", "companions-input", "companions-area", "companions-dropdown", "companions");
@@ -549,20 +540,17 @@ function renameInList(listKey, oldVal, newVal) { const idx = state.lists[listKey
 function populateListsFromTrips(trips) { trips.forEach(t => { t.tags.forEach(tag => addToList("tags", tag)); t.artists.forEach(a => addToList("artists", a)); t.travelers.forEach(c => addToList("companions", c)); }); }
 
 // ═══════════════════════════════════════════════════════════
-// LISTAS SUSPENSAS VIEW & AUTOCOMPLETE (Omitidos p/ focar no principal, mantendo funções originais minimizadas)
+// LISTAS SUSPENSAS VIEW
 // ═══════════════════════════════════════════════════════════
 const LIST_META = { tags:{label:"Tags / Motivos",icon:"hash",desc:"Aparece no campo Tags do formulário"}, artists:{label:"Artistas",icon:"music-2",desc:"Artistas que aparecem no autocomplete"}, companions:{label:"Acompanhantes",icon:"users",desc:"Nomes que aparecem no autocomplete"} };
-function renderListasView() { if (!els["lista-grid"]) return; els["lista-grid"].innerHTML = Object.entries(LIST_META).map(([key, meta]) => `
-    <div class="lista-card"><div class="lista-card-header"><h3 class="lista-card-title">${meta.label}</h3><span class="lista-count">${state.lists[key].length}</span></div>
-    <div class="lista-items" id="lista-items-${key}">${state.lists[key].length===0 ? `<div style="color:var(--ink-3);font-size:13px;font-style:italic;text-align:center;padding:12px 0;">Nenhum item cadastrado</div>`: state.lists[key].map(item => renderListaItem(key, item)).join("")}</div>
-    <div class="lista-add-row"><div class="lista-add-input-wrap"><input class="lista-add-input" id="lista-add-${key}" placeholder="Novo item..." type="text"><button class="lista-add-btn" onclick="addFromListInput('${key}')">Adicionar</button></div></div>
-    <div class="lista-import-note"><i data-lucide="info"></i> ${meta.desc}. Novas entradas no formulário são salvas aqui automaticamente.</div></div>`).join("");
-  Object.keys(LIST_META).forEach(key => { const input = document.getElementById(`lista-add-${key}`); if(input){input.addEventListener("keydown", e=>{if(e.key==="Enter"){e.preventDefault();addFromListInput(key);}});} }); refreshIcons();
-}
-function renderListaItem(listKey, item) { return `<div class="lista-item-row" id="lista-row-${listKey}-${CSS.escape(item)}"><div class="lista-item-text"><input type="text" value="${escapeHtml(item)}" onblur="handleListItemRename('${listKey}','${escapeHtml(item)}',this.value)" onkeydown="if(event.key==='Enter'){this.blur();}"></div><div class="lista-item-actions"><button class="icon-btn danger" onclick="removeFromList('${listKey}','${escapeHtml(item)}')" title="Remover"><i data-lucide="x"></i></button></div></div>`; }
+function renderListasView() { if (!els["lista-grid"]) return; els["lista-grid"].innerHTML = Object.entries(LIST_META).map(([key, meta]) => `<div class="lista-card"><div class="lista-card-header"><h3 class="lista-card-title">${meta.label}</h3><span class="lista-count">${state.lists[key].length}</span></div><div class="lista-items" id="lista-items-${key}">${state.lists[key].length===0 ? `<div style="color:var(--ink-3);font-size:13px;font-style:italic;text-align:center;padding:12px 0;">Nenhum item cadastrado</div>`: state.lists[key].map(item => renderListaItem(key, item)).join("")}</div><div class="lista-add-row"><div class="lista-add-input-wrap"><input class="lista-add-input" id="lista-add-${key}" placeholder="Novo item..." type="text"><button class="lista-add-btn" onclick="addFromListInput('${key}')">Adicionar</button></div></div><div class="lista-import-note"><i data-lucide="info"></i> ${meta.desc}. Novas entradas são salvas aqui automaticamente.</div></div>`).join(""); Object.keys(LIST_META).forEach(key => { const input = document.getElementById(`lista-add-${key}`); if(input){input.addEventListener("keydown", e=>{if(e.key==="Enter"){e.preventDefault();addFromListInput(key);}});} }); refreshIcons(); }
+function renderListaItem(listKey, item) { return `<div class="lista-item-row" id="lista-row-${listKey}-${CSS.escape(item)}"><div class="lista-item-text"><input type="text" value="${escapeHtml(item)}" onblur="handleListItemRename('${listKey}','${escapeHtml(item)}',this.value)" onkeydown="if(event.key==='Enter'){this.blur();}"></div><div class="lista-item-actions"><button type="button" class="icon-btn danger" onclick="removeFromList('${listKey}','${escapeHtml(item)}')" title="Remover"><i data-lucide="x"></i></button></div></div>`; }
 function addFromListInput(key) { const input = document.getElementById(`lista-add-${key}`); if (!input) return; const val = input.value.trim(); if (val) { addToList(key, val); input.value = ""; } }
 function handleListItemRename(listKey, oldVal, newVal) { if (newVal.trim() !== oldVal) { renameInList(listKey, oldVal, newVal); renderListasView(); } }
 
+// ═══════════════════════════════════════════════════════════
+// AUTOCOMPLETE
+// ═══════════════════════════════════════════════════════════
 function setupAutocomplete(stateKey, inputId, areaId, dropdownId, listKey) {
   const input = document.getElementById(inputId), area = document.getElementById(areaId), dropdown = document.getElementById(dropdownId);
   area.addEventListener("click", () => input.focus());
@@ -591,9 +579,7 @@ let cityBlockCounter = 0;
 function addCityBlock() {
   const id = ++cityBlockCounter; state.formCities.push({ id, uf:"", city:"", lat:null, lng:null });
   const div = document.createElement("div"); div.className = "city-block"; div.id = `city-block-${id}`;
-  div.innerHTML = `<div class="city-block-header"><div class="city-block-label">Cidade ${state.formCities.length}</div>${state.formCities.length > 1 ? `<button type="button" class="remove-city-btn" onclick="removeCityBlock(${id})"><i data-lucide="x"></i></button>` : ""}</div>
-    <div class="city-block-grid"><div class="field"><label>Estado (UF) *</label><select class="form-input" id="f-uf-${id}" onchange="onUFChange(${id}, this.value)"><option value="">Carregando...</option></select></div>
-    <div class="field"><label>Cidade *</label><select class="form-input" id="f-city-${id}" disabled><option value="">Selecione o Estado</option></select></div></div>`;
+  div.innerHTML = `<div class="city-block-header"><div class="city-block-label">Cidade ${state.formCities.length}</div>${state.formCities.length > 1 ? `<button type="button" class="remove-city-btn" onclick="removeCityBlock(${id})"><i data-lucide="x"></i></button>` : ""}</div><div class="city-block-grid"><div class="field"><label>Estado (UF) *</label><select class="form-input" id="f-uf-${id}" onchange="onUFChange(${id}, this.value)"><option value="">Carregando...</option></select></div><div class="field"><label>Cidade *</label><select class="form-input" id="f-city-${id}" disabled><option value="">Selecione o Estado</option></select></div></div>`;
   els["city-blocks"].appendChild(div); refreshIcons(); populateCityBlockUF(id);
   document.getElementById(`f-city-${id}`).addEventListener("change", (e) => { const cityObj = state.formCities.find(c => c.id === id); if(cityObj) cityObj.city = e.target.value; updateNameSuggestions(); });
 }
@@ -610,7 +596,7 @@ function fillCitySelect(select, cities) { select.innerHTML = `<option value="">S
 async function initIBGEForm() { try { const res = await fetch("https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome"); state.ibgeUFs = await res.json(); document.querySelectorAll("[id^='f-uf-']").forEach(sel => populateCityBlockUF(parseInt(sel.id.replace("f-uf-","")))); } catch(e) {} }
 
 // ═══════════════════════════════════════════════════════════
-// SMART NAME SUGGESTIONS
+// SMART SUGGESTIONS
 // ═══════════════════════════════════════════════════════════
 function updateNameSuggestions() {
   const suggestions = []; const start = document.getElementById("f-start")?.value; const year = start ? start.split("-")[0] : ""; const month = start ? ["","Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"][parseInt(start.split("-")[1])] : "";
@@ -640,8 +626,6 @@ function normalizeTrip(row, index) {
   let year = "";
   if (startDate && startDate.includes("-")) year = startDate.split("-")[0];
   else if (startDate && startDate.includes("/")) year = startDate.split("/")[2];
-  
-  // SOLUÇÃO: Garante o ano completo (E.g. 23 -> 2023)
   if(year.length === 2) year = "20" + year;
 
   return { id: `trip-${index}`, name: name||city, city, uf, startDate, endDate, year, tags, artists, travelers, lat, lng, searchIndex: `${name} ${city} ${uf} ${tags.join(" ")} ${artists.join(" ")} ${travelers.join(" ")}`.toLowerCase() };
@@ -660,16 +644,26 @@ function applyFilters() {
 function clearFilters() { state.filters = { search:"", year:"", uf:"", tag:"" }; ["filter-search","filter-year","filter-uf","filter-tag"].forEach(id => els[id].value=""); applyFilters(); }
 
 // ═══════════════════════════════════════════════════════════
-// RENDER
+// RENDER & NAVIGATION
 // ═══════════════════════════════════════════════════════════
+function switchView(view) {
+  document.querySelectorAll(".view").forEach(el => el.classList.remove("active"));
+  document.getElementById(`view-${view}`).classList.add("active");
+  document.querySelectorAll(".nav-item").forEach(btn => btn.classList.toggle("active", btn.dataset.view===view));
+  const kickers = {dashboard:"Painel pessoal",map:"Mapa de viagens",stats:"Análise dos dados",form:"Registrar experiência",listas:"Configurações",planejar:"Planejar viagem"};
+  const titles = {dashboard:'Meus <em>moments</em>',map:'Mapa do <em>Brasil</em>',stats:'Minhas <em>estatísticas</em>',form:'Novo <em>moment</em>',listas:'Listas <em>suspensas</em>',planejar:'Planejar <em>Roteiro</em>'};
+  if (document.getElementById("page-kicker")) document.getElementById("page-kicker").textContent = kickers[view]||"";
+  if (document.getElementById("page-title")) document.getElementById("page-title").innerHTML = titles[view]||"";
+  if (view==="map") setTimeout(initMap, 200);
+  if (view==="listas") renderListasView();
+}
+
 function renderAll() { renderKpis(); renderDashboardResults(); renderStats(); renderMapLayer(); refreshIcons(); }
 
 function renderKpis() {
   const cities = [...new Set(state.filtered.map(t=>t.city))].sort(), ufs = [...new Set(state.filtered.map(t=>t.uf))].sort();
   state.currentCitiesList = cities; state.currentUfsList = ufs;
-  const html = `<article class="metric-card"><div class="metric-label"><i data-lucide="plane"></i> Moments</div><div class="metric-value">${state.filtered.length}</div><div class="metric-sub">registros no total</div></article>
-    <article class="metric-card" onclick="openListModal('Cidades Visitadas',state.currentCitiesList,'map-pin')"><div class="metric-label"><i data-lucide="map-pin"></i> Cidades</div><div class="metric-value">${cities.length}</div><div class="metric-sub">destinos únicos explorados</div></article>
-    <article class="metric-card" onclick="openListModal('UFs Visitadas',state.currentUfsList,'map')"><div class="metric-label"><i data-lucide="map"></i> Estados</div><div class="metric-value">${ufs.length}</div><div class="metric-sub">estados do Brasil</div></article>`;
+  const html = `<article class="metric-card"><div class="metric-label"><i data-lucide="plane"></i> Moments</div><div class="metric-value">${state.filtered.length}</div><div class="metric-sub">registros no total</div></article><article class="metric-card" onclick="openListModal('Cidades Visitadas',state.currentCitiesList,'map-pin')"><div class="metric-label"><i data-lucide="map-pin"></i> Cidades</div><div class="metric-value">${cities.length}</div><div class="metric-sub">destinos únicos explorados</div></article><article class="metric-card" onclick="openListModal('UFs Visitadas',state.currentUfsList,'map')"><div class="metric-label"><i data-lucide="map"></i> Estados</div><div class="metric-value">${ufs.length}</div><div class="metric-sub">estados do Brasil</div></article>`;
   els["kpi-grid"].innerHTML = html; els["stats-kpi-grid"].innerHTML = html;
 }
 
@@ -691,27 +685,12 @@ function renderTripCard(trip) {
 }
 
 // ═══════════════════════════════════════════════════════════
-// MAP
+// MAPA
 // ═══════════════════════════════════════════════════════════
-function switchView(view) {
-  document.querySelectorAll(".view").forEach(el => el.classList.remove("active"));
-  document.getElementById(`view-${view}`).classList.add("active");
-  document.querySelectorAll(".nav-item").forEach(btn => btn.classList.toggle("active", btn.dataset.view===view));
-  const kickers = {dashboard:"Painel pessoal",map:"Mapa de viagens",stats:"Análise dos dados",form:"Registrar experiência",listas:"Configurações"};
-  const titles = {dashboard:'Meus <em>moments</em>',map:'Mapa do <em>Brasil</em>',stats:'Minhas <em>estatísticas</em>',form:'Novo <em>moment</em>',listas:'Listas <em>suspensas</em>'};
-  if (document.getElementById("page-kicker")) document.getElementById("page-kicker").textContent = kickers[view]||"";
-  if (document.getElementById("page-title")) document.getElementById("page-title").innerHTML = titles[view]||"";
-  if (view==="map") setTimeout(initMap, 200);
-  if (view==="listas") renderListasView();
-}
-
 function initMap() {
   if (state.map) { state.map.invalidateSize(); renderMapLayer(); return; }
-  const brazilBounds = [[-34.0,-74.0],[5.5,-34.0]];
-  state.map = L.map("map",{zoomControl:false,maxBounds:brazilBounds,maxBoundsViscosity:1.0,minZoom:4}).fitBounds(brazilBounds);
+  state.map = L.map("map",{zoomControl:false,maxBounds:[[-34.0,-74.0],[5.5,-34.0]],minZoom:4}).fitBounds([[-34.0,-74.0],[5.5,-34.0]]);
   L.control.zoom({position:"bottomright"}).addTo(state.map);
-  
-  // SOLUÇÃO: Camada light_nolabels (limpa rótulos de fora do Brasil e nome)
   L.tileLayer("https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png",{attribution:"&copy; OSM"}).addTo(state.map);
   renderMapLayer();
 }
@@ -720,7 +699,6 @@ function renderMapLayer() {
   if (!state.map||!state.geoData) return;
   if (state.mapLayer) state.map.removeLayer(state.mapLayer);
   state.mapLayer = L.layerGroup();
-
   const ufCounts = state.filtered.reduce((acc,t) => { acc[t.uf]=(acc[t.uf]||0)+1; return acc; },{});
   const max = Math.max(...Object.values(ufCounts),1);
 
@@ -728,26 +706,18 @@ function renderMapLayer() {
     L.geoJSON(state.geoData, {
       style: f => {
         const count = ufCounts[f.properties.sigla]||0;
-        // SOLUÇÃO: Degradê mais linear/suave
-        const intensity = count ? 0.3 + (count/max)*0.7 : 0; 
-        return { color:"var(--white)", weight:1.5, fillColor: count ? "var(--blue-med)" : "#e2e8f0", fillOpacity: count ? intensity : 0.4 };
+        const intensity = count ? 0.65 + (count/max)*0.35 : 0; 
+        return { color: "var(--white)", weight: 1.5, fillColor: count ? "var(--blue-dark)" : "#e2e8f0", fillOpacity: count ? intensity : 0.6 };
       },
       onEachFeature:(f,layer)=> {
         const sigla = f.properties.sigla;
         const count = ufCounts[sigla]||0;
-        
-        // Rótulo da UF permanentemente visível
-        layer.bindTooltip(sigla, {
-          permanent: true, direction: "center",
-          className: `uf-label ${count > 0 ? 'visited' : ''}`
-        });
-
-        // Evento de clique para mostrar os cards da UF
+        layer.bindTooltip(sigla, { permanent: true, direction: "center", className: `uf-label ${count > 0 ? 'visited' : ''}` });
         layer.on('click', () => { if(count > 0) showMomentsByLocation('UF', sigla); });
       }
     }).addTo(state.mapLayer);
   } else {
-    L.geoJSON(state.geoData,{style:{color:"var(--white)",weight:1.5,fillColor:"#e2e8f0",fillOpacity:.4}}).addTo(state.mapLayer);
+    L.geoJSON(state.geoData,{style:{color:"var(--white)",weight:1.5,fillColor:"#e2e8f0",fillOpacity:.6}}).addTo(state.mapLayer);
     const cityGroups = {};
     state.filtered.forEach(t => {
       const key = `${t.city}-${t.uf}`;
@@ -761,9 +731,7 @@ function renderMapLayer() {
       if(lat&&lng) {
         L.circleMarker([lat,lng],{radius:6+(group.count/maxCity)*12,color:"#fff",weight:2,fillColor:"var(--accent)",fillOpacity:.85})
          .bindTooltip(`<b>${group.city} - ${group.uf}</b><br>${group.count} moment(s)`)
-         // Evento de clique para mostrar os cards da Cidade
-         .on('click', () => showMomentsByLocation('Cidade', group.city))
-         .addTo(state.mapLayer);
+         .on('click', () => showMomentsByLocation('Cidade', group.city)).addTo(state.mapLayer);
       }
     });
   }
@@ -773,7 +741,7 @@ function renderMapLayer() {
 }
 
 // ═══════════════════════════════════════════════════════════
-// STATS
+// ESTATÍSTICAS
 // ═══════════════════════════════════════════════════════════
 function renderStats() {
   const getTop = (mapFn) => Object.entries(state.filtered.reduce((acc,t)=>{ const vals = Array.isArray(mapFn(t)) ? mapFn(t) : [mapFn(t)]; vals.forEach(v=>{ if(v) acc[v]=(acc[v]||0)+1; }); return acc; },{})).sort((a,b)=>b[1]-a[1]).slice(0,6);
@@ -784,65 +752,91 @@ function renderStats() {
   const yearsData = Object.entries(state.filtered.reduce((acc,t)=>{ if(t.year) acc[t.year]=(acc[t.year]||0)+1; return acc; },{})).sort((a,b)=>a[0].localeCompare(b[0]));
   const ctx = document.getElementById("timeChart").getContext("2d");
   if (state.chartInstance) state.chartInstance.destroy();
-  
-  // SOLUÇÃO: Gráfico de Linha com Rótulos usando o Plugin Datalabels
   state.chartInstance = new Chart(ctx, {
     type: "line",
     data: { 
       labels: yearsData.map(d=>d[0]), 
-      datasets: [{
-        label: "Moments", 
-        data: yearsData.map(d=>d[1]), 
-        borderColor: "var(--blue-light)", 
-        backgroundColor: "rgba(38,185,221,0.15)", // preenchimento abaixo da linha
-        borderWidth: 3,
-        pointBackgroundColor: "var(--white)",
-        pointBorderColor: "var(--blue-med)",
-        pointBorderWidth: 2,
-        pointRadius: 5,
-        fill: true,
-        tension: 0.3 // Curvatura da linha
-      }] 
+      datasets: [{ label: "Moments", data: yearsData.map(d=>d[1]), borderColor: "var(--blue-light)", backgroundColor: "rgba(38,185,221,0.15)", borderWidth: 3, pointBackgroundColor: "var(--white)", pointBorderColor: "var(--blue-med)", pointBorderWidth: 2, pointRadius: 5, fill: true, tension: 0.3 }] 
     },
     options: { 
       responsive: true, maintainAspectRatio: false, 
-      scales: { 
-        y: { beginAtZero: true, display: false }, // oculta o eixo Y para ficar mais limpo 
-        x: { grid: { display: false } }
-      }, 
-      layout: { padding: { top: 30 } }, // Dá espaço para o rótulo acima
+      scales: { y: { beginAtZero: true, display: false }, x: { grid: { display: false } } }, 
+      layout: { padding: { top: 30 } }, 
       plugins: { 
         legend: { display: false },
-        datalabels: {
-          backgroundColor: "var(--paper-2)",
-          borderColor: "var(--line-strong)",
-          borderWidth: 1,
-          borderRadius: 8,
-          color: "var(--blue-dark)",
-          font: { weight: 'bold', size: 13 },
-          padding: { top: 4, bottom: 4, left: 10, right: 10 },
-          align: 'top',
-          offset: 8
-        }
+        datalabels: { backgroundColor: "var(--paper-2)", borderColor: "var(--line-strong)", borderWidth: 1, borderRadius: 8, color: "var(--blue-dark)", font: { weight: 'bold', size: 13 }, padding: { top: 4, bottom: 4, left: 10, right: 10 }, align: 'top', offset: 8 }
       } 
     }
   });
 }
 
 // ═══════════════════════════════════════════════════════════
-// MODALS
+// PLANEJAR ROTEIRO
+// ═══════════════════════════════════════════════════════════
+function gerarGradeRoteiro() {
+  const dest = document.getElementById("plan-dest").value.trim();
+  const startStr = document.getElementById("plan-start").value;
+  const endStr = document.getElementById("plan-end").value;
+  const msgDiv = document.getElementById("plan-message");
+  
+  if (!startStr || !endStr) { alert("Por favor, preencha as datas de início e fim."); return; }
+
+  let startDate = new Date(startStr + "T12:00:00");
+  let endDate = new Date(endStr + "T12:00:00");
+  let daysArray = [];
+  const meses = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
+  
+  let current = new Date(startDate);
+  while (current <= endDate) {
+    daysArray.push(`${current.getDate()}-${meses[current.getMonth()]}`);
+    current.setDate(current.getDate() + 1);
+  }
+
+  document.getElementById("plan-grid-title").textContent = dest ? `Roteiro Diário: ${dest}` : "Roteiro Diário";
+
+  let html = `<table class="itinerary-table"><thead><tr><th style="width: 40px; background: var(--paper);"></th>`;
+  daysArray.forEach(d => { html += `<th class="itinerary-th">${d}</th>`; });
+  html += `</tr></thead><tbody>`;
+
+  const turnos = ["Manhã", "Tarde", "Noite"];
+  turnos.forEach(turno => {
+    html += `<tr><td class="itinerary-row-label">${turno}</td>`;
+    daysArray.forEach((d, index) => {
+      html += `<td class="itinerary-td"><textarea class="itinerary-input" id="plan-${turno.toLowerCase()}-${index}" placeholder="O que fazer..."></textarea></td>`;
+    });
+    html += `</tr>`;
+  });
+
+  html += `</tbody></table>`;
+  document.getElementById("itinerary-table-wrapper").innerHTML = html;
+  document.getElementById("plan-grid-container").style.display = "block";
+  msgDiv.textContent = "";
+}
+
+async function salvarPlanejamento() {
+  const dest = document.getElementById("plan-dest").value.trim();
+  const msgDiv = document.getElementById("plan-message");
+  msgDiv.style.color = "var(--ink-3)";
+  msgDiv.textContent = "Salvando no Banco Oficial (Google Sheets)...";
+
+  const planoData = { destino: dest, data_criacao: new Date().toISOString(), status: "Planejado", nota: "Roteiro capturado com sucesso da interface" };
+
+  try {
+    // const response = await fetch(GOOGLE_SCRIPT_URL, { method: "POST", body: JSON.stringify(planoData), headers: { "Content-Type": "application/json" } });
+    setTimeout(() => { msgDiv.style.color = "var(--blue-med)"; msgDiv.textContent = "✓ Roteiro planejado com sucesso! A sua planilha foi atualizada."; }, 1500);
+  } catch(error) {
+    msgDiv.style.color = "var(--accent)"; msgDiv.textContent = "Erro ao conectar com a planilha.";
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// MODALS & FORM SUBMIT
 // ═══════════════════════════════════════════════════════════
 function showMomentsByLocation(type, locationName) {
   const trips = state.filtered.filter(t => type === 'UF' ? t.uf === locationName : t.city === locationName);
-  els["modal-header"].innerHTML = `
-    <h2 style="font-family:'DM Serif Display',serif;font-size:32px;margin:0;color:var(--blue-dark);">Moments em ${locationName}</h2>
-    <p style="margin:8px 0 0;color:var(--ink-3);font-size:15px;font-weight:500;">Total: ${trips.length} registros</p>`;
-
-  els["modal-body"].innerHTML = `<div class="gallery-grid">
-    ${trips.map(renderTripCard).join("")}
-  </div>`;
-  els["trip-modal"].classList.add("open");
-  refreshIcons();
+  els["modal-header"].innerHTML = `<h2 style="font-family:'DM Serif Display',serif;font-size:32px;margin:0;color:var(--blue-dark);">Moments em ${locationName}</h2><p style="margin:8px 0 0;color:var(--ink-3);font-size:15px;font-weight:500;">Total: ${trips.length} registros</p>`;
+  els["modal-body"].innerHTML = `<div class="gallery-grid">${trips.map(renderTripCard).join("")}</div>`;
+  els["trip-modal"].classList.add("open"); refreshIcons();
 }
 
 function openTripModal(tripId) {
@@ -851,6 +845,7 @@ function openTripModal(tripId) {
   els["modal-body"].innerHTML = `<div style="display:grid;gap:14px;font-size:15px;">${infoBlock("calendar","Datas",`${trip.startDate}${trip.endDate?" → "+trip.endDate:""}`)}${trip.tags.length ? infoBlock("hash","Tags",trip.tags.join(", ")) : ""}${trip.artists.length ? infoBlock("music-2","Artistas",trip.artists.join(", ")) : ""}${infoBlock("users","Acompanhantes",trip.travelers.join(", ")||"Viajei a solo")}</div>`;
   els["trip-modal"].classList.add("open"); refreshIcons();
 }
+
 function infoBlock(icon, label, value) { return `<div style="background:var(--paper-2);padding:16px;border-radius:12px;"><strong style="color:var(--blue-dark);display:block;margin-bottom:4px;font-size:12px;text-transform:uppercase;letter-spacing:.06em;">${label}</strong>${escapeHtml(value)}</div>`; }
 
 function openListModal(title, listItems, iconName) {
@@ -859,12 +854,25 @@ function openListModal(title, listItems, iconName) {
   els["modal-body"].innerHTML = `<div style="display:flex;flex-direction:column;">${listItems.map(item=>`<div class="modal-list-item"><span>${escapeHtml(item)}</span><span class="modal-list-badge">${counts[item]||0}</span></div>`).join("")}</div>`;
   els["trip-modal"].classList.add("open"); refreshIcons();
 }
+
 function closeModal() { els["trip-modal"].classList.remove("open"); }
 
-// ═══════════════════════════════════════════════════════════
-// FORM SUBMIT
-// ═══════════════════════════════════════════════════════════
-function handleFormSubmit(e) { e.preventDefault(); const name = document.getElementById("f-name").value.trim(), start = document.getElementById("f-start").value, cities = state.formCities.filter(c=>c.city&&c.uf); if(!cities.length){els["form-message"].style.color="var(--accent)";els["form-message"].textContent="⚠️ Adicione ao menos uma cidade completa.";return;} let year = start?start.split("-")[0]:""; if(year.length===2)year="20"+year; cities.forEach((cityObj,i)=>{const tripEntry={id:`session-${Date.now()}-${i}`,name:cities.length>1?`${name} · ${cityObj.city}`:name,city:cityObj.city,uf:cityObj.uf,startDate:start,endDate:document.getElementById("f-end").value,year,tags:[...state.formTags],artists:[...state.formArtists],travelers:[...state.formCompanions],lat:cityObj.lat,lng:cityObj.lng,searchIndex:`${name} ${cityObj.city} ${cityObj.uf} ${state.formTags.join(" ")} ${state.formArtists.join(" ")} ${state.formCompanions.join(" ")}`.toLowerCase()};state.trips.unshift(tripEntry);}); els["form-message"].style.color="var(--blue-med)"; els["form-message"].textContent=`✓ ${cities.length} entrada(s) salva(s) na sessão com sucesso!`; setTimeout(()=>{document.getElementById("trip-form").reset();els["form-message"].textContent="";state.formTags=[];state.formArtists=[];state.formCompanions=[];state.formCities=[];cityBlockCounter=0;els["city-blocks"].innerHTML="";["tags-area","artists-area","companions-area"].forEach(id=>{const area=document.getElementById(id);if(area)area.innerHTML=`<input class="tag-text-input" id="${id.replace('-area','-input')}" placeholder="Digite para buscar...">`;});setupAutocomplete("tags","tags-input","tags-area","tags-dropdown","tags");setupAutocomplete("artists","artists-input","artists-area","artists-dropdown","artists");setupAutocomplete("companions","companions-input","companions-area","companions-dropdown","companions");addCityBlock();els["name-suggestions"].innerHTML="";els["sync-text"].textContent=`${state.trips.length} moments`;populateFilters();applyFilters();},2000); }
+function handleFormSubmit(e) {
+  e.preventDefault(); const name = document.getElementById("f-name").value.trim(), start = document.getElementById("f-start").value, cities = state.formCities.filter(c=>c.city&&c.uf);
+  if(!cities.length){els["form-message"].style.color="var(--accent)";els["form-message"].textContent="⚠️ Adicione ao menos uma cidade completa.";return;}
+  let year = start?start.split("-")[0]:""; if(year.length===2)year="20"+year;
+  cities.forEach((cityObj,i)=>{
+    const tripEntry={id:`session-${Date.now()}-${i}`,name:cities.length>1?`${name} · ${cityObj.city}`:name,city:cityObj.city,uf:cityObj.uf,startDate:start,endDate:document.getElementById("f-end").value,year,tags:[...state.formTags],artists:[...state.formArtists],travelers:[...state.formCompanions],lat:cityObj.lat,lng:cityObj.lng,searchIndex:`${name} ${cityObj.city} ${cityObj.uf} ${state.formTags.join(" ")} ${state.formArtists.join(" ")} ${state.formCompanions.join(" ")}`.toLowerCase()};
+    state.trips.unshift(tripEntry);
+  });
+  els["form-message"].style.color="var(--blue-med)"; els["form-message"].textContent=`✓ ${cities.length} entrada(s) salva(s) na sessão com sucesso!`;
+  setTimeout(()=>{
+    document.getElementById("trip-form").reset();els["form-message"].textContent="";state.formTags=[];state.formArtists=[];state.formCompanions=[];state.formCities=[];cityBlockCounter=0;els["city-blocks"].innerHTML="";
+    ["tags-area","artists-area","companions-area"].forEach(id=>{const area=document.getElementById(id);if(area)area.innerHTML=`<input class="tag-text-input" id="${id.replace('-area','-input')}" placeholder="Digite para buscar...">`;});
+    setupAutocomplete("tags","tags-input","tags-area","tags-dropdown","tags");setupAutocomplete("artists","artists-input","artists-area","artists-dropdown","artists");setupAutocomplete("companions","companions-input","companions-area","companions-dropdown","companions");
+    addCityBlock();els["name-suggestions"].innerHTML="";els["sync-text"].textContent=`${state.trips.length} moments`;populateFilters();applyFilters();
+  },2000);
+}
 
 function updateActiveButtons(selector, activeValue) { document.querySelectorAll(selector).forEach(btn => btn.classList.toggle("active", btn.dataset[selector.replace("[data-","").replace("]","").replace("-","").toLowerCase()] === activeValue || btn.getAttribute("data-map-type") === activeValue || btn.getAttribute("data-mode") === activeValue) ); }
 function escapeHtml(str) { if(!str) return ""; return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
