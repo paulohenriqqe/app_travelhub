@@ -489,8 +489,8 @@
     z-index: 1;
   }
   #map { width: 100%; height: 68vh; min-height: 520px; background:
-      radial-gradient(circle at top, rgba(38, 185, 221, 0.16), rgba(248, 250, 252, 0.96) 42%),
-      linear-gradient(180deg, #eff6ff 0%, #f8fafc 100%);
+      radial-gradient(circle at top, rgba(38, 185, 221, 0.14), rgba(230, 239, 245, 0.96) 46%),
+      linear-gradient(180deg, #e4eff6 0%, #eef4f8 100%);
     cursor: pointer; }
   .map-stack { display: flex; flex-direction: column; gap: 14px; }
   .map-meta-strip { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -1258,6 +1258,13 @@
     transition: var(--transition);
   }
   .map-toggle.active, .view-toggle.active { background: var(--blue-dark); color: #fff; border-color: var(--blue-dark); }
+  .view-toggle:disabled {
+    opacity: 0.42;
+    cursor: not-allowed;
+    background: var(--paper-2);
+    color: var(--ink-3);
+    border-color: var(--line);
+  }
   .filter-chip {
     border-style: dashed;
     background: linear-gradient(180deg, var(--white), var(--paper));
@@ -1455,13 +1462,6 @@
         <div class="dashboard-stack">
           <div class="map-toolbar">
             <div class="toolbar-group">
-              <span class="toolbar-caption">Leitura</span>
-              <div class="segmented">
-                <button class="map-toggle active" data-map-type="atlas"><i data-lucide="sparkles"></i> Atlas</button>
-                <button class="map-toggle" data-map-type="coverage"><i data-lucide="orbit"></i> Cobertura</button>
-              </div>
-            </div>
-            <div class="toolbar-group">
               <span class="toolbar-caption">Nível</span>
               <div class="segmented">
                 <button class="view-toggle active" data-mode="states"><i data-lucide="map"></i> Estados</button>
@@ -1469,7 +1469,7 @@
               </div>
             </div>
             <button class="filter-chip active" id="toggle-planned-map" aria-pressed="true"><i data-lucide="route"></i> Planos</button>
-            <div class="map-note" id="map-note">Estados primeiro. Municípios entram no detalhe.</div>
+            <div class="map-note" id="map-note">Cobertura por estados.</div>
           </div>
           <div class="map-meta-strip" id="map-meta-strip"></div>
           <div class="map-layout">
@@ -1477,8 +1477,8 @@
               <div class="panel map-panel"><div id="map"></div></div>
             </div>
             <aside class="panel rank-panel">
-              <div class="panel-label" style="margin-bottom:10px;">Leitura do atlas</div>
-              <p class="atlas-panel-copy">Estados em destaque, cidades no detalhe e planos como camada opcional.</p>
+              <div class="panel-label" style="margin-bottom:10px;">Leitura da cobertura</div>
+              <p class="atlas-panel-copy">Estados para intensidade. Municípios para distribuição dos pontos.</p>
               <div class="rank-list" id="map-rank"></div>
             </aside>
           </div>
@@ -1832,7 +1832,7 @@ const state = {
   filteredPlans: [],
   filters: { search: "", year: "", uf: "", tag: "" },
   activeView: "dashboard",
-  mapType: "atlas",
+  mapType: "coverage",
   mapDetail: "states",
   showPlannedMap: true,
   selectedMapFeature: null,
@@ -1988,11 +1988,6 @@ function bindEvents() {
     applyFilters();
   }));
   els["clear-filters"].addEventListener("click", clearFilters);
-  document.querySelectorAll("[data-map-type]").forEach(btn => btn.addEventListener("click", () => {
-    state.mapType = btn.dataset.mapType;
-    updateActiveButtons("[data-map-type]", state.mapType);
-    renderMapLayer();
-  }));
   document.querySelectorAll("[data-mode]").forEach(btn => btn.addEventListener("click", () => {
     state.mapDetail = btn.dataset.mode;
     updateActiveButtons("[data-mode]", state.mapDetail);
@@ -2572,7 +2567,7 @@ async function loadMapGeoData() {
     if (state.map) renderMapLayer();
   } catch (error) {
     state.geoData = { world: null, brazil: null };
-    state.errors.geo = "O atlas carregou sem as camadas territoriais locais.";
+    state.errors.geo = "A cobertura carregou sem as camadas territoriais locais.";
     if (state.map) renderMapLayer();
   }
 }
@@ -2826,8 +2821,15 @@ function mixHexColors(fromHex, toHex, ratio) {
 function getIntensityColor(value, max, palette = "country") {
   const safeMax = Math.max(max || 1, 1);
   const ratio = clamp(value / safeMax, 0, 1);
-  if (palette === "state") return mixHexColors("#dbe9f4", "#4e84bf", Math.pow(ratio, 0.9));
-  return mixHexColors("#dde7f1", "#5f92c8", Math.pow(ratio, 0.86));
+  if (palette === "state") return mixHexColors("#cfe1ef", "#2f74b5", Math.pow(ratio, 0.82));
+  return mixHexColors("#d4e2ec", "#4c86bd", Math.pow(ratio, 0.82));
+}
+
+function getAtlasWashColor(value, max, palette = "country") {
+  const safeMax = Math.max(max || 1, 1);
+  const ratio = clamp(value / safeMax, 0, 1);
+  if (palette === "state") return mixHexColors("#e7eef3", "#a8bfd5", Math.pow(ratio, 0.95));
+  return mixHexColors("#e2eaf0", "#b4c7d8", Math.pow(ratio, 0.92));
 }
 
 function getCountryLabelPt(key, fallback = "") {
@@ -3337,7 +3339,7 @@ function switchView(view) {
   };
   const titles = {
     dashboard: "Ciclo de <em>viagens</em>",
-    map: "Atlas das <em>viagens</em>",
+    map: "Cobertura das <em>viagens</em>",
     stats: "Minhas <em>métricas</em>",
     form: "Nova <em>efetivação</em>",
     listas: "Listas do <em>formulário</em>",
@@ -3402,7 +3404,7 @@ function renderKpis() {
     <article class="metric-card" onclick="openListModal('Países visitados', state.currentCountriesList)">
       <div class="metric-label"><i data-lucide="globe-2"></i> Países</div>
       <div class="metric-value">${countries.length}</div>
-      <div class="metric-sub">camadas geográficas ativas no atlas</div>
+      <div class="metric-sub">camadas geográficas ativas na cobertura</div>
     </article>
     <article class="metric-card" onclick="openListModal('Regiões visitadas', state.currentUfsList)">
       <div class="metric-label"><i data-lucide="map"></i> Regiões</div>
@@ -3445,7 +3447,7 @@ function renderKpis() {
 function renderDashboardCycle() {
   const miniStats = [
     { icon: "calendar-range", label: "Anos vividos", value: [...new Set(state.filtered.map(trip => trip.year).filter(Boolean))].length },
-    { icon: "globe-2", label: "Países no atlas", value: [...new Set(state.filtered.map(trip => trip.country).filter(Boolean))].length },
+    { icon: "globe-2", label: "Países cobertos", value: [...new Set(state.filtered.map(trip => trip.country).filter(Boolean))].length },
     { icon: "map", label: "Regiões brasileiras", value: [...new Set(state.filtered.filter(trip => isBrazilCountry(trip.country)).map(trip => trip.region || trip.uf).filter(Boolean))].length },
     { icon: "hash", label: "Motivos registrados", value: [...new Set(state.filtered.flatMap(trip => trip.tags))].length }
   ];
@@ -3490,7 +3492,7 @@ function renderDashboardCycle() {
     { label: "Motivo mais frequente", value: topTag ? `${topTag[0]} | ${topTag[1]} vez(es)` : "Sem tags ainda" },
     { label: "Companhia mais recorrente", value: topCompanion ? `${topCompanion[0]} | ${topCompanion[1]} viagem(ns)` : "Sem acompanhantes recorrentes" },
     { label: "Artista mais lembrado", value: topArtist ? `${topArtist[0]} | ${topArtist[1]} registro(s)` : "Sem artista recorrente" },
-    { label: "Atlas ativo", value: `${countryCount} país(es) e ${state.currentUfsList.length} região(ões)` }
+    { label: "Cobertura ativa", value: `${countryCount} país(es) e ${state.currentUfsList.length} região(ões)` }
   ];
   els["dashboard-summary-list"].innerHTML = summaryRows.map(row => `
     <div class="summary-row">
@@ -3541,12 +3543,8 @@ function initMap() {
   }
   state.map = L.map("map", { zoomControl: false, minZoom: 2, worldCopyJump: true, maxBounds: [[-80, -180], [85, 180]] }).setView([-15.5, -52], 3);
   state.map.createPane("coveragePane");
-  state.map.createPane("routePane");
-  state.map.createPane("labelPane");
   state.map.createPane("cityPane");
   state.map.getPane("coveragePane").style.zIndex = 420;
-  state.map.getPane("routePane").style.zIndex = 610;
-  state.map.getPane("labelPane").style.zIndex = 625;
   state.map.getPane("cityPane").style.zIndex = 650;
   L.control.zoom({ position: "bottomright" }).addTo(state.map);
   state.map.on("click", () => {
@@ -3560,7 +3558,36 @@ function initMap() {
 function renderCoverageSidebar(collections) {
   const countries = [...collections.countries.values()].sort((a, b) => b.trips.length - a.trips.length).slice(0, 5);
   const regions = [...collections.regions.values()].sort((a, b) => b.trips.length - a.trips.length).slice(0, 5);
+  const cities = [...collections.cities.values()].sort((a, b) => b.trips.length - a.trips.length).slice(0, 5);
   const upcomingPlans = getUpcomingPlans(4);
+
+  const primarySection = state.mapDetail === "states"
+    ? `
+    <section class="atlas-section">
+      <h3 class="atlas-section-title">UFs com mais presença</h3>
+      ${regions.length ? regions.map(item => `
+        <div class="atlas-entry" onclick="openTripsCollectionModal('Viagens em ${escapeHtml(item.label)}', getTripsForRegion(decodeURIComponent('${encodeURIComponent(item.label)}')), 'UF brasileira visitada')">
+          <div>
+            <strong>${escapeHtml(item.label)}</strong>
+            <span>${item.trips.length} registro(s) no Brasil</span>
+          </div>
+          <div class="atlas-entry-badge">${item.trips.length}</div>
+        </div>
+      `).join("") : `<div class="inline-note">As UFs visitadas aparecem aqui quando houver viagens brasileiras.</div>`}
+    </section>`
+    : `
+    <section class="atlas-section">
+      <h3 class="atlas-section-title">Municípios com mais presença</h3>
+      ${cities.length ? cities.map(item => `
+        <div class="atlas-entry" onclick="openTripsCollectionModal('Viagens em ${escapeHtml(item.label)}', getTripsForLocationLabel(decodeURIComponent('${encodeURIComponent(item.label)}')), 'Cidade visitada')">
+          <div>
+            <strong>${escapeHtml(item.label)}</strong>
+            <span>${item.trips.length} registro(s) nesse município</span>
+          </div>
+          <div class="atlas-entry-badge">${item.trips.length}</div>
+        </div>
+      `).join("") : `<div class="inline-note">Os municípios aparecem aqui quando houver pontos suficientes no mapa.</div>`}
+    </section>`;
 
   els["map-rank"].innerHTML = `
     <section class="atlas-section">
@@ -3575,18 +3602,7 @@ function renderCoverageSidebar(collections) {
         </div>
       `).join("") : `<div class="inline-note">Nenhum país com dados suficientes para destacar.</div>`}
     </section>
-    <section class="atlas-section">
-      <h3 class="atlas-section-title">UFs brasileiras</h3>
-      ${regions.length ? regions.map(item => `
-        <div class="atlas-entry" onclick="openTripsCollectionModal('Viagens em ${escapeHtml(item.label)}', getTripsForRegion(decodeURIComponent('${encodeURIComponent(item.label)}')), 'UF brasileira visitada')">
-          <div>
-            <strong>${escapeHtml(item.label)}</strong>
-            <span>${item.trips.length} registro(s) no Brasil</span>
-          </div>
-          <div class="atlas-entry-badge">${item.trips.length}</div>
-        </div>
-      `).join("") : `<div class="inline-note">As UFs visitadas aparecem aqui quando houver viagens brasileiras.</div>`}
-    </section>
+    ${primarySection}
     <section class="atlas-section">
       <h3 class="atlas-section-title">Próximos destinos</h3>
       ${upcomingPlans.length ? upcomingPlans.map(plan => `
@@ -3618,16 +3634,16 @@ function renderMapLayer(preserveViewport = false) {
   state.mapLayer = L.layerGroup();
   renderMapMetaStrip();
 
-  const atlasMode = state.mapType === "atlas";
+  const cityMode = state.mapDetail === "cities";
   const collections = buildMapCollections();
   const viewportPoints = [];
   const focusBounds = getMapFocusBounds();
   const maxCountryTrips = Math.max(...[...collections.countries.values()].map(item => item.trips.length), 1);
   const maxRegionTrips = Math.max(...[...collections.regions.values()].map(item => item.trips.length), 1);
-  const brazilStatesActive = !!(state.geoData.brazil?.features?.length && (state.mapType === "coverage" || state.mapDetail === "states"));
+  const hasBrazilStateLayer = !!state.geoData.brazil?.features?.length;
+  const brazilChoroplethActive = hasBrazilStateLayer && !cityMode;
 
   const baseLayer = L.layerGroup();
-  const routeLayer = L.layerGroup();
   const cityMarkerLayer = L.layerGroup();
   const planLayer = L.layerGroup();
 
@@ -3651,21 +3667,25 @@ function renderMapLayer(preserveViewport = false) {
           const tripsCount = item?.trips.length || 0;
           const visited = tripsCount > 0;
           const isBrazil = key === "brazil";
-          const useBrazilOutlineOnly = isBrazil && brazilStatesActive;
-          const fillColor = visited ? getIntensityColor(tripsCount, maxCountryTrips, "country") : "rgba(218, 230, 238, 0.88)";
+          const useBrazilOutlineOnly = isBrazil && brazilChoroplethActive;
+          const fillColor = cityMode
+            ? (isBrazil ? "rgba(217, 230, 239, 0.9)" : "rgba(209, 224, 233, 0.88)")
+            : (visited ? getIntensityColor(tripsCount, maxCountryTrips, "country") : "rgba(208, 223, 233, 0.88)");
           const selected = isMapFeatureSelected("country", key);
           const dimmed = hasMapSelection("country") && !selected;
           return {
             color: selected
-              ? "rgba(10,47,76,0.95)"
-              : isBrazil
-                ? "rgba(10,47,76,0.92)"
+              ? "rgba(10,47,76,0.92)"
+              : isBrazil && hasBrazilStateLayer
+                ? "rgba(255,255,255,0)"
+                : isBrazil
+                  ? "rgba(71,96,112,0.48)"
                 : visited
-                  ? "rgba(255,255,255,0.78)"
-                  : "rgba(255,255,255,0.54)",
-            weight: selected ? 2.2 : isBrazil ? 2 : atlasMode ? 0.7 : 0.85,
+                  ? (cityMode ? "rgba(255,255,255,0.6)" : "rgba(255,255,255,0.5)")
+                  : "rgba(255,255,255,0.42)",
+            weight: selected ? 1.9 : isBrazil && hasBrazilStateLayer ? 0 : isBrazil ? 1.05 : cityMode ? 0.58 : 0.5,
             fillColor: useBrazilOutlineOnly ? "rgba(255,255,255,0)" : fillColor,
-            fillOpacity: useBrazilOutlineOnly ? 0 : dimmed ? 0.34 : atlasMode ? 0.94 : 0.9,
+            fillOpacity: useBrazilOutlineOnly ? 0 : dimmed ? 0.28 : cityMode ? 0.92 : 0.9,
             opacity: dimmed ? 0.42 : 1
           };
         },
@@ -3689,7 +3709,7 @@ function renderMapLayer(preserveViewport = false) {
               renderMapLayer(true);
               openTripsCollectionModal(`Viagens em ${label}`, item.trips, "País visitado");
             });
-            if ((!atlasMode || state.mapDetail === "states") && bounds && bounds.isValid()) addCoverageCenter(layer);
+            if (!cityMode && bounds && bounds.isValid()) addCoverageCenter(layer);
           }
         }
       });
@@ -3700,23 +3720,31 @@ function renderMapLayer(preserveViewport = false) {
   }
 
   try {
-    if (brazilStatesActive) {
-      const brazilLayer = L.geoJSON(state.geoData.brazil, {
+    if (hasBrazilStateLayer) {
+      let brazilLayer;
+      brazilLayer = L.geoJSON(state.geoData.brazil, {
         pane: "coveragePane",
         style: feature => {
           const key = getBrazilFeatureKey(feature);
           const item = collections.regions.get(key);
           const tripsCount = item?.trips.length || 0;
           const visited = tripsCount > 0;
-          const fillColor = visited ? getIntensityColor(tripsCount, maxRegionTrips, "state") : "rgba(235, 242, 246, 0.45)";
+          const fillColor = cityMode
+            ? "rgba(255,255,255,0)"
+            : (visited ? getIntensityColor(tripsCount, maxRegionTrips, "state") : "rgba(222, 233, 240, 0.64)");
           const selected = isMapFeatureSelected("region", key);
           const dimmed = hasMapSelection("region") && !selected;
           return {
-            color: selected ? "rgba(10,47,76,0.95)" : "rgba(255,255,255,0.92)",
-            weight: selected ? 2.15 : atlasMode ? 0.9 : 1,
+            stroke: true,
+            color: selected
+              ? "rgba(10,47,76,0.9)"
+              : cityMode
+                ? (visited ? "rgba(54,84,103,0.48)" : "rgba(68,96,112,0.28)")
+                : (visited ? "rgba(255,255,255,0.66)" : "rgba(83,112,130,0.2)"),
+            weight: selected ? 1.7 : cityMode ? (visited ? 0.78 : 0.55) : (visited ? 0.56 : 0.42),
             fillColor,
-            fillOpacity: dimmed ? 0.24 : atlasMode ? 0.92 : 0.9,
-            opacity: dimmed ? 0.38 : 1
+            fillOpacity: cityMode ? 0 : dimmed ? 0.22 : 0.92,
+            opacity: dimmed ? 0.34 : cityMode ? 0.9 : 0.84
           };
         },
         onEachFeature: (feature, layer) => {
@@ -3730,6 +3758,17 @@ function renderMapLayer(preserveViewport = false) {
               : `<b>${escapeHtml(regionLabel)}</b>`,
             { sticky: true }
           );
+          layer.on("mouseover", () => {
+            layer.setStyle({
+              stroke: true,
+              color: "rgba(10,47,76,0.42)",
+              weight: 1.05,
+              opacity: 0.82
+            });
+          });
+          layer.on("mouseout", () => {
+            if (brazilLayer) brazilLayer.resetStyle(layer);
+          });
           if (tripsCount) {
             layer.on("click", event => {
               L.DomEvent.stopPropagation(event);
@@ -3737,7 +3776,7 @@ function renderMapLayer(preserveViewport = false) {
               renderMapLayer(true);
               openTripsCollectionModal(`Viagens em ${item.label}`, item.trips, "UF brasileira visitada");
             });
-            if (!atlasMode || state.mapDetail === "states") addCoverageCenter(layer);
+            addCoverageCenter(layer);
           }
         }
       });
@@ -3747,8 +3786,7 @@ function renderMapLayer(preserveViewport = false) {
     state.errors.geo = "A camada de UFs não renderizou, mas as cidades continuam disponíveis.";
   }
 
-  if (atlasMode) {
-    if (state.mapDetail === "cities") {
+  if (cityMode) {
       const cityGroups = [...collections.cities.values()];
       const maxCity = Math.max(...cityGroups.map(group => group.trips.length), 1);
       cityGroups.forEach(group => {
@@ -3765,9 +3803,9 @@ function renderMapLayer(preserveViewport = false) {
           .on("click", () => openTripsCollectionModal(`Viagens em ${group.label}`, group.trips, "Cidade visitada"))
           .addTo(cityMarkerLayer);
       });
-    }
+  }
 
-    if (state.showPlannedMap) {
+  if (state.showPlannedMap) {
       state.plans
         .filter(plan => plan.city && plan.status !== "cancelado")
         .forEach(plan => {
@@ -3782,26 +3820,20 @@ function renderMapLayer(preserveViewport = false) {
             .on("click", () => { selectPlan(plan.id); switchView("planejar"); })
             .addTo(planLayer);
         });
-    }
-
-    renderAtlasSidebar();
-    els["map-note"].textContent = state.errors.geo
-      ? "O atlas está usando marcadores e rotas, mas as geometrias territoriais não carregaram totalmente."
-      : state.mapDetail === "states"
-        ? "Estados primeiro. Municípios entram no detalhe."
-        : "Municípios em foco, com estados preservados como contexto.";
-  } else {
-    renderCoverageSidebar(collections);
-    els["map-note"].textContent = state.errors.geo
-      ? "Cobertura parcial: a base carregou, mas as camadas territoriais locais ainda não chegaram."
-      : "Cobertura reforça países visitados e UFs com memória real.";
   }
+
+  renderCoverageSidebar(collections);
+  els["map-note"].textContent = state.errors.geo
+    ? "Cobertura parcial: a base carregou, mas as camadas territoriais locais ainda não chegaram."
+    : cityMode
+      ? "Cobertura por municípios: pontos e planos sobre a base territorial."
+      : "Cobertura por estados: intensidade de presença por país e UF.";
 
   baseLayer.addTo(state.mapLayer);
-  if (atlasMode) {
+  if (cityMode) {
     cityMarkerLayer.addTo(state.mapLayer);
-    if (state.showPlannedMap) planLayer.addTo(state.mapLayer);
   }
+  if (state.showPlannedMap) planLayer.addTo(state.mapLayer);
 
   state.mapLayer.addTo(state.map);
   if (!preserveViewport) updateMapViewport(viewportPoints);
@@ -4422,13 +4454,13 @@ function showMomentsByLocation(type, locationName) {
     if (type === "Região") return (trip.region || trip.uf) === locationName;
     return trip.city === locationName;
   });
-  openTripsCollectionModal(`Viagens em ${locationName}`, trips, type || "Atlas editorial");
+  openTripsCollectionModal(`Viagens em ${locationName}`, trips, type || "Cobertura");
 }
 
 function openTripsCollectionModal(title, trips, subtitle) {
   els["modal-header"].innerHTML = `
     <h2 style="font-family:'DM Serif Display',serif;font-size:32px;margin:0;color:var(--blue-dark);">${escapeHtml(title)}</h2>
-    <p style="margin:8px 0 0;color:var(--ink-3);font-size:15px;font-weight:500;">${escapeHtml(subtitle || "Atlas editorial")}</p>
+    <p style="margin:8px 0 0;color:var(--ink-3);font-size:15px;font-weight:500;">${escapeHtml(subtitle || "Cobertura")}</p>
     <p style="margin:8px 0 0;color:var(--ink-3);font-size:15px;font-weight:500;">Total: ${(trips || []).length} registro(s)</p>
   `;
   els["modal-body"].innerHTML = `<div class="gallery-grid">${(trips || []).map(renderTripCard).join("")}</div>`;
