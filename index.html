@@ -1789,6 +1789,36 @@ const COUNTRY_LABELS_PT = {
   unitedstatesofamerica: "EUA"
 };
 
+const COUNTRY_LABEL_OVERRIDES_PT = {
+  akrotirisovereignbasearea: "Akrotiri",
+  ashmoreandcartierislands: "Ashmore e Cartier",
+  bajonuevobankpetrelis: "Banco Bajo Nuevo",
+  baykonurcosmodrome: "Baikonur",
+  birtawil: "Bir Tawil",
+  brazilianisland: "Ilha Brasileira",
+  clippertonisland: "Ilha Clipperton",
+  coralseaislands: "Ilhas do Mar de Coral",
+  cyprusnomansarea: "Zona neutra do Chipre",
+  dhekeliasovereignbasearea: "Dhekelia",
+  france: "França",
+  indianoceanterritories: "Territórios do Oceano Índico",
+  kosovo: "Kosovo",
+  northerncyprus: "Norte do Chipre",
+  norway: "Noruega",
+  scarboroughreef: "Recife Scarborough",
+  serranillabank: "Banco Serranilla",
+  siachenglacier: "Geleira Siachen",
+  somaliland: "Somalilândia",
+  southernpatagonianicefield: "Campo de gelo patagônico",
+  spratlyislands: "Ilhas Spratly",
+  taiwan: "Taiwan",
+  usnavalbaseguantanamobay: "Guantánamo"
+};
+
+const countryDisplayNamesPt = typeof Intl !== "undefined" && Intl.DisplayNames
+  ? new Intl.DisplayNames(["pt-BR"], { type: "region" })
+  : null;
+
 const LEGACY_TEXT_FIXES = {
   barbaramoreira: "Bárbara Moreira",
   brbaramoreira: "Bárbara Moreira",
@@ -1823,7 +1853,7 @@ const LEGACY_TEXT_FIXES = {
   maiaraemarasa: "Maiara e Maraísa"
 };
 
-const APP_VERSION = "2026-06-01-4";
+const APP_VERSION = "2026-06-01-5";
 
 const state = {
   trips: [],
@@ -2579,7 +2609,8 @@ function withCacheBust(url) {
 
 function normalizeTrip(row, index) {
   const getField = aliases => {
-    const key = Object.keys(row).find(field => aliases.some(alias => field.toLowerCase() === alias.toLowerCase()));
+    const normalizedAliases = aliases.map(alias => normalizeLookupKey(alias));
+    const key = Object.keys(row).find(field => normalizedAliases.includes(normalizeLookupKey(field)));
     return key ? (row[key] || "") : "";
   };
   const country = normalizeCountryValue(getField(["País", "Pais", "Country"]) || "Brasil");
@@ -2623,7 +2654,8 @@ function normalizeTrip(row, index) {
 
 function normalizePlan(row, index) {
   const getField = aliases => {
-    const key = Object.keys(row).find(field => aliases.some(alias => field.toLowerCase() === alias.toLowerCase()));
+    const normalizedAliases = aliases.map(alias => normalizeLookupKey(alias));
+    const key = Object.keys(row).find(field => normalizedAliases.includes(normalizeLookupKey(field)));
     return key ? (row[key] || "") : "";
   };
   const id = String(getField(["Id", "ID", "PlanId", "Plan Id"])).trim() || `plan-${index + 1}`;
@@ -2832,8 +2864,25 @@ function getAtlasWashColor(value, max, palette = "country") {
   return mixHexColors("#e2eaf0", "#b4c7d8", Math.pow(ratio, 0.92));
 }
 
-function getCountryLabelPt(key, fallback = "") {
-  return COUNTRY_LABELS_PT[key] || normalizeCountryValue(fallback || key);
+function getCountryLabelPt(key, fallback = "", iso2 = "") {
+  const fallbackText = cleanTextValue(fallback || key);
+  const fallbackKey = normalizeLookupKey(fallbackText);
+  const normalizedKey = normalizeLookupKey(key);
+  const mapped = COUNTRY_LABELS_PT[normalizedKey] || COUNTRY_LABEL_OVERRIDES_PT[normalizedKey] || COUNTRY_LABEL_OVERRIDES_PT[fallbackKey];
+  if (mapped) return mapped;
+  const code = String(iso2 || "").trim().toUpperCase();
+  if (/^[A-Z]{2}$/.test(code) && countryDisplayNamesPt) {
+    try {
+      const displayName = countryDisplayNamesPt.of(code);
+      if (displayName && displayName !== code) return displayName;
+    } catch (error) {}
+  }
+  return normalizeCountryValue(fallbackText || key);
+}
+
+function getGeoFeatureCountryLabelPt(feature, key) {
+  const props = feature?.properties || {};
+  return getCountryLabelPt(key, props.name || key, props.iso2 || "");
 }
 
 function getMapFocusBounds() {
@@ -3694,7 +3743,7 @@ function renderMapLayer(preserveViewport = false) {
           const item = collections.countries.get(key);
           const tripsCount = item?.trips.length || 0;
           const visited = tripsCount > 0;
-          const label = visited ? normalizeCountryValue(item.label || feature.properties?.name || "País") : getCountryLabelPt(key, feature.properties?.name || "");
+          const label = visited ? getCountryLabelPt(key, item.label || feature.properties?.name || "País", feature.properties?.iso2 || "") : getGeoFeatureCountryLabelPt(feature, key);
           const bounds = layer.getBounds?.();
           layer.bindTooltip(
             visited
