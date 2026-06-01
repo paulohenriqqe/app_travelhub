@@ -1683,7 +1683,7 @@ const LEGACY_TEXT_FIXES = {
   historia: "História"
 };
 
-const APP_VERSION = "2026-05-31-3";
+const APP_VERSION = "2026-06-01-1";
 
 const state = {
   trips: [],
@@ -1713,7 +1713,10 @@ const state = {
   currentJourneyGroups: [],
   currentCitiesList: [],
   currentCountriesList: [],
-  currentUfsList: []
+  currentUfsList: [],
+  currentTagsList: [],
+  currentCompanionsList: [],
+  currentArtistsList: []
 };
 
 const els = {};
@@ -2724,6 +2727,26 @@ function getTripsForArtist(artist) {
   return state.filtered.filter(trip => trip.artists.includes(artist));
 }
 
+function getTripsForListTitle(title, value) {
+  if (title.includes("País")) return getTripsForCountry(value);
+  if (title.includes("Regi")) return getTripsForRegionScope(value);
+  if (title.includes("Cidade")) return getTripsForLocationLabel(value);
+  if (title.includes("Motivo") || title.includes("Tag")) return getTripsForTag(value);
+  if (title.includes("Companhia")) return getTripsForCompanion(value);
+  if (title.includes("Artista")) return getTripsForArtist(value);
+  return state.filtered;
+}
+
+function getListSubtitle(title) {
+  if (title.includes("País")) return "Escala internacional atual";
+  if (title.includes("Regi")) return "Camadas territoriais brasileiras e futuras";
+  if (title.includes("Cidade")) return "Recortes locais da base";
+  if (title.includes("Motivo") || title.includes("Tag")) return "Motivos e contextos recorrentes";
+  if (title.includes("Companhia")) return "Pessoas que aparecem nas viagens";
+  if (title.includes("Artista")) return "Artistas e contextos lembrados";
+  return "Coleção da base";
+}
+
 function getUpcomingPlans(limit) {
   const today = new Date().toISOString().slice(0, 10);
   return state.plans
@@ -3073,6 +3096,9 @@ function renderKpis() {
   state.currentCitiesList = cities;
   state.currentCountriesList = countries;
   state.currentUfsList = regions;
+  state.currentTagsList = uniqueTags.sort((a, b) => a.localeCompare(b, "pt-BR"));
+  state.currentCompanionsList = uniqueCompanions.sort((a, b) => a.localeCompare(b, "pt-BR"));
+  state.currentArtistsList = uniqueArtists.sort((a, b) => a.localeCompare(b, "pt-BR"));
 
   const homeHtml = `
     <article class="metric-card" onclick="openJourneyGroupsModal('Viagens registradas', state.currentJourneyGroups)">
@@ -3095,17 +3121,17 @@ function renderKpis() {
       <div class="metric-value">${regions.length}</div>
       <div class="metric-sub">${brazilRegions.length} UFs brasileiras com memória real</div>
     </article>
-    <article class="metric-card">
+    <article class="metric-card" onclick="openListModal('Motivos registrados', state.currentTagsList)">
       <div class="metric-label"><i data-lucide="hash"></i> Motivos</div>
       <div class="metric-value">${uniqueTags.length}</div>
       <div class="metric-sub">tags e contextos recorrentes</div>
     </article>
-    <article class="metric-card">
+    <article class="metric-card" onclick="openListModal('Companhias recorrentes', state.currentCompanionsList)">
       <div class="metric-label"><i data-lucide="users"></i> Companhias</div>
       <div class="metric-value">${uniqueCompanions.length}</div>
       <div class="metric-sub">pessoas que aparecem nas viagens</div>
     </article>
-    <article class="metric-card">
+    <article class="metric-card" onclick="openListModal('Artistas presentes', state.currentArtistsList)">
       <div class="metric-label"><i data-lucide="music-2"></i> Artistas</div>
       <div class="metric-value">${uniqueArtists.length}</div>
       <div class="metric-sub">presenças e contextos lembrados nas viagens</div>
@@ -3226,6 +3252,12 @@ function initMap() {
     return;
   }
   state.map = L.map("map", { zoomControl: false, minZoom: 2, worldCopyJump: true, maxBounds: [[-80, -180], [85, 180]] }).setView([-15.5, -52], 3);
+  state.map.createPane("coveragePane");
+  state.map.createPane("routePane");
+  state.map.createPane("cityPane");
+  state.map.getPane("coveragePane").style.zIndex = 420;
+  state.map.getPane("routePane").style.zIndex = 610;
+  state.map.getPane("cityPane").style.zIndex = 650;
   L.control.zoom({ position: "bottomright" }).addTo(state.map);
   L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", { attribution: "&copy; OSM" }).addTo(state.map);
   renderMapLayer();
@@ -3301,61 +3333,72 @@ function renderMapLayer() {
     } catch (error) {}
   };
 
-  if (state.geoData.world?.features?.length) {
-    const worldLayer = L.geoJSON(state.geoData.world, {
-      style: feature => {
-        const key = getWorldFeatureKey(feature);
-        const item = collections.countries.get(key);
-        const visited = !!item?.trips.length;
-        return {
-          color: visited ? "rgba(10,47,76,0.98)" : "rgba(148,163,184,0.48)",
-          weight: visited ? (atlasMode ? 2.8 : 3.2) : 0.9,
-          fillColor: visited ? (atlasMode ? "rgba(38,185,221,0.12)" : "rgba(38,185,221,0.32)") : "rgba(248,250,252,0.02)",
-          fillOpacity: visited ? (atlasMode ? 0.16 : 0.4) : 0.03
-        };
-      },
-      onEachFeature: (feature, layer) => {
-        const key = getWorldFeatureKey(feature);
-        const item = collections.countries.get(key);
-        if (!item?.trips.length) return;
-        const label = item.label || feature.properties?.name || "País";
-        layer.bindTooltip(`<b>${escapeHtml(label)}</b><br>${item.trips.length} registro(s) reais`);
-        layer.on("click", () => openTripsCollectionModal(`Viagens em ${label}`, item.trips, "País visitado"));
-        if (!atlasMode) addCoverageCenter(layer);
-      }
-    });
-    worldLayer.addTo(baseLayer);
+  try {
+    if (state.geoData.world?.features?.length) {
+      const worldLayer = L.geoJSON(state.geoData.world, {
+        pane: "coveragePane",
+        style: feature => {
+          const key = getWorldFeatureKey(feature);
+          const item = collections.countries.get(key);
+          const visited = !!item?.trips.length;
+          return {
+            color: visited ? "rgba(10,47,76,0.98)" : "rgba(148,163,184,0.48)",
+            weight: visited ? (atlasMode ? 2.8 : 3.2) : 0.9,
+            fillColor: visited ? (atlasMode ? "rgba(38,185,221,0.12)" : "rgba(38,185,221,0.32)") : "rgba(248,250,252,0.02)",
+            fillOpacity: visited ? (atlasMode ? 0.16 : 0.4) : 0.03
+          };
+        },
+        onEachFeature: (feature, layer) => {
+          const key = getWorldFeatureKey(feature);
+          const item = collections.countries.get(key);
+          if (!item?.trips.length) return;
+          const label = item.label || feature.properties?.name || "País";
+          layer.bindTooltip(`<b>${escapeHtml(label)}</b><br>${item.trips.length} registro(s) reais`);
+          layer.on("click", () => openTripsCollectionModal(`Viagens em ${label}`, item.trips, "País visitado"));
+          if (!atlasMode) addCoverageCenter(layer);
+        }
+      });
+      worldLayer.addTo(baseLayer);
+    }
+  } catch (error) {
+    state.errors.geo = "A camada de países não renderizou, mas as cidades continuam disponíveis.";
   }
 
-  if (state.geoData.brazil?.features?.length) {
-    const brazilLayer = L.geoJSON(state.geoData.brazil, {
-      style: feature => {
-        const key = getBrazilFeatureKey(feature);
-        const item = collections.regions.get(key);
-        const visited = !!item?.trips.length;
-        return {
-          color: visited ? "rgba(10,47,76,0.92)" : "rgba(148,163,184,0.42)",
-          weight: visited ? (atlasMode ? 1.8 : 2.4) : 0.75,
-          fillColor: visited ? (atlasMode ? "rgba(212,70,28,0.08)" : "rgba(212,70,28,0.28)") : "rgba(255,255,255,0)",
-          fillOpacity: visited ? (atlasMode ? 0.18 : 0.36) : 0
-        };
-      },
-      onEachFeature: (feature, layer) => {
-        const key = getBrazilFeatureKey(feature);
-        const item = collections.regions.get(key);
-        if (!item?.trips.length) return;
-        layer.bindTooltip(`<b>${escapeHtml(item.label)}</b><br>${item.trips.length} registro(s) reais`);
-        layer.on("click", () => openTripsCollectionModal(`Viagens em ${item.label}`, item.trips, "UF brasileira visitada"));
-        if (!atlasMode) addCoverageCenter(layer);
-      }
-    });
-    brazilLayer.addTo(baseLayer);
+  try {
+    if (state.geoData.brazil?.features?.length) {
+      const brazilLayer = L.geoJSON(state.geoData.brazil, {
+        pane: "coveragePane",
+        style: feature => {
+          const key = getBrazilFeatureKey(feature);
+          const item = collections.regions.get(key);
+          const visited = !!item?.trips.length;
+          return {
+            color: visited ? "rgba(10,47,76,0.92)" : "rgba(148,163,184,0.42)",
+            weight: visited ? (atlasMode ? 1.8 : 2.4) : 0.75,
+            fillColor: visited ? (atlasMode ? "rgba(212,70,28,0.08)" : "rgba(212,70,28,0.28)") : "rgba(255,255,255,0)",
+            fillOpacity: visited ? (atlasMode ? 0.18 : 0.36) : 0
+          };
+        },
+        onEachFeature: (feature, layer) => {
+          const key = getBrazilFeatureKey(feature);
+          const item = collections.regions.get(key);
+          if (!item?.trips.length) return;
+          layer.bindTooltip(`<b>${escapeHtml(item.label)}</b><br>${item.trips.length} registro(s) reais`);
+          layer.on("click", () => openTripsCollectionModal(`Viagens em ${item.label}`, item.trips, "UF brasileira visitada"));
+          if (!atlasMode) addCoverageCenter(layer);
+        }
+      });
+      brazilLayer.addTo(baseLayer);
+    }
+  } catch (error) {
+    state.errors.geo = "A camada de UFs não renderizou, mas as cidades continuam disponíveis.";
   }
 
   if (atlasMode) {
     buildTripRoutes(state.filtered).forEach(route => {
       if (route.points.length > 1) {
         L.polyline(route.points, {
+          pane: "routePane",
           color: "rgba(9,117,153,0.42)",
           weight: 2,
           opacity: 0.78,
@@ -3372,6 +3415,7 @@ function renderMapLayer() {
       if (!coords) return;
       viewportPoints.push(coords);
       L.circleMarker([coords.lat, coords.lng], {
+        pane: "cityPane",
         radius: 5 + (group.trips.length / maxCity) * 9,
         color: "rgba(255,255,255,0.98)",
         weight: 2,
@@ -3390,6 +3434,7 @@ function renderMapLayer() {
           if (!coords) return;
           viewportPoints.push(coords);
           L.circleMarker([coords.lat, coords.lng], {
+            pane: "cityPane",
             radius: 8,
             color: "rgba(9,117,153,0.96)",
             weight: 2,
@@ -4111,13 +4156,21 @@ function openListModal(title, listItems) {
     let key = trip.city;
     if (title.includes("País")) key = trip.country;
     else if (title.includes("Regi")) key = trip.region || trip.uf;
+    else if (title.includes("Motivo") || title.includes("Tag")) {
+      trip.tags.forEach(tag => { counts[tag] = (counts[tag] || 0) + 1; });
+      return;
+    }
+    else if (title.includes("Companhia")) {
+      trip.travelers.forEach(traveler => { counts[traveler] = (counts[traveler] || 0) + 1; });
+      return;
+    }
+    else if (title.includes("Artista")) {
+      trip.artists.forEach(artist => { counts[artist] = (counts[artist] || 0) + 1; });
+      return;
+    }
     counts[key] = (counts[key] || 0) + 1;
   });
-  const subtitle = title.includes("País")
-    ? "Escala internacional atual"
-    : title.includes("Regi")
-      ? "Camadas territoriais brasileiras e futuras"
-      : "Recortes locais da base";
+  const subtitle = getListSubtitle(title);
   els["modal-header"].innerHTML = `
     <h2 style="font-family:'DM Serif Display',serif;font-size:32px;margin:0;color:var(--blue-dark);">${title}</h2>
     <p style="margin:8px 0 0;color:var(--ink-3);font-size:15px;font-weight:500;">${subtitle}</p>
@@ -4126,15 +4179,7 @@ function openListModal(title, listItems) {
   els["modal-body"].innerHTML = `
     <div style="display:flex;flex-direction:column;">
       ${listItems.map(item => `
-        <button type="button" class="modal-list-item" onclick="${
-          title.includes("País")
-            ? `openTripsCollectionModal('Viagens em ${escapeHtml(item)}', getTripsForCountry(decodeURIComponent('${encodeURIComponent(item)}')), 'País visitado')`
-            : title.includes("Regi")
-              ? `openTripsCollectionModal('Viagens em ${escapeHtml(item)}', getTripsForRegion(decodeURIComponent('${encodeURIComponent(item)}')), 'Região brasileira')`
-              : title.includes("Cidade")
-                ? `openTripsCollectionModal('Viagens em ${escapeHtml(item)}', getTripsForLocationLabel(decodeURIComponent('${encodeURIComponent(item)}')), 'Cidade visitada')`
-                : ""
-        }">
+        <button type="button" class="modal-list-item" onclick="openTripsCollectionModal('Viagens em ${escapeHtml(item)}', getTripsForListTitle('${escapeHtml(title)}', decodeURIComponent('${encodeURIComponent(item)}')), '${escapeHtml(subtitle)}')">
           <span>${escapeHtml(item)}</span>
           <span class="modal-list-badge">${counts[item] || 0}</span>
         </button>
