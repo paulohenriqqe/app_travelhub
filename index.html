@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>  
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -477,23 +477,26 @@
   .status-chip.efetivado { background: var(--success-bg); color: var(--success); border-color: rgba(15, 118, 110, 0.26); }
   .status-chip.cancelado { background: var(--paper-2); color: var(--ink-2); border-color: var(--line); }
 
-  .map-layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 24px; align-items: start; }
-  .map-panel { overflow: hidden; padding: 0; border: none; box-shadow: var(--shadow-md); border-radius: 16px; z-index: 1; }
+  .map-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 18px; align-items: start; }
+  .map-panel {
+    overflow: hidden;
+    padding: 0;
+    border: 1px solid var(--line);
+    box-shadow: none;
+    border-radius: 8px;
+    z-index: 1;
+  }
   #map { width: 100%; height: 68vh; min-height: 520px; background:
       radial-gradient(circle at top, rgba(38, 185, 221, 0.16), rgba(248, 250, 252, 0.96) 42%),
       linear-gradient(180deg, #eff6ff 0%, #f8fafc 100%);
     cursor: pointer; }
   .map-stack { display: flex; flex-direction: column; gap: 14px; }
-  .map-meta-strip {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 10px;
-  }
+  .map-meta-strip { display: flex; flex-wrap: wrap; gap: 8px; }
   .map-meta-card {
-    width: 100%;
-    padding: 14px 16px;
-    border-radius: 14px;
-    background: linear-gradient(180deg, var(--white), var(--paper));
+    min-width: 126px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: var(--white);
     border: 1px solid var(--line);
     text-align: left;
     transition: var(--transition);
@@ -503,9 +506,9 @@
     display: block;
     color: var(--blue-dark);
     font-family: "DM Serif Display", serif;
-    font-size: 26px;
+    font-size: 22px;
     line-height: 1;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
   }
   .map-meta-card span {
     color: var(--ink-3);
@@ -526,7 +529,7 @@
     color: var(--blue-dark);
   }
   .leaflet-tooltip.uf-label.visited { color: var(--white); text-shadow: none; }
-  .rank-panel { padding: 24px; background: linear-gradient(180deg, var(--white), #f8fbfd); }
+  .rank-panel { padding: 18px; background: var(--white); border-radius: 8px; box-shadow: none; }
   .rank-list { display: flex; flex-direction: column; gap: 16px; margin-top: 20px; }
   .rank-row { display: grid; grid-template-columns: 40px 1fr 35px; gap: 12px; align-items: center; }
   .rank-name { color: var(--ink); font-size: 14px; font-weight: 700; }
@@ -571,8 +574,8 @@
     align-items: flex-start;
     justify-content: space-between;
     gap: 12px;
-    padding: 12px 14px;
-    border-radius: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
     background: var(--paper);
     border: 1px solid var(--line);
     cursor: pointer;
@@ -594,9 +597,9 @@
   .atlas-entry-badge {
     min-width: 36px;
     text-align: right;
-    color: var(--blue-med);
+    color: var(--accent);
     font-family: "DM Serif Display", serif;
-    font-size: 22px;
+    font-size: 20px;
     line-height: 1;
   }
 
@@ -1255,7 +1258,8 @@
       white-space: normal;
       line-height: 1.5;
     }
-    .map-meta-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .map-meta-strip { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .map-meta-card { min-width: 0; }
     .rank-panel { padding: 18px; }
     .modal-header { padding: 32px 24px 20px; }
     .modal-body { padding: 24px; }
@@ -3287,7 +3291,7 @@ function renderMapLayer() {
   const cityMarkerLayer = L.layerGroup();
   const planLayer = L.layerGroup();
 
-  const addBoundsCenter = layer => {
+  const addCoverageCenter = layer => {
     try {
       const bounds = layer.getBounds?.();
       if (bounds && bounds.isValid()) {
@@ -3317,7 +3321,7 @@ function renderMapLayer() {
         const label = item.label || feature.properties?.name || "País";
         layer.bindTooltip(`<b>${escapeHtml(label)}</b><br>${item.trips.length} registro(s) reais`);
         layer.on("click", () => openTripsCollectionModal(`Viagens em ${label}`, item.trips, "País visitado"));
-        addBoundsCenter(layer);
+        if (!atlasMode) addCoverageCenter(layer);
       }
     });
     worldLayer.addTo(baseLayer);
@@ -3342,7 +3346,7 @@ function renderMapLayer() {
         if (!item?.trips.length) return;
         layer.bindTooltip(`<b>${escapeHtml(item.label)}</b><br>${item.trips.length} registro(s) reais`);
         layer.on("click", () => openTripsCollectionModal(`Viagens em ${item.label}`, item.trips, "UF brasileira visitada"));
-        addBoundsCenter(layer);
+        if (!atlasMode) addCoverageCenter(layer);
       }
     });
     brazilLayer.addTo(baseLayer);
@@ -3352,10 +3356,10 @@ function renderMapLayer() {
     buildTripRoutes(state.filtered).forEach(route => {
       if (route.points.length > 1) {
         L.polyline(route.points, {
-          color: "rgba(10,47,76,0.30)",
-          weight: 3,
-          opacity: 0.92,
-          dashArray: "10 10"
+          color: "rgba(9,117,153,0.42)",
+          weight: 2,
+          opacity: 0.78,
+          dashArray: "8 10"
         }).addTo(routeLayer);
       }
     });
@@ -3368,11 +3372,11 @@ function renderMapLayer() {
       if (!coords) return;
       viewportPoints.push(coords);
       L.circleMarker([coords.lat, coords.lng], {
-        radius: 7 + (group.trips.length / maxCity) * 13,
-        color: "rgba(255,255,255,0.96)",
+        radius: 5 + (group.trips.length / maxCity) * 9,
+        color: "rgba(255,255,255,0.98)",
         weight: 2,
         fillColor: "#d4461c",
-        fillOpacity: 0.86
+        fillOpacity: 0.9
       }).bindTooltip(`<b>${escapeHtml(group.label)}</b><br>${group.trips.length} registro(s) nessa cidade`)
         .on("click", () => openTripsCollectionModal(`Viagens em ${group.label}`, group.trips, "Cidade visitada"))
         .addTo(cityMarkerLayer);
