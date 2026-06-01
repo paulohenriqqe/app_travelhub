@@ -602,6 +602,28 @@
     font-size: 20px;
     line-height: 1;
   }
+  .atlas-marker-icon {
+    background: transparent;
+    border: 0;
+  }
+  .atlas-marker-dot {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    background: radial-gradient(circle at 35% 30%, #ff8a5d, var(--accent));
+    color: var(--white);
+    border: 2px solid rgba(255, 255, 255, 0.96);
+    box-shadow: 0 12px 26px rgba(10, 47, 76, 0.22), 0 0 0 5px rgba(212, 70, 28, 0.14);
+    font-size: 11px;
+    font-weight: 900;
+    line-height: 1;
+  }
+  .atlas-marker-icon.plan .atlas-marker-dot {
+    background: radial-gradient(circle at 35% 30%, #26b9dd, #097599);
+    box-shadow: 0 12px 26px rgba(9, 117, 153, 0.2), 0 0 0 5px rgba(38, 185, 221, 0.15);
+  }
 
   .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px; }
   .chart-panel { padding: 24px; }
@@ -1622,7 +1644,7 @@ const PLANNING_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRNecM
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyatqPK38hk8EAwdTZLl02iOpTKMNz8dWzUOTl5XTz4tpm1BPPxUNbdFBg9CQN7EZIO3Q/exec";
 
 const ITINERARY_SLOTS = [
-  { key: "manha", label: "Manha" },
+  { key: "manha", label: "Manhã" },
   { key: "tarde", label: "Tarde" },
   { key: "noite", label: "Noite" }
 ];
@@ -1679,11 +1701,38 @@ const COUNTRY_GEO_KEYS = {
 
 const LEGACY_TEXT_FIXES = {
   barbaramoreira: "Bárbara Moreira",
+  brbaramoreira: "Bárbara Moreira",
   saopaulo: "São Paulo",
-  historia: "História"
+  spaulo: "São Paulo",
+  historia: "História",
+  histria: "História",
+  joaopessoa: "João Pessoa",
+  jopessoa: "João Pessoa",
+  camposdojordao: "Campos do Jordão",
+  camposdojordo: "Campos do Jordão",
+  jaguariuna: "Jaguariúna",
+  jaguarina: "Jaguariúna",
+  maceio: "Maceió",
+  macei: "Maceió",
+  buzios: "Búzios",
+  bzios: "Búzios",
+  montesiao: "Monte Sião",
+  montesio: "Monte Sião",
+  pascoa: "Páscoa",
+  pscoa: "Páscoa",
+  ferias: "Férias",
+  frias: "Férias",
+  festatipica: "Festa típica",
+  festatpica: "Festa típica",
+  parquedediversoes: "Parque de Diversões",
+  parquedediverses: "Parque de Diversões",
+  gloriagroove: "Glória Groove",
+  glriagroove: "Glória Groove",
+  maiaraemaraisa: "Maiara e Maraísa",
+  maiaraemarasa: "Maiara e Maraísa"
 };
 
-const APP_VERSION = "2026-06-01-1";
+const APP_VERSION = "2026-06-01-3";
 
 const state = {
   trips: [],
@@ -1829,7 +1878,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function cacheElements() {
   [
     "sync-pill", "sync-text", "kpi-grid", "stats-kpi-grid", "journey-mini-stats", "dashboard-status-list", "dashboard-plan-list", "dashboard-summary-list",
-      "filter-search", "filter-year", "filter-uf", "filter-tag", "clear-filters", "result-count", "dashboard-results", "map-rank", "map-meta-strip", "stat-ufs", "stat-cities",
+      "filter-search", "filter-year", "filter-uf", "filter-tag", "clear-filters", "result-count", "dashboard-results", "map-rank", "map-meta-strip", "map-note", "stat-ufs", "stat-cities",
     "stat-tags", "stat-companions", "stat-artists", "stat-upcoming-plans", "trip-modal", "modal-header", "modal-body", "city-blocks", "add-city-btn", "name-suggestions", "lista-grid",
     "form-message", "plan-conversion-banner", "conversion-banner-title", "conversion-banner-copy", "planning-source-note", "planning-mini-stats",
     "plan-list", "plan-detail-panel", "plan-draft-summary", "plan-grid-container", "plan-grid-title", "itinerary-table-wrapper", "plan-message",
@@ -3308,6 +3357,16 @@ function renderCoverageSidebar(collections) {
   `;
 }
 
+function createAtlasMarkerIcon(label, variant, size) {
+  const safeLabel = label ? escapeHtml(String(label)) : "";
+  return L.divIcon({
+    className: `atlas-marker-icon ${variant || "city"}`,
+    html: `<span class="atlas-marker-dot">${safeLabel}</span>`,
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size / 2]
+  });
+}
+
 function renderMapLayer() {
   if (!state.map) return;
   if (state.mapLayer) state.map.removeLayer(state.mapLayer);
@@ -3414,13 +3473,11 @@ function renderMapLayer() {
       const coords = getMapCoordinates(seedTrip || group);
       if (!coords) return;
       viewportPoints.push(coords);
-      L.circleMarker([coords.lat, coords.lng], {
+      const markerSize = Math.round(20 + (group.trips.length / maxCity) * 20);
+      L.marker([coords.lat, coords.lng], {
         pane: "cityPane",
-        radius: 5 + (group.trips.length / maxCity) * 9,
-        color: "rgba(255,255,255,0.98)",
-        weight: 2,
-        fillColor: "#d4461c",
-        fillOpacity: 0.9
+        title: group.label,
+        icon: createAtlasMarkerIcon(group.trips.length, "city", markerSize)
       }).bindTooltip(`<b>${escapeHtml(group.label)}</b><br>${group.trips.length} registro(s) nessa cidade`)
         .on("click", () => openTripsCollectionModal(`Viagens em ${group.label}`, group.trips, "Cidade visitada"))
         .addTo(cityMarkerLayer);
@@ -3433,13 +3490,10 @@ function renderMapLayer() {
           const coords = getMapCoordinates(plan);
           if (!coords) return;
           viewportPoints.push(coords);
-          L.circleMarker([coords.lat, coords.lng], {
+          L.marker([coords.lat, coords.lng], {
             pane: "cityPane",
-            radius: 8,
-            color: "rgba(9,117,153,0.96)",
-            weight: 2,
-            fillColor: "rgba(38,185,221,0.22)",
-            fillOpacity: 0.7
+            title: plan.destination,
+            icon: createAtlasMarkerIcon("", "plan", 24)
           }).bindTooltip(`<b>${escapeHtml(plan.destination)}</b><br>${escapeHtml(getPlanLocationLabel(plan))}`)
             .on("click", () => { selectPlan(plan.id); switchView("planejar"); })
             .addTo(planLayer);
@@ -4347,6 +4401,7 @@ function escapeHtml(value) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
 }
+
 </script>
 </body>
 </html>
