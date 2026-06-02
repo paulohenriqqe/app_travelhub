@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="TravelHub">
+  <defs>
+    <linearGradient id="travelhubGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f37321"/>
+      <stop offset="100%" stop-color="#d4461c"/>
+    </linearGradient>
+  </defs>
+  <rect x="6" y="6" width="52" height="52" rx="14" fill="url(#travelhubGradient)"/>
+  <path d="M22 21h20v5h-7v18h-6V26h-7z" fill="#ffffff"/>
+</svg>
