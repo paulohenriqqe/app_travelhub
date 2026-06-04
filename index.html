@@ -2129,7 +2129,7 @@
         <h1 class="page-title" id="page-title">Ciclo de <em>viagens</em></h1>
       </div>
       <div class="top-actions">
-        <button class="primary-action" data-jump-form><i data-lucide="plus"></i> Nova viagem</button>
+        <button class="primary-action" id="topbar-primary-action" data-jump-form><i data-lucide="plus"></i> Nova viagem</button>
         <div class="sync-pill" id="sync-pill"><span class="sync-dot"></span><span id="sync-text">Carregando dados</span></div>
       </div>
     </header>
@@ -2609,7 +2609,14 @@ const LEGACY_TEXT_FIXES = {
   maiaraemarasa: "Maiara e Maraísa"
 };
 
-const APP_VERSION = "2026-06-04-05";
+const DEFAULT_GLOBAL_COUNTRIES = [
+  "Alemanha", "Argentina", "Austrália", "Áustria", "Bélgica", "Bolívia", "Brasil", "Canadá", "Chile", "China",
+  "Colômbia", "Coreia do Sul", "Dinamarca", "Egito", "Emirados Árabes Unidos", "Espanha", "Estados Unidos", "França",
+  "Grécia", "Holanda", "Hungria", "Índia", "Irlanda", "Itália", "Japão", "Marrocos", "México", "Noruega",
+  "Nova Zelândia", "Paraguai", "Peru", "Portugal", "Reino Unido", "Suécia", "Suíça", "Turquia", "Uruguai"
+];
+
+const APP_VERSION = "2026-06-04-06";
 
 const state = {
   trips: [],
@@ -2810,11 +2817,21 @@ function closeTransientPanels() {
 }
 
 function getGlobalCountrySuggestions() {
-  return state.globalGeo.countries || [];
+  return dedupeValues([...(state.globalGeo.countries || []), ...DEFAULT_GLOBAL_COUNTRIES]);
 }
 
 function getGlobalSubdivisionSuggestions(country) {
   return state.globalGeo.subdivisions[normalizeLookupKey(country)] || [];
+}
+
+function getCountrySelectOptions(selectedCountry = "") {
+  return dedupeValues([selectedCountry, ...getGlobalCountrySuggestions()]);
+}
+
+function renderCountrySelectOptions(selectedCountry = "") {
+  return getCountrySelectOptions(selectedCountry || "Brasil")
+    .map(country => `<option value="${escapeHtml(country)}" ${normalizeLookupKey(country) === normalizeLookupKey(selectedCountry) ? "selected" : ""}>${escapeHtml(country)}</option>`)
+    .join("");
 }
 
 function formatTripLocation(trip) {
@@ -2902,7 +2919,7 @@ function bindEvents() {
     }
     switchView(btn.dataset.view);
   }));
-  document.querySelector("[data-jump-form]").addEventListener("click", openFreshTripEditor);
+  document.querySelector("[data-jump-form]").addEventListener("click", handleTopbarPrimaryAction);
   els["filter-search"].addEventListener("input", e => { state.filters.search = e.target.value.trim().toLowerCase(); applyFilters(); });
   ["filter-year", "filter-uf", "filter-tag"].forEach(id => els[id].addEventListener("change", e => {
     state.filters[id.replace("filter-", "")] = e.target.value;
@@ -3258,7 +3275,7 @@ function renderCityBlock(id) {
     <div class="city-block-grid ${brazilMode ? "" : "compact-grid"}">
       <div class="field">
         <label>País *</label>
-        <input class="form-input" id="f-country-${id}" value="${escapeHtml(cityObj.country || "Brasil")}" placeholder="Ex: Brasil" list="global-country-options">
+        <select class="form-input" id="f-country-${id}">${renderCountrySelectOptions(cityObj.country || "Brasil")}</select>
       </div>
       ${brazilMode ? `
         <div class="field">
@@ -3286,13 +3303,9 @@ function renderCityBlock(id) {
       : "Latitude e longitude serão confirmadas automaticamente ao salvar."}</div>
   `;
 
-  const countryInput = document.getElementById(`f-country-${id}`);
-  if (countryInput) {
-    countryInput.addEventListener("change", event => onCountryChange(id, event.target.value));
-    countryInput.addEventListener("blur", event => {
-      event.target.value = normalizeCountryValue(event.target.value || "Brasil");
-      onCountryChange(id, event.target.value);
-    });
+  const countrySelect = document.getElementById(`f-country-${id}`);
+  if (countrySelect) {
+    countrySelect.addEventListener("change", event => onCountryChange(id, event.target.value));
   }
 
   if (brazilMode) {
@@ -3615,7 +3628,7 @@ async function loadGlobalRegionData() {
     const response = await fetch(withCacheBust("assets/data/global-regions.json"), { cache: "no-store" });
     if (!response.ok) throw new Error("Falha ao carregar países e regiões globais.");
     const data = await response.json();
-    state.globalGeo.countries = dedupeValues((data.countries || []).map(item => normalizeCountryValue(item)));
+    state.globalGeo.countries = dedupeValues([...(data.countries || []).map(item => normalizeCountryValue(item)), ...DEFAULT_GLOBAL_COUNTRIES]);
     state.globalGeo.subdivisions = Object.entries(data.subdivisions || {}).reduce((acc, [country, values]) => {
       acc[normalizeLookupKey(country)] = dedupeValues((values || []).map(value => normalizeRegionValue(value, country)));
       return acc;
@@ -3624,7 +3637,8 @@ async function loadGlobalRegionData() {
     state.formCities.filter(city => !isBrazilCountry(city.country)).forEach(city => renderCityBlock(city.id));
     state.formPlanCities.filter(city => !isBrazilCountry(city.country)).forEach(city => renderPlanCityBlock(city.id));
   } catch (error) {
-    state.globalGeo = { countries: [], subdivisions: {} };
+    state.globalGeo = { countries: [...DEFAULT_GLOBAL_COUNTRIES], subdivisions: {} };
+    renderGlobalCountryOptions();
   }
 }
 
@@ -4625,7 +4639,7 @@ function renderPlanCityBlock(id) {
     <div class="city-block-grid ${brazilMode ? "" : "compact-grid"}">
       <div class="field">
         <label>País *</label>
-        <input class="form-input" id="plan-country-${id}" value="${escapeHtml(cityObj.country || "Brasil")}" placeholder="Ex: Brasil" list="global-country-options">
+        <select class="form-input" id="plan-country-${id}">${renderCountrySelectOptions(cityObj.country || "Brasil")}</select>
       </div>
       ${brazilMode ? `
         <div class="field">
@@ -4653,13 +4667,9 @@ function renderPlanCityBlock(id) {
       : "Latitude e longitude serão confirmadas automaticamente ao salvar."}</div>
   `;
 
-  const countryInput = document.getElementById(`plan-country-${id}`);
-  if (countryInput) {
-    countryInput.addEventListener("change", event => onPlanCountryChange(id, event.target.value));
-    countryInput.addEventListener("blur", event => {
-      event.target.value = normalizeCountryValue(event.target.value || "Brasil");
-      onPlanCountryChange(id, event.target.value);
-    });
+  const countrySelect = document.getElementById(`plan-country-${id}`);
+  if (countrySelect) {
+    countrySelect.addEventListener("change", event => onPlanCountryChange(id, event.target.value));
   }
 
   if (brazilMode) {
@@ -4839,6 +4849,7 @@ function switchView(view) {
     planejar: "Planejar <em>roteiro</em>"
   };
   document.getElementById("page-title").innerHTML = titles[view] || "";
+  updateTopbarPrimaryAction();
   if (view === "map") {
     setTimeout(() => {
       initMap();
@@ -4857,6 +4868,24 @@ function openFreshTripEditor() {
   closeTransientPanels();
   resetTripForm(true);
   switchView("editor");
+}
+
+function updateTopbarPrimaryAction() {
+  const button = document.getElementById("topbar-primary-action");
+  if (!button) return;
+  button.innerHTML = state.activeView === "planejar"
+    ? `<i data-lucide="plus"></i> Novo roteiro`
+    : `<i data-lucide="plus"></i> Nova viagem`;
+  refreshIcons();
+}
+
+function handleTopbarPrimaryAction() {
+  if (state.activeView === "planejar") {
+    resetPlanEditor();
+    switchView("planejar");
+    return;
+  }
+  openFreshTripEditor();
 }
 
 function renderAll() {
