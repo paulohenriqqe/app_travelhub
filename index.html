@@ -1543,6 +1543,7 @@
     gap: 10px;
   }
   .spotlight-card {
+    position: relative;
     width: 100%;
     padding: 14px;
     border-radius: 16px;
@@ -1554,10 +1555,9 @@
     transition: var(--transition);
   }
   .spotlight-topline {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 8px;
+    position: absolute;
+    top: 14px;
+    right: 14px;
   }
   .spotlight-card:hover {
     transform: translateY(-2px);
@@ -1566,7 +1566,8 @@
   }
   .spotlight-card strong {
     display: block;
-    margin-top: 8px;
+    margin-top: 0;
+    padding-right: 124px;
     color: var(--blue-dark);
     font-family: "DM Serif Display", serif;
     font-size: 20px;
@@ -5231,11 +5232,11 @@ function renderMapLayer(preserveViewport = false) {
           return {
             color: selected
               ? "rgba(10, 47, 76, 0.92)"
-              : state.showPlannedMap && hasPlanned
-                ? "rgba(79, 121, 173, 0.72)"
-                : highlightBrazilShape
+              : highlightBrazilShape
                   ? "rgba(255,255,255,0.92)"
-                  : isBrazil
+                : state.showPlannedMap && hasPlanned
+                  ? "rgba(255,255,255,0.58)"
+                : isBrazil
                     ? "rgba(89, 96, 102, 0.56)"
                     : visited
                       ? "rgba(255,255,255,0.58)"
@@ -5329,7 +5330,7 @@ function renderMapLayer(preserveViewport = false) {
             color: selected
               ? "rgba(10,47,76,0.9)"
               : state.showPlannedMap && hasPlanned
-                ? "rgba(76, 118, 170, 0.72)"
+                ? "rgba(255,255,255,0.72)"
                 : (visited ? "rgba(255,255,255,0.72)" : "rgba(255,255,255,0.34)"),
             weight: selected ? 0.7 : state.showPlannedMap && hasPlanned ? 0.7 : 0.45,
             fillColor,
