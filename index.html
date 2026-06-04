@@ -266,38 +266,42 @@
     border: 1px solid var(--line);
     box-shadow: var(--shadow-sm);
   }
-  .dashboard-hero-grid { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(320px, 0.9fr); gap: 24px; align-items: start; }
-  .kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+  .dashboard-hero-grid { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(320px, 0.9fr); gap: 18px; align-items: start; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
   .metric-card {
-    padding: 24px;
+    padding: 16px 18px;
     transition: var(--transition);
     cursor: pointer;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    min-height: 160px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 92px;
   }
   .metric-card:hover { border-color: var(--blue-light); box-shadow: var(--shadow-md); transform: translateY(-3px); }
-  .metric-label {
+  .metric-main {
     display: flex;
     align-items: center;
-    gap: 8px;
+    min-width: 0;
+    gap: 10px;
+    color: var(--blue-dark);
+  }
+  .metric-label {
     color: var(--ink-3);
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.05em;
     text-transform: uppercase;
   }
-  .metric-label svg { width: 18px; height: 18px; color: var(--accent); }
+  .metric-main svg { width: 18px; height: 18px; color: var(--accent); flex: 0 0 auto; }
   .metric-value {
-    margin-top: 12px;
     font-family: "DM Serif Display", serif;
-    font-size: 40px;
+    font-size: 34px;
     line-height: 1;
     color: var(--blue-dark);
   }
-  .metric-sub { margin-top: 8px; color: var(--ink-3); font-size: 13px; font-weight: 500; }
-  .dashboard-upcoming-panel { padding: 24px; }
+  .metric-sub { color: var(--ink-3); font-size: 12px; font-weight: 700; text-align: right; }
+  .dashboard-upcoming-panel { padding: 18px; }
   .dashboard-upcoming-panel .spotlight-grid { grid-template-columns: 1fr; }
 
   .journey-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 24px; }
@@ -1534,11 +1538,13 @@
   }
   .modal-body { padding: 32px 40px; display: flex; flex-direction: column; gap: 20px; }
   .modal-list-item {
+    position: relative;
+    overflow: hidden;
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    padding: 16px 0;
+    padding: 14px 16px;
     border: none;
     border-bottom: 1px solid var(--line);
     background: transparent;
@@ -1548,6 +1554,16 @@
     text-align: left;
     cursor: pointer;
   }
+  .modal-list-bar {
+    position: absolute;
+    inset: 7px auto 7px 0;
+    width: var(--bar-width, 0%);
+    max-width: 100%;
+    border-radius: 999px;
+    background: rgba(243, 115, 33, 0.12);
+    pointer-events: none;
+  }
+  .modal-list-label, .modal-list-badge { position: relative; z-index: 1; }
   .modal-list-item:hover { color: var(--blue-dark); }
   .modal-list-item:last-child { border-bottom: none; }
   .modal-list-badge {
@@ -4033,44 +4049,36 @@ function renderKpis() {
 
   const homeHtml = `
     <article class="metric-card" onclick="openJourneyGroupsModal('Viagens registradas', state.currentJourneyGroups)">
-      <div class="metric-label"><i data-lucide="plane"></i> Viagens</div>
-      <div class="metric-value">${journeyCount}</div>
-      <div class="metric-sub">${formatCountLabel(journeyCount, "jornada", "jornadas")} registradas</div>
+      <div class="metric-main"><span class="metric-value">${journeyCount}</span><span class="metric-label">Viagens</span><i data-lucide="plane"></i></div>
+      <div class="metric-sub">${formatCountLabel(journeyCount, "jornada", "jornadas")}</div>
     </article>
     <article class="metric-card" onclick="openListModal('Anos registrados', state.currentYearsList)">
-      <div class="metric-label"><i data-lucide="calendar-range"></i> Anos</div>
-      <div class="metric-value">${years.length}</div>
-      <div class="metric-sub">${formatCountLabel(years.length, "ano registrado", "anos registrados")}</div>
+      <div class="metric-main"><span class="metric-value">${years.length}</span><span class="metric-label">Anos</span><i data-lucide="calendar-range"></i></div>
+      <div class="metric-sub">${formatCountLabel(years.length, "ano", "anos")}</div>
     </article>
     <article class="metric-card" onclick="openListModal('Cidades visitadas', state.currentCitiesList)">
-      <div class="metric-label"><i data-lucide="map-pin"></i> Cidades</div>
-      <div class="metric-value">${cities.length}</div>
-      <div class="metric-sub">${formatCountLabel(cities.length, "destino único", "destinos únicos")}</div>
+      <div class="metric-main"><span class="metric-value">${cities.length}</span><span class="metric-label">Cidades</span><i data-lucide="map-pin"></i></div>
+      <div class="metric-sub">${formatCountLabel(cities.length, "destino", "destinos")}</div>
     </article>
     <article class="metric-card" onclick="openListModal('Países visitados', state.currentCountriesList)">
-      <div class="metric-label"><i data-lucide="globe-2"></i> Países</div>
-      <div class="metric-value">${countries.length}</div>
-      <div class="metric-sub">${formatCountLabel(countries.length, "país ativo", "países ativos")}</div>
+      <div class="metric-main"><span class="metric-value">${countries.length}</span><span class="metric-label">Países</span><i data-lucide="globe-2"></i></div>
+      <div class="metric-sub">${formatCountLabel(countries.length, "país", "países")}</div>
     </article>
     <article class="metric-card" onclick="openListModal('Regiões visitadas', state.currentUfsList)">
-      <div class="metric-label"><i data-lucide="map"></i> Regiões</div>
-      <div class="metric-value">${regions.length}</div>
-      <div class="metric-sub">${formatCountLabel(brazilRegions.length, "UF brasileira", "UFs brasileiras")}</div>
+      <div class="metric-main"><span class="metric-value">${regions.length}</span><span class="metric-label">Regiões</span><i data-lucide="map"></i></div>
+      <div class="metric-sub">${formatCountLabel(brazilRegions.length, "UF", "UFs")}</div>
     </article>
     <article class="metric-card" onclick="openListModal('Motivos registrados', state.currentTagsList)">
-      <div class="metric-label"><i data-lucide="hash"></i> Motivos</div>
-      <div class="metric-value">${uniqueTags.length}</div>
-      <div class="metric-sub">${formatCountLabel(uniqueTags.length, "motivo", "motivos")} registrados</div>
+      <div class="metric-main"><span class="metric-value">${uniqueTags.length}</span><span class="metric-label">Motivos</span><i data-lucide="hash"></i></div>
+      <div class="metric-sub">${formatCountLabel(uniqueTags.length, "motivo", "motivos")}</div>
     </article>
     <article class="metric-card" onclick="openListModal('Companhias recorrentes', state.currentCompanionsList)">
-      <div class="metric-label"><i data-lucide="users"></i> Acompanhantes</div>
-      <div class="metric-value">${uniqueCompanions.length}</div>
-      <div class="metric-sub">${formatCountLabel(uniqueCompanions.length, "pessoa", "pessoas")} no histórico</div>
+      <div class="metric-main"><span class="metric-value">${uniqueCompanions.length}</span><span class="metric-label">Pessoas</span><i data-lucide="users"></i></div>
+      <div class="metric-sub">Acompanhantes</div>
     </article>
     <article class="metric-card" onclick="openListModal('Artistas presentes', state.currentArtistsList)">
-      <div class="metric-label"><i data-lucide="music-2"></i> Artistas</div>
-      <div class="metric-value">${uniqueArtists.length}</div>
-      <div class="metric-sub">${formatCountLabel(uniqueArtists.length, "artista", "artistas")} presentes</div>
+      <div class="metric-main"><span class="metric-value">${uniqueArtists.length}</span><span class="metric-label">Artistas</span><i data-lucide="music-2"></i></div>
+      <div class="metric-sub">${formatCountLabel(uniqueArtists.length, "artista", "artistas")}</div>
     </article>
   `;
 
@@ -5631,6 +5639,7 @@ function openListModal(title, listItems) {
       if (title.includes("Ano")) return Number(b) - Number(a);
       return a.localeCompare(b, "pt-BR");
     });
+  const maxCount = Math.max(...sortedItems.map(item => counts[item] || 0), 1);
   const subtitle = getListSubtitle(title);
   els["modal-header"].innerHTML = `
     <h2 style="font-family:'DM Serif Display',serif;font-size:32px;margin:0;color:var(--blue-dark);">${title}</h2>
@@ -5640,8 +5649,9 @@ function openListModal(title, listItems) {
   els["modal-body"].innerHTML = `
     <div style="display:flex;flex-direction:column;">
       ${sortedItems.map(item => `
-        <button type="button" class="modal-list-item" onclick="openTripsCollectionModal('Viagens em ${escapeHtml(item)}', getTripsForListTitle('${escapeHtml(title)}', decodeURIComponent('${encodeURIComponent(item)}')), '${escapeHtml(subtitle)}')">
-          <span>${escapeHtml(item)}</span>
+        <button type="button" class="modal-list-item" style="--bar-width:${Math.max(8, ((counts[item] || 0) / maxCount) * 100)}%;" onclick="openTripsCollectionModal('Viagens em ${escapeHtml(item)}', getTripsForListTitle('${escapeHtml(title)}', decodeURIComponent('${encodeURIComponent(item)}')), '${escapeHtml(subtitle)}')">
+          <span class="modal-list-bar"></span>
+          <span class="modal-list-label">${escapeHtml(item)}</span>
           <span class="modal-list-badge">${counts[item] || 0}</span>
         </button>
       `).join("")}
