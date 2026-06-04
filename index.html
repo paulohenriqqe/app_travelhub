@@ -573,21 +573,47 @@
     gap: 14px;
     margin-top: 14px;
   }
-  .trip-card-actions .secondary-action,
-  .trip-card-actions .danger-action,
-  .plan-item-actions .secondary-action,
-  .plan-item-actions .danger-action {
-    min-height: 34px;
-    padding: 7px 10px;
-    font-size: 12px;
-    border-radius: 9px;
+  .trip-card-actions, .plan-item-actions {
+    gap: 10px;
+    align-items: center;
   }
-  .trip-card-actions .secondary-action svg,
-  .trip-card-actions .danger-action svg,
-  .plan-item-actions .secondary-action svg,
-  .plan-item-actions .danger-action svg {
+  .icon-action-btn {
+    width: 32px;
+    height: 32px;
+    min-height: 32px;
+    padding: 0;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--line);
+    background: var(--white);
+    color: var(--ink-2);
+    box-shadow: none;
+    flex: 0 0 auto;
+  }
+  .icon-action-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+  }
+  .icon-action-btn svg {
     width: 14px;
     height: 14px;
+  }
+  .icon-action-btn.edit-btn:hover {
+    border-color: rgba(38, 185, 221, 0.45);
+    background: var(--blue-pale);
+    color: var(--blue-dark);
+  }
+  .icon-action-btn.delete-btn {
+    color: #dc2626;
+    border-color: rgba(220, 38, 38, 0.18);
+    background: rgba(254, 242, 242, 0.95);
+  }
+  .icon-action-btn.delete-btn:hover {
+    background: #fee2e2;
+    border-color: rgba(220, 38, 38, 0.28);
+    color: #b91c1c;
   }
 
   .origin-chip.manual { background: var(--paper-2); color: var(--ink-2); }
@@ -853,12 +879,6 @@
   .chart-panel { padding: 24px; }
   .chart-title { margin: 0 0 20px; font-size: 18px; font-family: "DM Serif Display", serif; color: var(--blue-dark); }
   .chart-container { position: relative; height: 280px; width: 100%; }
-  .time-chart-panel { overflow: visible; }
-  .time-chart-container {
-    height: 360px;
-    min-height: 340px;
-  }
-  .time-chart-container canvas { overflow: visible; }
   .horizontal-list { display: flex; flex-direction: column; gap: 16px; }
   .horizontal-row { display: grid; grid-template-columns: minmax(100px, 140px) 1fr 30px; gap: 16px; align-items: center; }
   button.horizontal-row {
@@ -1757,9 +1777,9 @@
           </section>
 
           <div class="stats-grid">
-            <div class="panel chart-panel time-chart-panel" style="grid-column:1/-1;">
+            <div class="panel chart-panel" style="grid-column:1/-1;">
               <h2 class="chart-title">Evolução das viagens no tempo</h2>
-              <div class="chart-container time-chart-container"><canvas id="timeChart"></canvas></div>
+              <div class="chart-container"><canvas id="timeChart"></canvas></div>
             </div>
             <div class="panel chart-panel"><h2 class="chart-title">Regiões mais revisitadas</h2><div class="horizontal-list" id="stat-ufs"></div></div>
             <div class="panel chart-panel"><h2 class="chart-title">Localizações mais revisitadas</h2><div class="horizontal-list" id="stat-cities"></div></div>
@@ -4057,8 +4077,8 @@ function renderTripCard(trip) {
       ${linkedPlan ? `<div class="trip-links">Ligada ao plano ${escapeHtml(linkedPlan.destination)}</div>` : ""}
       ${trip.tags.length ? `<div class="tag-row">${trip.tags.slice(0, 3).map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}</div>` : ""}
       <div class="trip-card-actions">
-        <button type="button" class="secondary-action" onclick="event.stopPropagation(); beginTripEdit(decodeURIComponent('${encodeURIComponent(trip.id)}'))"><i data-lucide="pencil"></i> Editar</button>
-        <button type="button" class="danger-action" onclick="event.stopPropagation(); deleteTrip(decodeURIComponent('${encodeURIComponent(trip.id)}'))"><i data-lucide="trash-2"></i> Excluir</button>
+        <button type="button" class="icon-action-btn edit-btn" aria-label="Editar viagem" title="Editar viagem" onclick="event.stopPropagation(); beginTripEdit(decodeURIComponent('${encodeURIComponent(trip.id)}'))"><i data-lucide="pencil"></i></button>
+        <button type="button" class="icon-action-btn delete-btn" aria-label="Excluir viagem" title="Excluir viagem" onclick="event.stopPropagation(); deleteTrip(decodeURIComponent('${encodeURIComponent(trip.id)}'))"><i data-lucide="trash-2"></i></button>
       </div>
       <div class="trip-details">
         <span><i data-lucide="users"></i>${formatPeopleCount(trip.travelers.length)}</span>
@@ -4477,22 +4497,9 @@ function renderStats() {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      layout: { padding: { top: 34, right: 24, bottom: 14, left: 24 } },
       scales: {
-        y: {
-          display: false,
-          beginAtZero: true,
-          grace: "35%"
-        },
-        x: {
-          grid: { display: false },
-          border: { display: false },
-          ticks: {
-            color: "rgba(10, 47, 76, 0.82)",
-            font: { weight: "800", size: 16 },
-            padding: 14
-          }
-        }
+        y: { display: false, beginAtZero: true },
+        x: { grid: { display: false }, border: { display: false } }
       },
       plugins: {
         legend: { display: false },
@@ -4501,16 +4508,15 @@ function renderStats() {
           formatter: value => value,
           anchor: "end",
           align: "top",
-          offset: 10,
+          offset: 8,
           color: "#ffffff",
-          font: { weight: "900", size: 14 },
-          backgroundColor: "rgba(9, 117, 153, 0.96)",
-          borderColor: "rgba(255, 255, 255, 0.92)",
-          borderWidth: 1,
+          font: { weight: "800", size: 12 },
+          backgroundColor: "rgba(10, 47, 76, 0.92)",
+          borderColor: "rgba(10, 47, 76, 0)",
+          borderWidth: 0,
           borderRadius: 999,
-          padding: { top: 7, right: 13, bottom: 7, left: 13 },
-          clamp: false,
-          clip: false
+          padding: { top: 6, right: 12, bottom: 6, left: 12 },
+          clamp: true
         },
         tooltip: { displayColors: false }
       }
@@ -4592,8 +4598,8 @@ function renderPlanList() {
           <span><i data-lucide="git-branch-plus"></i>${formatCountLabel(linkedTrips.length, "linha efetivada", "linhas efetivadas")}</span>
         </div>
         <div class="plan-item-actions">
-          <button type="button" class="secondary-action" onclick="event.stopPropagation(); beginPlanEdit(decodeURIComponent('${encodeURIComponent(plan.id)}'))"><i data-lucide="pencil"></i> Editar</button>
-          <button type="button" class="danger-action" onclick="event.stopPropagation(); deletePlanById(decodeURIComponent('${encodeURIComponent(plan.id)}'))"><i data-lucide="trash-2"></i> Excluir</button>
+          <button type="button" class="icon-action-btn edit-btn" aria-label="Editar plano" title="Editar plano" onclick="event.stopPropagation(); beginPlanEdit(decodeURIComponent('${encodeURIComponent(plan.id)}'))"><i data-lucide="pencil"></i></button>
+          <button type="button" class="icon-action-btn delete-btn" aria-label="Excluir plano" title="Excluir plano" onclick="event.stopPropagation(); deletePlanById(decodeURIComponent('${encodeURIComponent(plan.id)}'))"><i data-lucide="trash-2"></i></button>
         </div>
       </article>
     `;
@@ -4708,8 +4714,8 @@ function renderSelectedPlan() {
         </select>
         <button type="button" class="secondary-action" onclick="updateSelectedPlanStatus()"><i data-lucide="save"></i> Atualizar status</button>
       </div>
-      <button type="button" class="secondary-action" onclick="beginPlanEdit(decodeURIComponent('${encodeURIComponent(plan.id)}'))"><i data-lucide="pencil"></i> Editar plano</button>
-      <button type="button" class="danger-action" onclick="deleteSelectedPlan()"><i data-lucide="trash-2"></i> Excluir plano</button>
+      <button type="button" class="icon-action-btn edit-btn" aria-label="Editar plano" title="Editar plano" onclick="beginPlanEdit(decodeURIComponent('${encodeURIComponent(plan.id)}'))"><i data-lucide="pencil"></i></button>
+      <button type="button" class="icon-action-btn delete-btn" aria-label="Excluir plano" title="Excluir plano" onclick="deleteSelectedPlan()"><i data-lucide="trash-2"></i></button>
       <button type="button" class="primary-action" onclick="startPlanConversion(decodeURIComponent('${encodeURIComponent(plan.id)}'))" ${plan.status === "cancelado" ? "disabled" : ""}><i data-lucide="git-branch-plus"></i> Efetivar este plano</button>
     </div>
 
@@ -4903,7 +4909,7 @@ async function salvarPlanejamento() {
       ? "Plano atualizado com sucesso."
       : itineraryHasEntries(itinerary)
         ? "Plano salvo com sucesso e pronto para acompanhamento."
-        : "Plano salvo com sucesso. Ele ficou sem roteiro detalhado, mas o status já pode ser acompanhado.";
+        : "Plano salvo com sucesso. Ele ficou sem roteiro detalhado, mas o status ja pode ser acompanhado.";
     resetPlanEditor();
     message.style.color = "var(--success)";
     message.textContent = successMessage;
@@ -4940,9 +4946,9 @@ async function deletePlanById(planId) {
     applyFilters();
     if (message) {
       message.style.color = "var(--success)";
-      message.textContent = "Plano excluído com sucesso.";
+      message.textContent = "Plano excluido com sucesso.";
     }
-    showToast("Plano excluído com sucesso.", "success", "Plano removido");
+    showToast("Plano excluido com sucesso.", "success", "Plano removido");
   } catch (error) {
     if (message) {
       message.style.color = "var(--danger)";
@@ -5308,23 +5314,6 @@ function resetTripForm(clearBanner) {
   if (clearBanner) clearPendingConversion(true);
 }
 
-function normalizeBackendMessage(message) {
-  return String(message || "")
-    .replace(/nao/gi, match => match[0] === "N" ? "Não" : "não")
-    .replace(/acao/gi, match => match[0] === "A" ? "Ação" : "ação")
-    .replace(/atualizacao/gi, match => match[0] === "A" ? "Atualização" : "atualização")
-    .replace(/exclusao/gi, match => match[0] === "E" ? "Exclusão" : "exclusão")
-    .replace(/efetivacao/gi, match => match[0] === "E" ? "Efetivação" : "efetivação")
-    .replace(/obrigatorio/gi, match => match[0] === "O" ? "Obrigatório" : "obrigatório")
-    .replace(/invalida/gi, match => match[0] === "I" ? "Inválida" : "inválida")
-    .replace(/excluido/gi, match => match[0] === "E" ? "Excluído" : "excluído")
-    .replace(/excluida/gi, match => match[0] === "E" ? "Excluída" : "excluída")
-    .replace(/criada/gi, match => match[0] === "C" ? "Criada" : "criada")
-    .replace(/Aba nao encontrada/g, "Aba não encontrada")
-    .replace(/Plano nao encontrado/g, "Plano não encontrado")
-    .replace(/Viagem nao encontrada/g, "Viagem não encontrada");
-}
-
 async function postToAppsScript(action, payload) {
   if (!isConfiguredUrl(GOOGLE_SCRIPT_URL, "SEU_ID_AQUI")) {
     throw new Error("Configure GOOGLE_SCRIPT_URL com a URL real do seu Google Apps Script antes de salvar.");
@@ -5340,10 +5329,10 @@ async function postToAppsScript(action, payload) {
   try { data = text ? JSON.parse(text) : {}; } catch (error) {}
 
   if (!response.ok) {
-    throw new Error(normalizeBackendMessage(data.message || text || "Falha ao falar com o Apps Script."));
+    throw new Error(data.message || text || "Falha ao falar com o Apps Script.");
   }
   if (data.ok === false) {
-    throw new Error(normalizeBackendMessage(data.message || "O Apps Script retornou erro."));
+    throw new Error(data.message || "O Apps Script retornou erro.");
   }
   return data;
 }
@@ -5409,8 +5398,8 @@ function openTripModal(tripId) {
       <i data-lucide="map-pin" style="width:18px;vertical-align:middle;color:var(--accent)"></i> ${escapeHtml(formatTripLocation(trip) || trip.country)}
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;">
-      <button type="button" class="secondary-action" onclick="beginTripEdit(decodeURIComponent('${encodeURIComponent(trip.id)}')); closeModal();"><i data-lucide="pencil"></i> Editar viagem</button>
-      <button type="button" class="danger-action" onclick="deleteTrip(decodeURIComponent('${encodeURIComponent(trip.id)}'))"><i data-lucide="trash-2"></i> Excluir viagem</button>
+      <button type="button" class="icon-action-btn edit-btn" aria-label="Editar viagem" title="Editar viagem" onclick="beginTripEdit(decodeURIComponent('${encodeURIComponent(trip.id)}')); closeModal();"><i data-lucide="pencil"></i></button>
+      <button type="button" class="icon-action-btn delete-btn" aria-label="Excluir viagem" title="Excluir viagem" onclick="deleteTrip(decodeURIComponent('${encodeURIComponent(trip.id)}'))"><i data-lucide="trash-2"></i></button>
     </div>
   `;
   els["modal-body"].innerHTML = `
@@ -5439,7 +5428,7 @@ async function deleteTrip(tripId) {
     state.trips = state.trips.filter(item => item.id !== trip.id);
     closeModal();
     applyFilters();
-    showToast("Viagem excluída com sucesso.", "success", "Viagem removida");
+    showToast("Viagem excluida com sucesso.", "success", "Viagem removida");
   } catch (error) {
     els["modal-body"].insertAdjacentHTML("afterbegin", `<div class="empty-state" style="margin-bottom:16px;">${escapeHtml(error.message || "Não foi possível excluir a viagem.")}</div>`);
     showToast(error.message || "Não foi possível excluir a viagem.", "error", "Erro ao excluir");
