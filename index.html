@@ -2615,7 +2615,23 @@ const DEFAULT_GLOBAL_COUNTRIES = [
   "Nova Zelândia", "Paraguai", "Peru", "Portugal", "Reino Unido", "Suécia", "Suíça", "Turquia", "Uruguai"
 ];
 
-const APP_VERSION = "2026-06-04-06";
+const COUNTRY_CANONICAL_LABELS = Object.freeze({
+  ...Object.fromEntries(DEFAULT_GLOBAL_COUNTRIES.map(country => [normalizeLookupKey(country), country])),
+  br: "Brasil",
+  brazil: "Brasil",
+  usa: "Estados Unidos",
+  eua: "Estados Unidos",
+  unitedstates: "Estados Unidos",
+  estadosunidos: "Estados Unidos",
+  uk: "Reino Unido",
+  unitedkingdom: "Reino Unido",
+  reinounido: "Reino Unido",
+  uae: "Emirados Árabes Unidos",
+  emiradosarabesunidos: "Emirados Árabes Unidos",
+  emiradosrabesunidos: "Emirados Árabes Unidos"
+});
+
+const APP_VERSION = "2026-06-04-07";
 
 const state = {
   trips: [],
@@ -2677,7 +2693,7 @@ const TAXONOMY_FIELD_META = {
 
 function repairMojibake(value) {
   const text = String(value || "").trim();
-  if (!text || !/[ÃÂ ]/.test(text)) return text;
+  if (!text || !/[ÃÂ\uFFFD]/.test(text)) return text;
   try {
     const bytes = Uint8Array.from(text.split("").map(char => char.charCodeAt(0) & 255));
     const decoded = new TextDecoder("utf-8").decode(bytes).trim();
@@ -2750,9 +2766,8 @@ function isBrazilCountry(country) {
 function normalizeCountryValue(value) {
   const text = cleanTextValue(value || "Brasil");
   const key = normalizeLookupKey(text || "Brasil");
-  if (!key || key === "br" || key === "brazil" || key === "brasil") return "Brasil";
-  if (key === "eua" || key === "usa" || key === "unitedstates" || key === "estadosunidos") return "Estados Unidos";
-  if (key === "uk" || key === "reinounido" || key === "unitedkingdom") return "Reino Unido";
+  if (!key) return "Brasil";
+  if (COUNTRY_CANONICAL_LABELS[key]) return COUNTRY_CANONICAL_LABELS[key];
   return titleCaseLabel(text);
 }
 
@@ -2828,8 +2843,9 @@ function getCountrySelectOptions(selectedCountry = "") {
 }
 
 function renderCountrySelectOptions(selectedCountry = "") {
-  return getCountrySelectOptions(selectedCountry || "Brasil")
-    .map(country => `<option value="${escapeHtml(country)}" ${normalizeLookupKey(country) === normalizeLookupKey(selectedCountry) ? "selected" : ""}>${escapeHtml(country)}</option>`)
+  const normalizedSelected = normalizeCountryValue(selectedCountry || "Brasil");
+  return getCountrySelectOptions(normalizedSelected)
+    .map(country => `<option value="${escapeHtml(country)}" ${normalizeLookupKey(country) === normalizeLookupKey(normalizedSelected) ? "selected" : ""}>${escapeHtml(country)}</option>`)
     .join("");
 }
 
@@ -3589,13 +3605,13 @@ function looksLikeHealthyUtf8(text) {
   if (!text) return false;
   const hasExpectedHeaders = /Viagem,País,Cidade|Viagem,Pais,Cidade/i.test(text);
   const mojibakeCount = (text.match(/[ÃÂ]/g) || []).length;
-  const replacementCount = (text.match(/ /g) || []).length;
+  const replacementCount = (text.match(/\uFFFD/g) || []).length;
   return hasExpectedHeaders && mojibakeCount === 0 && replacementCount === 0;
 }
 
 function getDecodedTextScore(text) {
   if (!text) return Number.NEGATIVE_INFINITY;
-  const replacementPenalty = (text.match(/ /g) || []).length * 8;
+  const replacementPenalty = (text.match(/\uFFFD/g) || []).length * 8;
   const mojibakePenalty = (text.match(/[ÃÂ]/g) || []).length * 4;
   const accentBonus = (text.match(/[À-ÿ]/g) || []).length;
   const headerBonus = /País|Cidade|Data de início|Data de fim|Acompanhantes|Artistas|Latitude|Longitude/i.test(text) ? 30 : 0;
