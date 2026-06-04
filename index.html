@@ -878,7 +878,7 @@
   .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px; }
   .chart-panel { padding: 24px; }
   .chart-title { margin: 0 0 20px; font-size: 18px; font-family: "DM Serif Display", serif; color: var(--blue-dark); }
-  .chart-container { position: relative; height: 280px; width: 100%; }
+  .chart-container { position: relative; height: 320px; width: 100%; }
   .horizontal-list { display: flex; flex-direction: column; gap: 16px; }
   .horizontal-row { display: grid; grid-template-columns: minmax(100px, 140px) 1fr 30px; gap: 16px; align-items: center; }
   button.horizontal-row {
@@ -4466,8 +4466,18 @@ function renderStats() {
   draw("stat-companions", getTop(trip => trip.travelers), "getTripsForCompanion", "Companhia recorrente");
   draw("stat-artists", getTop(trip => trip.artists), "getTripsForArtist", "Artista recorrente");
 
-  const years = [...new Set(state.filtered.map(trip => trip.year).filter(Boolean))].sort();
-  const effectiveSeries = years.map(year => state.filtered.filter(trip => trip.year === year).length);
+  const yearCounts = state.filtered.reduce((acc, trip) => {
+    const numericYear = Number.parseInt(trip.year, 10);
+    if (!Number.isInteger(numericYear)) return acc;
+    acc[numericYear] = (acc[numericYear] || 0) + 1;
+    return acc;
+  }, {});
+  const yearKeys = Object.keys(yearCounts).map(Number).sort((a, b) => a - b);
+  const years = yearKeys.length
+    ? Array.from({ length: yearKeys[yearKeys.length - 1] - yearKeys[0] + 1 }, (_, index) => yearKeys[0] + index)
+    : [];
+  const effectiveSeries = years.map(year => yearCounts[year] || 0);
+  const maxSeriesValue = Math.max(...effectiveSeries, 0);
 
   const ctx = document.getElementById("timeChart").getContext("2d");
   if (state.chartInstance) state.chartInstance.destroy();
@@ -4484,28 +4494,55 @@ function renderStats() {
           borderColor: "rgba(212, 70, 28, 1)",
           backgroundColor: chartFill,
           borderWidth: 3,
+          clip: false,
           pointBackgroundColor: "rgba(212, 70, 28, 1)",
           pointBorderColor: "rgba(255, 255, 255, 0.96)",
           pointBorderWidth: 2,
-          pointRadius: 4,
-          pointHoverRadius: 6,
+          pointRadius: context => context.raw > 0 ? 4 : 3,
+          pointHoverRadius: context => context.raw > 0 ? 6 : 4,
           fill: true,
-          tension: 0.42
+          tension: 0.35,
+          cubicInterpolationMode: "monotone"
         }
       ]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      layout: {
+        padding: { top: 28, right: 16, bottom: 0, left: 8 }
+      },
       scales: {
-        y: { display: false, beginAtZero: true },
-        x: { grid: { display: false }, border: { display: false } }
+        y: {
+          display: true,
+          beginAtZero: true,
+          suggestedMax: maxSeriesValue ? maxSeriesValue + Math.max(1, Math.round(maxSeriesValue * 0.2)) : 2,
+          ticks: {
+            precision: 0,
+            color: "rgba(77, 91, 105, 0.9)",
+            font: { size: 12, weight: "700" },
+            padding: 10
+          },
+          grid: {
+            color: "rgba(10, 47, 76, 0.08)",
+            drawBorder: false
+          },
+          border: { display: false }
+        },
+        x: {
+          ticks: {
+            color: "rgba(77, 91, 105, 0.9)",
+            font: { size: 12, weight: "700" }
+          },
+          grid: { display: false },
+          border: { display: false }
+        }
       },
       plugins: {
         legend: { display: false },
         datalabels: {
           display: true,
-          formatter: value => value,
+          formatter: value => value > 0 ? value : "",
           anchor: "end",
           align: "top",
           offset: 8,
@@ -4516,9 +4553,15 @@ function renderStats() {
           borderWidth: 0,
           borderRadius: 999,
           padding: { top: 6, right: 12, bottom: 6, left: 12 },
-          clamp: true
+          clamp: true,
+          clip: false
         },
-        tooltip: { displayColors: false }
+        tooltip: {
+          displayColors: false,
+          callbacks: {
+            label: context => `${context.parsed.y} ${context.parsed.y === 1 ? "viagem" : "viagens"}`
+          }
+        }
       }
     }
   });
