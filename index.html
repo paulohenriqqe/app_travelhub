@@ -929,7 +929,202 @@
     text-overflow: ellipsis;
   }
 
-  .form-panel { max-width: 900px; margin: 0 auto; padding: 40px; }
+  .form-panel { max-width: 960px; margin: 0 auto; padding: 40px; }
+  .form-shell-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 28px;
+  }
+  .form-shell-title {
+    margin: 0;
+    font-size: 32px;
+    line-height: 1;
+  }
+  .form-shell-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-left: auto;
+    flex-wrap: wrap;
+  }
+  .hero-assist {
+    position: relative;
+  }
+  .hero-icon-btn, .hero-search-trigger {
+    min-height: 44px;
+    border: 1px solid var(--line);
+    background: var(--white);
+    color: var(--blue-dark);
+    box-shadow: 0 10px 24px rgba(10, 47, 76, 0.08);
+    transition: var(--transition);
+  }
+  .hero-icon-btn {
+    width: 44px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .hero-icon-btn:hover, .hero-search-trigger:hover,
+  .hero-assist.open .hero-icon-btn, .hero-assist.open .hero-search-trigger {
+    transform: translateY(-1px);
+    border-color: rgba(212, 70, 28, 0.24);
+    box-shadow: 0 14px 28px rgba(212, 70, 28, 0.12);
+  }
+  .hero-icon-btn svg, .hero-search-trigger svg {
+    width: 18px;
+    height: 18px;
+    color: var(--accent);
+  }
+  .hero-search-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+  }
+  .hero-search-trigger span { color: var(--blue-dark); }
+  .hero-popover-card, .hero-search-panel {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    width: min(360px, calc(100vw - 48px));
+    padding: 16px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid rgba(10, 47, 76, 0.08);
+    box-shadow: 0 24px 50px rgba(10, 47, 76, 0.18);
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    pointer-events: none;
+    transition: var(--transition);
+    z-index: 30;
+  }
+  .hero-popover-card strong, .hero-search-title {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--blue-dark);
+    font-size: 15px;
+    font-weight: 800;
+  }
+  .hero-assist.open .hero-popover-card,
+  .hero-assist.open .hero-search-panel {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  .hero-help-list {
+    display: grid;
+    gap: 8px;
+    color: var(--ink-2);
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  .hero-help-list span {
+    display: flex;
+    gap: 8px;
+  }
+  .hero-help-list span::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex: 0 0 7px;
+    margin-top: 6px;
+    background: var(--accent);
+    box-shadow: 0 0 0 4px rgba(212, 70, 28, 0.12);
+  }
+  .hero-search-panel {
+    padding: 14px;
+  }
+  .hero-search-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 14px;
+    min-height: 46px;
+    border-radius: 14px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+  }
+  .hero-search-input-wrap svg {
+    width: 18px;
+    height: 18px;
+    color: var(--ink-3);
+    flex: 0 0 auto;
+  }
+  .hero-search-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--blue-dark);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .hero-search-results {
+    display: grid;
+    gap: 10px;
+    margin-top: 12px;
+    max-height: 320px;
+    overflow: auto;
+    padding-right: 2px;
+  }
+  .hero-search-results::-webkit-scrollbar { width: 6px; }
+  .hero-search-results::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 999px; }
+  .hero-search-result {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: linear-gradient(180deg, var(--white) 0%, var(--paper) 100%);
+    padding: 14px 16px;
+    text-align: left;
+    transition: var(--transition);
+  }
+  .hero-search-result:hover {
+    border-color: rgba(38, 185, 221, 0.28);
+    transform: translateY(-1px);
+    box-shadow: 0 14px 26px rgba(10, 47, 76, 0.08);
+  }
+  .hero-search-kicker, .hero-search-hint {
+    display: block;
+    color: var(--ink-3);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .hero-search-result strong {
+    display: block;
+    margin: 6px 0 4px;
+    color: var(--blue-dark);
+    font-size: 16px;
+    font-family: "DM Serif Display", serif;
+    font-weight: 400;
+  }
+  .hero-search-meta {
+    color: var(--ink-2);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .hero-search-empty {
+    padding: 18px 14px;
+    border-radius: 16px;
+    background: var(--paper);
+    border: 1px dashed var(--line);
+    color: var(--ink-3);
+    font-size: 13px;
+    text-align: center;
+  }
   .form-section {
     background: var(--paper);
     border-radius: 12px;
@@ -1741,7 +1936,7 @@
       right: 16px;
       z-index: 1000;
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 4px;
       padding: 8px;
       border: 1px solid var(--line);
@@ -1765,6 +1960,21 @@
     .mobile-nav .nav-item svg { width: 18px; height: 18px; margin: 0 auto; }
     .mobile-nav .nav-item.active { background: var(--blue-pale); color: var(--blue-dark); }
     .form-panel { padding: 20px; }
+    .form-shell-header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 14px;
+    }
+    .form-shell-actions {
+      margin-left: 0;
+      justify-content: space-between;
+    }
+    .hero-popover-card, .hero-search-panel {
+      left: 0;
+      right: 0;
+      width: auto;
+    }
+    .hero-search-trigger span { display: none; }
     .conversion-banner { flex-direction: column; align-items: flex-start; }
     .detail-status-wrap, .draft-actions { grid-template-columns: 1fr; }
     .quick-grid { grid-template-columns: 1fr 1fr; }
@@ -1787,7 +1997,6 @@
       <div class="nav-label">Operação</div>
       <button class="nav-item" data-view="editor"><i data-lucide="plus-circle"></i> Editor</button>
       <button class="nav-item" data-view="planejar"><i data-lucide="calendar-clock"></i> Plano</button>
-      <button class="nav-item" data-view="listas"><i data-lucide="list"></i> Listas</button>
     </nav>
   </aside>
 
@@ -1874,8 +2083,41 @@
             <button type="button" class="secondary-action" id="clear-conversion-btn"><i data-lucide="x"></i> Cancelar conversão</button>
           </div>
 
-          <h2 class="chart-title" id="trip-form-title" style="font-size:32px;text-align:center;margin-bottom:8px;">Nova viagem</h2>
-          <p id="trip-form-copy" style="text-align:center;color:var(--ink-3);margin:0 0 32px;font-size:14px;">Cadastre uma viagem nova ou ajuste uma que já existe. As coordenadas continuam automáticas.</p>
+          <div class="form-shell-header">
+            <div>
+              <h2 class="chart-title form-shell-title" id="trip-form-title">Nova viagem</h2>
+            </div>
+            <div class="form-shell-actions">
+              <div class="hero-assist hero-search-assist" id="trip-lookup-assist">
+                <button type="button" class="hero-search-trigger" id="trip-lookup-btn" aria-expanded="false" aria-controls="trip-lookup-panel">
+                  <i data-lucide="search"></i>
+                  <span>Buscar anteriores</span>
+                </button>
+                <div class="hero-search-panel" id="trip-lookup-panel">
+                  <span class="hero-search-title">Buscar viagens anteriores</span>
+                  <div class="hero-search-input-wrap">
+                    <i data-lucide="search"></i>
+                    <input type="search" class="hero-search-input" id="trip-lookup-input" placeholder="Nome, cidade, tag, artista...">
+                  </div>
+                  <div class="hero-search-results" id="trip-lookup-results"></div>
+                </div>
+              </div>
+              <div class="hero-assist" id="trip-help-assist">
+                <button type="button" class="hero-icon-btn" id="trip-help-btn" aria-expanded="false" aria-controls="trip-help-card" aria-label="Como preencher esta tela">
+                  <i data-lucide="circle-help"></i>
+                </button>
+                <div class="hero-popover-card" id="trip-help-card">
+                  <strong>Como preencher</strong>
+                  <div class="hero-help-list">
+                    <span>Escolha um nome curto e fácil de achar depois.</span>
+                    <span>Adicione uma ou mais localizações visitadas.</span>
+                    <span>Use tags, artistas e acompanhantes para dar contexto.</span>
+                    <span>Use a lupa para reaproveitar uma viagem antiga.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
           <form id="trip-form">
             <div class="form-section">
@@ -1961,8 +2203,27 @@
 
             <div class="plan-main">
               <section class="panel plan-panel">
-                <h2 class="panel-title" id="plan-editor-title">Criar novo plano</h2>
-                <p class="panel-copy" id="plan-editor-copy">Monte o plano com destino, datas e contexto. O roteiro diario e opcional e pode ser ajustado depois.</p>
+                <div class="form-shell-header">
+                  <div>
+                    <h2 class="panel-title" id="plan-editor-title">Criar novo plano</h2>
+                  </div>
+                  <div class="form-shell-actions">
+                    <div class="hero-assist" id="plan-help-assist">
+                      <button type="button" class="hero-icon-btn" id="plan-help-btn" aria-expanded="false" aria-controls="plan-help-card" aria-label="Como preencher este plano">
+                        <i data-lucide="circle-help"></i>
+                      </button>
+                      <div class="hero-popover-card" id="plan-help-card">
+                        <strong>Como preencher</strong>
+                        <div class="hero-help-list">
+                          <span>Defina destino, datas e status inicial.</span>
+                          <span>Use tags, artistas e acompanhantes para contexto.</span>
+                          <span>Gere o roteiro diário só quando fizer sentido.</span>
+                          <span>Depois você pode efetivar o plano sem retrabalho.</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
                 <div class="plan-form-grid">
                   <div class="field field-full">
@@ -2059,7 +2320,6 @@
   <button class="nav-item" data-view="map"><i data-lucide="map"></i> Mapa</button>
   <button class="nav-item" data-view="editor"><i data-lucide="plus-circle"></i> Editor</button>
   <button class="nav-item" data-view="planejar"><i data-lucide="calendar-clock"></i> Plano</button>
-  <button class="nav-item" data-view="listas"><i data-lucide="list"></i> Listas</button>
 </nav>
 
 <div id="trip-modal" class="modal-overlay">
@@ -2235,7 +2495,7 @@ const LEGACY_TEXT_FIXES = {
   maiaraemarasa: "Maiara e Maraísa"
 };
 
-const APP_VERSION = "2026-06-04-02";
+const APP_VERSION = "2026-06-04-03";
 
 const state = {
   trips: [],
@@ -2403,8 +2663,33 @@ function closeAllAutocompleteDropdowns(exceptId = "") {
   });
 }
 
+function closeAssistPanels(exceptId = "") {
+  ["trip-help-assist", "plan-help-assist", "trip-lookup-assist"].forEach(id => {
+    const node = document.getElementById(id);
+    if (!node || id === exceptId) return;
+    node.classList.remove("open");
+    const button = node.querySelector("button[aria-expanded]");
+    if (button) button.setAttribute("aria-expanded", "false");
+  });
+}
+
+function toggleAssistPanel(assistId) {
+  const node = document.getElementById(assistId);
+  if (!node) return;
+  const shouldOpen = !node.classList.contains("open");
+  closeAssistPanels(shouldOpen ? assistId : "");
+  node.classList.toggle("open", shouldOpen);
+  const button = node.querySelector("button[aria-expanded]");
+  if (button) button.setAttribute("aria-expanded", shouldOpen ? "true" : "false");
+  if (shouldOpen && assistId === "trip-lookup-assist") {
+    renderTripLookupResults(els["trip-lookup-input"]?.value || "");
+    setTimeout(() => els["trip-lookup-input"]?.focus(), 20);
+  }
+}
+
 function closeTransientPanels() {
   closeModal();
+  closeAssistPanels();
   clearMapSelection();
 }
 
@@ -2463,7 +2748,8 @@ function cacheElements() {
     "form-message", "plan-conversion-banner", "conversion-banner-title", "conversion-banner-copy", "planning-source-note", "planning-mini-stats",
     "plan-list", "plan-detail-panel", "plan-draft-summary", "plan-grid-container", "plan-grid-title", "itinerary-table-wrapper", "plan-message",
     "detail-plan-message", "plan-name", "plan-country", "plan-dest", "plan-uf", "plan-start", "plan-end", "plan-status", "save-plan-btn", "toggle-planned-map",
-    "trip-form-title", "trip-form-copy", "trip-submit-btn", "cancel-trip-edit-btn", "plan-editor-title", "plan-editor-copy", "cancel-plan-edit-btn", "app-toast"
+    "trip-form-title", "trip-submit-btn", "cancel-trip-edit-btn", "plan-editor-title", "cancel-plan-edit-btn", "app-toast",
+    "trip-lookup-btn", "trip-lookup-input", "trip-lookup-results", "trip-help-btn", "plan-help-btn"
   ].forEach(id => { els[id] = document.getElementById(id); });
 }
 
@@ -2519,7 +2805,11 @@ function bindEvents() {
   });
   document.getElementById("trip-form").addEventListener("submit", handleFormSubmit);
   els["trip-modal"].addEventListener("click", e => { if (e.target === els["trip-modal"]) closeModal(); });
-  document.addEventListener("keydown", e => { if (e.key === "Escape" && els["trip-modal"].classList.contains("open")) closeModal(); });
+  document.addEventListener("keydown", e => {
+    if (e.key !== "Escape") return;
+    closeAssistPanels();
+    if (els["trip-modal"].classList.contains("open")) closeModal();
+  });
   els["add-city-btn"].addEventListener("click", addCityBlock);
   document.getElementById("f-start").addEventListener("change", updateNameSuggestions);
   document.getElementById("f-end").addEventListener("change", updateNameSuggestions);
@@ -2532,6 +2822,27 @@ function bindEvents() {
   syncPlanRegionOptions(true);
   document.addEventListener("click", e => {
     if (!e.target.closest(".autocomplete-wrapper")) closeAllAutocompleteDropdowns();
+    if (!e.target.closest(".hero-assist")) closeAssistPanels();
+  });
+  els["trip-help-btn"]?.addEventListener("click", event => {
+    event.stopPropagation();
+    toggleAssistPanel("trip-help-assist");
+  });
+  els["plan-help-btn"]?.addEventListener("click", event => {
+    event.stopPropagation();
+    toggleAssistPanel("plan-help-assist");
+  });
+  els["trip-lookup-btn"]?.addEventListener("click", event => {
+    event.stopPropagation();
+    toggleAssistPanel("trip-lookup-assist");
+  });
+  els["trip-lookup-input"]?.addEventListener("input", event => renderTripLookupResults(event.target.value));
+  els["trip-lookup-input"]?.addEventListener("keydown", event => {
+    if (event.key !== "Enter") return;
+    const first = getTripLookupMatches(event.target.value)[0];
+    if (!first) return;
+    event.preventDefault();
+    selectTripLookupResult(first.id);
   });
   setupAutocomplete("tags", "tags-input", "tags-area", "tags-dropdown", "tags");
   setupAutocomplete("artists", "artists-input", "artists-area", "artists-dropdown", "artists");
@@ -3010,6 +3321,67 @@ function updateNameSuggestions() {
   `).join("");
 }
 
+function getTripLookupMatches(query) {
+  const search = cleanTextValue(query).toLowerCase();
+  const searchKey = normalizeLookupKey(query);
+  const sortedTrips = [...state.trips].sort((a, b) => {
+    const dateA = normalizeDateValue(a.startDate) || "";
+    const dateB = normalizeDateValue(b.startDate) || "";
+    if (dateA !== dateB) return dateB.localeCompare(dateA);
+    return (a.name || "").localeCompare(b.name || "", "pt-BR");
+  });
+  if (!search) return sortedTrips.slice(0, 8);
+  return sortedTrips.filter(trip => {
+    if (trip.searchIndex.includes(search)) return true;
+    if (!searchKey) return false;
+    const normalizedBlob = normalizeLookupKey([
+      trip.name,
+      trip.city,
+      trip.region,
+      trip.country,
+      ...(trip.tags || []),
+      ...(trip.artists || []),
+      ...(trip.travelers || [])
+    ].filter(Boolean).join(" "));
+    return normalizedBlob.includes(searchKey);
+  }).slice(0, 8);
+}
+
+function renderTripLookupResults(query = "") {
+  const container = els["trip-lookup-results"];
+  if (!container) return;
+
+  if (!state.loaded.trips) {
+    container.innerHTML = `<div class="hero-search-empty">Sincronizando as viagens para a busca rapida...</div>`;
+    return;
+  }
+  if (state.errors.trips) {
+    container.innerHTML = `<div class="hero-search-empty">A base de viagens nao carregou. Confira a sincronizacao para buscar anteriores.</div>`;
+    return;
+  }
+
+  const matches = getTripLookupMatches(query);
+  if (!matches.length) {
+    container.innerHTML = `<div class="hero-search-empty">Nenhuma viagem encontrada com esse termo.</div>`;
+    return;
+  }
+
+  const isSearching = !!cleanTextValue(query);
+  container.innerHTML = matches.map(trip => `
+    <button type="button" class="hero-search-result" onclick="selectTripLookupResult(decodeURIComponent('${encodeURIComponent(trip.id)}'))">
+      <span class="hero-search-kicker">${isSearching ? "Pronta para editar" : "Viagem recente"}</span>
+      <strong>${escapeHtml(trip.name)}</strong>
+      <span class="hero-search-meta">${escapeHtml(formatTripLocation(trip) || trip.country || "Sem local")} | ${escapeHtml(formatDateRange(trip.startDate, trip.endDate))}</span>
+      <span class="hero-search-hint">Clique para abrir no editor</span>
+    </button>
+  `).join("");
+}
+
+function selectTripLookupResult(tripId) {
+  closeAssistPanels();
+  beginTripEdit(tripId);
+}
+
 async function loadData() {
   updateSyncPill();
   await Promise.allSettled([fetchTrips(), fetchPlans()]);
@@ -3029,6 +3401,7 @@ async function fetchTrips() {
     state.errors.trips = "Não foi possível carregar a base principal.";
     state.trips = [];
   }
+  renderTripLookupResults(els["trip-lookup-input"]?.value || "");
   updateSyncPill();
 }
 
@@ -4166,6 +4539,7 @@ function switchView(view) {
     resetTripForm(true);
     closeAllAutocompleteDropdowns();
   }
+  closeAssistPanels();
   state.activeView = view;
   document.querySelectorAll(".view").forEach(element => element.classList.remove("active"));
   document.getElementById(`view-${view}`).classList.add("active");
@@ -4174,7 +4548,6 @@ function switchView(view) {
     dashboard: "Ciclo de <em>viagens</em>",
     map: "Cobertura das <em>viagens</em>",
     editor: "Editor de <em>viagens</em>",
-    listas: "Listas do <em>formulário</em>",
     planejar: "Planejar <em>roteiro</em>"
   };
   document.getElementById("page-title").innerHTML = titles[view] || "";
@@ -4975,11 +5348,6 @@ function updatePlanEditorUi() {
   if (els["plan-editor-title"]) {
     els["plan-editor-title"].textContent = editing ? "Editar plano" : "Criar novo plano";
   }
-  if (els["plan-editor-copy"]) {
-    els["plan-editor-copy"].textContent = editing
-      ? "Ajuste destino, datas e contexto. As coordenadas continuam automáticas."
-      : "Monte o plano com destino, datas e contexto. O roteiro diário é opcional.";
-  }
   if (els["save-plan-btn"]) {
     els["save-plan-btn"].innerHTML = editing
       ? `<i data-lucide="save"></i> Salvar alterações`
@@ -5381,11 +5749,6 @@ function updateTripFormUi() {
   const editing = !!state.editingTripId;
   if (els["trip-form-title"]) {
     els["trip-form-title"].textContent = editing ? "Editar viagem" : "Nova viagem";
-  }
-  if (els["trip-form-copy"]) {
-    els["trip-form-copy"].textContent = editing
-      ? "Edite uma viagem por vez. As coordenadas continuam automáticas."
-      : "Cadastre uma viagem nova ou ajuste uma que já existe. As coordenadas continuam automáticas.";
   }
   if (els["trip-submit-btn"]) {
     els["trip-submit-btn"].innerHTML = editing
