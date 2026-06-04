@@ -2020,7 +2020,7 @@
                 </div>
 
                 <div class="draft-actions">
-                  <div class="draft-summary" id="plan-draft-summary">Preencha destino e datas. O roteiro diario pode ser gerado depois.</div>
+                  <div class="draft-summary" id="plan-draft-summary">Preencha destino e datas. O roteiro diário pode ser gerado depois.</div>
                   <button type="button" class="btn-outline" id="generate-plan-grid-btn"><i data-lucide="layout-grid"></i> Gerar grade diária</button>
                 </div>
 
@@ -2047,10 +2047,6 @@
 
       <section class="view" id="view-listas">
         <div class="dashboard-stack">
-          <div style="padding:0 0 8px;">
-            <h2 style="font-family:'DM Serif Display',serif;font-size:28px;color:var(--blue-dark);margin:0 0 6px;">Listas do formulário</h2>
-            <p style="color:var(--ink-3);font-size:14px;margin:0;">Gerencie as opções do formulário. O autocomplete usa essas listas e continua aprendendo com as viagens carregadas.</p>
-          </div>
           <div class="lista-grid" id="lista-grid"></div>
         </div>
       </section>
@@ -2239,7 +2235,7 @@ const LEGACY_TEXT_FIXES = {
   maiaraemarasa: "Maiara e Maraísa"
 };
 
-const APP_VERSION = "2026-06-04-01";
+const APP_VERSION = "2026-06-04-02";
 
 const state = {
   trips: [],
@@ -2609,7 +2605,7 @@ function populateListsFromTrips(trips) {
 }
 
 const LIST_META = {
-  tags: { label: "Tags / Motivos", icon: "hash" },
+  tags: { label: "Tags", icon: "hash" },
   artists: { label: "Artistas", icon: "music-2" },
   companions: { label: "Acompanhantes", icon: "users" }
 };
