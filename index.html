@@ -4869,7 +4869,6 @@ function renderPlanningMetrics() {
   const metrics = [
     { label: "Planos totais", value: state.planMetrics.total },
     { label: "Em aberto", value: state.planMetrics.open },
-    { label: "Com localização", value: state.plans.filter(plan => plan.city || plan.region || plan.hasConfirmedCoords).length },
     { label: "Já conectados", value: linkedIds.size }
   ];
   els["planning-mini-stats"].innerHTML = metrics.map(metric => `
