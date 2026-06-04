@@ -1944,7 +1944,7 @@
 
       <section class="view" id="view-planejar">
         <div class="dashboard-stack">
-          <div class="source-note" id="planning-source-note">Planeje, acompanhe e efetive sem precisar repetir informações depois.</div>
+          <div class="source-note" id="planning-source-note"></div>
 
           <div class="plan-layout">
             <aside class="plan-sidebar">
@@ -1988,16 +1988,25 @@
                   <div class="field"><label>Data de início</label><input type="date" class="form-input" id="plan-start"></div>
                   <div class="field"><label>Data de fim</label><input type="date" class="form-input" id="plan-end"></div>
                   <div class="field">
-                    <label>Tags / motivo</label>
-                    <input type="text" class="form-input" id="plan-tags" placeholder="Ex: História, bate-volta, gastronomia">
+                    <label>Tags</label>
+                    <div class="autocomplete-wrapper" id="ac-plan-tags-wrapper">
+                      <div class="tag-input-area" id="plan-tags-area"><input class="tag-text-input" id="plan-tags-input" placeholder="Digite para buscar ou criar tag..."></div>
+                      <div class="autocomplete-dropdown" id="plan-tags-dropdown"></div>
+                    </div>
                   </div>
                   <div class="field">
                     <label>Acompanhantes</label>
-                    <input type="text" class="form-input" id="plan-companions" placeholder="Ex: Rafael Soares, Ana">
+                    <div class="autocomplete-wrapper" id="ac-plan-companions-wrapper">
+                      <div class="tag-input-area" id="plan-companions-area"><input class="tag-text-input" id="plan-companions-input" placeholder="Digite para buscar ou adicionar acompanhante..."></div>
+                      <div class="autocomplete-dropdown" id="plan-companions-dropdown"></div>
+                    </div>
                   </div>
                   <div class="field field-full">
-                    <label>Artistas / contexto opcional</label>
-                    <input type="text" class="form-input" id="plan-artists" placeholder="Ex: Gilberto Gil, festival de inverno">
+                    <label>Artistas</label>
+                    <div class="autocomplete-wrapper" id="ac-plan-artists-wrapper">
+                      <div class="tag-input-area" id="plan-artists-area"><input class="tag-text-input" id="plan-artists-input" placeholder="Digite para buscar ou adicionar artista..."></div>
+                      <div class="autocomplete-dropdown" id="plan-artists-dropdown"></div>
+                    </div>
                   </div>
                   <div class="field field-full">
                     <label>Status inicial</label>
@@ -2020,12 +2029,9 @@
                   <div class="itinerary-container" id="itinerary-table-wrapper"></div>
                 </div>
 
-                <div class="draft-actions">
-                  <div class="draft-summary">As coordenadas do plano continuam automáticas. Você edita o contexto; o mapa resolve o ponto.</div>
-                  <div class="form-actions-row">
-                    <button type="button" class="secondary-action" id="cancel-plan-edit-btn" style="display:none;"><i data-lucide="x"></i> Cancelar edição</button>
-                    <button type="button" class="primary-action" id="save-plan-btn"><i data-lucide="save"></i> Salvar plano</button>
-                  </div>
+                <div class="form-actions-row">
+                  <button type="button" class="secondary-action" id="cancel-plan-edit-btn" style="display:none;"><i data-lucide="x"></i> Cancelar edição</button>
+                  <button type="button" class="primary-action" id="save-plan-btn"><i data-lucide="save"></i> Salvar plano</button>
                 </div>
 
                 <div id="plan-message"></div>
@@ -2233,7 +2239,7 @@ const LEGACY_TEXT_FIXES = {
   maiaraemarasa: "Maiara e Maraísa"
 };
 
-const APP_VERSION = "2026-06-01-13";
+const APP_VERSION = "2026-06-04-01";
 
 const state = {
   trips: [],
@@ -2257,6 +2263,9 @@ const state = {
   formTags: [],
   formArtists: [],
   formCompanions: [],
+  formPlanTags: [],
+  formPlanArtists: [],
+  formPlanCompanions: [],
   editingTripId: null,
   editingTripSource: null,
   editingPlanId: null,
@@ -2279,6 +2288,14 @@ const state = {
 const els = {};
 let cityBlockCounter = 0;
 let toastTimer = null;
+const TAXONOMY_FIELD_META = {
+  tags: { stateProp: "formTags", inputId: "tags-input", areaId: "tags-area", dropdownId: "tags-dropdown", listKey: "tags", placeholder: "Digite para buscar ou criar tag..." },
+  artists: { stateProp: "formArtists", inputId: "artists-input", areaId: "artists-area", dropdownId: "artists-dropdown", listKey: "artists", placeholder: "Digite para buscar ou adicionar artista..." },
+  companions: { stateProp: "formCompanions", inputId: "companions-input", areaId: "companions-area", dropdownId: "companions-dropdown", listKey: "companions", placeholder: "Digite para buscar ou adicionar acompanhante..." },
+  planTags: { stateProp: "formPlanTags", inputId: "plan-tags-input", areaId: "plan-tags-area", dropdownId: "plan-tags-dropdown", listKey: "tags", placeholder: "Digite para buscar ou criar tag..." },
+  planArtists: { stateProp: "formPlanArtists", inputId: "plan-artists-input", areaId: "plan-artists-area", dropdownId: "plan-artists-dropdown", listKey: "artists", placeholder: "Digite para buscar ou adicionar artista..." },
+  planCompanions: { stateProp: "formPlanCompanions", inputId: "plan-companions-input", areaId: "plan-companions-area", dropdownId: "plan-companions-dropdown", listKey: "companions", placeholder: "Digite para buscar ou adicionar acompanhante..." }
+};
 
 function repairMojibake(value) {
   const text = String(value || "").trim();
@@ -2449,7 +2466,7 @@ function cacheElements() {
     "stat-tags", "stat-companions", "stat-artists", "stat-upcoming-plans", "trip-modal", "modal-header", "modal-body", "city-blocks", "add-city-btn", "name-suggestions", "lista-grid",
     "form-message", "plan-conversion-banner", "conversion-banner-title", "conversion-banner-copy", "planning-source-note", "planning-mini-stats",
     "plan-list", "plan-detail-panel", "plan-draft-summary", "plan-grid-container", "plan-grid-title", "itinerary-table-wrapper", "plan-message",
-    "detail-plan-message", "plan-name", "plan-country", "plan-dest", "plan-uf", "plan-tags", "plan-companions", "plan-artists", "plan-start", "plan-end", "plan-status", "save-plan-btn", "toggle-planned-map",
+    "detail-plan-message", "plan-name", "plan-country", "plan-dest", "plan-uf", "plan-start", "plan-end", "plan-status", "save-plan-btn", "toggle-planned-map",
     "trip-form-title", "trip-form-copy", "trip-submit-btn", "cancel-trip-edit-btn", "plan-editor-title", "plan-editor-copy", "cancel-plan-edit-btn", "app-toast"
   ].forEach(id => { els[id] = document.getElementById(id); });
 }
@@ -2523,6 +2540,9 @@ function bindEvents() {
   setupAutocomplete("tags", "tags-input", "tags-area", "tags-dropdown", "tags");
   setupAutocomplete("artists", "artists-input", "artists-area", "artists-dropdown", "artists");
   setupAutocomplete("companions", "companions-input", "companions-area", "companions-dropdown", "companions");
+  setupAutocomplete("planTags", "plan-tags-input", "plan-tags-area", "plan-tags-dropdown", "tags");
+  setupAutocomplete("planArtists", "plan-artists-input", "plan-artists-area", "plan-artists-dropdown", "artists");
+  setupAutocomplete("planCompanions", "plan-companions-input", "plan-companions-area", "plan-companions-dropdown", "companions");
   document.getElementById("generate-plan-grid-btn").addEventListener("click", gerarGradeRoteiro);
   document.getElementById("save-plan-btn").addEventListener("click", salvarPlanejamento);
   document.getElementById("clear-conversion-btn").addEventListener("click", () => clearPendingConversion(true));
@@ -2661,10 +2681,11 @@ function handleListItemRename(listKey, oldVal, newVal) {
 }
 
 function setupAutocomplete(stateKey, inputId, areaId, dropdownId, listKey) {
+  const meta = TAXONOMY_FIELD_META[stateKey];
   const input = document.getElementById(inputId);
   const area = document.getElementById(areaId);
   const dropdown = document.getElementById(dropdownId);
-  if (!input || !area || !dropdown) return;
+  if (!meta || !input || !area || !dropdown) return;
   area.addEventListener("click", () => input.focus());
   input.addEventListener("input", () => renderDropdown(input, dropdown, listKey, stateKey));
   input.addEventListener("keydown", event => {
@@ -2674,7 +2695,7 @@ function setupAutocomplete(stateKey, inputId, areaId, dropdownId, listKey) {
       if (value) commitTag(stateKey, value, listKey, input, area);
     }
     if (event.key === "Backspace" && !input.value) {
-      const arr = state["form" + capitalize(stateKey)];
+      const arr = state[meta.stateProp];
       if (arr.length) {
         arr.pop();
         renderChips(stateKey, area, input, listKey);
@@ -2688,9 +2709,11 @@ function setupAutocomplete(stateKey, inputId, areaId, dropdownId, listKey) {
 }
 
 function renderDropdown(input, dropdown, listKey, stateKey) {
+  const meta = TAXONOMY_FIELD_META[stateKey];
+  if (!meta) return;
   closeAllAutocompleteDropdowns(dropdown.id);
   const query = input.value.trim().toLowerCase();
-  const selected = state["form" + capitalize(stateKey)];
+  const selected = state[meta.stateProp];
   let items = state.lists[listKey].filter(item => !selected.includes(item));
   if (query) items = items.filter(item => item.toLowerCase().includes(query));
 
@@ -2722,12 +2745,14 @@ function renderDropdown(input, dropdown, listKey, stateKey) {
 }
 
 function selectAcItem(stateKey, value, listKey) {
+  const meta = TAXONOMY_FIELD_META[stateKey];
+  if (!meta) return;
   commitTag(
     stateKey,
     value,
     listKey,
-    document.getElementById(stateKey === "tags" ? "tags-input" : stateKey === "artists" ? "artists-input" : "companions-input"),
-    document.getElementById(stateKey === "tags" ? "tags-area" : stateKey === "artists" ? "artists-area" : "companions-area")
+    document.getElementById(meta.inputId),
+    document.getElementById(meta.areaId)
   );
 }
 
@@ -2737,33 +2762,39 @@ function createAndSelectAcItem(stateKey, value, listKey) {
 }
 
 function commitTag(stateKey, value, listKey, input, area) {
-  const arr = state["form" + capitalize(stateKey)];
+  const meta = TAXONOMY_FIELD_META[stateKey];
+  if (!meta) return;
+  const arr = state[meta.stateProp];
   if (!arr.includes(value)) {
     arr.push(value);
     addToList(listKey, value);
   }
   input.value = "";
   renderChips(stateKey, area, input, listKey);
-  const dropdown = document.getElementById(stateKey + "-dropdown");
+  const dropdown = document.getElementById(meta.dropdownId);
   if (dropdown) dropdown.classList.remove("open");
   updateNameSuggestions();
 }
 
 function renderChips(stateKey, area, input, listKey) {
-  const arr = state["form" + capitalize(stateKey)];
+  const meta = TAXONOMY_FIELD_META[stateKey];
+  if (!meta || !area) return;
+  const arr = state[meta.stateProp];
   area.innerHTML = arr.map(value => `
     <span class="tag-chip">${escapeHtml(value)}<button type="button" onclick="removeFormTag('${stateKey}',decodeURIComponent('${encodeURIComponent(value)}'),'${listKey}')">x</button></span>
-  `).join("") + `<input class="tag-text-input" id="${stateKey}-input" placeholder="${arr.length ? "" : "Digite para buscar..."}">`;
+  `).join("") + `<input class="tag-text-input" id="${meta.inputId}" placeholder="${arr.length ? "" : meta.placeholder}">`;
   const newInput = area.querySelector("input");
-  setupAutocomplete(stateKey, `${stateKey}-input`, `${stateKey}-area`, `${stateKey}-dropdown`, listKey);
+  setupAutocomplete(stateKey, meta.inputId, meta.areaId, meta.dropdownId, listKey);
   newInput.focus();
 }
 
 function removeFormTag(stateKey, value, listKey) {
-  const arr = state["form" + capitalize(stateKey)];
+  const meta = TAXONOMY_FIELD_META[stateKey];
+  if (!meta) return;
+  const arr = state[meta.stateProp];
   const index = arr.indexOf(value);
   if (index !== -1) arr.splice(index, 1);
-  renderChips(stateKey, document.getElementById(stateKey + "-area"), null, listKey);
+  renderChips(stateKey, document.getElementById(meta.areaId), null, listKey);
   updateNameSuggestions();
 }
 
@@ -4048,6 +4079,12 @@ function renderFormTaxonomies() {
   renderChips("companions", document.getElementById("companions-area"), null, "companions");
 }
 
+function renderPlanTaxonomies() {
+  renderChips("planTags", document.getElementById("plan-tags-area"), null, "tags");
+  renderChips("planArtists", document.getElementById("plan-artists-area"), null, "artists");
+  renderChips("planCompanions", document.getElementById("plan-companions-area"), null, "companions");
+}
+
 async function fillCityBlockFromPlan(blockId, plan) {
   const cityObj = state.formCities.find(city => city.id === blockId);
   if (!cityObj) return;
@@ -4873,9 +4910,11 @@ function renderPlanningSourceNote() {
   if (!isConfiguredUrl(GOOGLE_SCRIPT_URL, "SEU_ID_AQUI")) notes.push({ tone: "", text: "GOOGLE_SCRIPT_URL ainda está em placeholder. Criar, atualizar status e efetivar vão exibir erro até você colar a URL real do Apps Script." });
   if (!notes.length) {
     els["planning-source-note"].className = "source-note";
-    els["planning-source-note"].textContent = "Planeje aqui e efetive depois sem repetir os mesmos dados.";
+    els["planning-source-note"].textContent = "";
+    els["planning-source-note"].style.display = "none";
     return;
   }
+  els["planning-source-note"].style.display = "";
   els["planning-source-note"].className = `source-note ${notes.some(note => note.tone === "error") ? "error" : ""}`;
   els["planning-source-note"].innerHTML = notes.map(note => escapeHtml(note.text)).join("<br><br>");
 }
@@ -4885,7 +4924,6 @@ function renderPlanningMetrics() {
   const metrics = [
     { label: "Planos totais", value: state.planMetrics.total },
     { label: "Em aberto", value: state.planMetrics.open },
-    { label: "Com localização", value: state.plans.filter(plan => plan.city || plan.region || plan.hasConfirmedCoords).length },
     { label: "Já conectados", value: linkedIds.size }
   ];
   els["planning-mini-stats"].innerHTML = metrics.map(metric => `
@@ -4959,11 +4997,11 @@ function updatePlanEditorUi() {
 
 function resetPlanEditor() {
   state.editingPlanId = null;
+  state.formPlanTags = [];
+  state.formPlanArtists = [];
+  state.formPlanCompanions = [];
   els["plan-name"].value = "";
   setPlanLocationValues({ country: "Brasil", region: "", city: "" });
-  els["plan-tags"].value = "";
-  els["plan-companions"].value = "";
-  els["plan-artists"].value = "";
   els["plan-start"].value = "";
   els["plan-end"].value = "";
   els["plan-status"].value = "planejado";
@@ -4972,6 +5010,7 @@ function resetPlanEditor() {
   els["plan-grid-title"].textContent = "Roteiro diário";
   els["plan-draft-summary"].textContent = "Preencha destino e datas. O roteiro diário pode ser gerado depois.";
   els["plan-message"].textContent = "";
+  renderPlanTaxonomies();
   updatePlanEditorUi();
   refreshIcons();
 }
@@ -4986,9 +5025,9 @@ function beginPlanEdit(planId) {
     region: plan.region || plan.uf || "",
     city: plan.city || ""
   });
-  els["plan-tags"].value = joinListValue(plan.tags);
-  els["plan-companions"].value = joinListValue(plan.travelers);
-  els["plan-artists"].value = joinListValue(plan.artists);
+  state.formPlanTags = [...plan.tags];
+  state.formPlanCompanions = [...plan.travelers];
+  state.formPlanArtists = [...plan.artists];
   els["plan-start"].value = plan.startDate || "";
   els["plan-end"].value = plan.endDate || "";
   els["plan-status"].value = plan.status || "planejado";
@@ -4997,6 +5036,7 @@ function beginPlanEdit(planId) {
   els["itinerary-table-wrapper"].innerHTML = renderItineraryTable(plan.itinerary, true, plan.startDate, plan.endDate);
   els["plan-draft-summary"].textContent = "Edite o contexto do plano e salve para atualizar a linha oficial.";
   els["plan-message"].textContent = "";
+  renderPlanTaxonomies();
   updatePlanEditorUi();
   refreshIcons();
   showToast(`Editando o plano ${plan.destination}.`, "info", "Plano");
@@ -5052,9 +5092,9 @@ function renderSelectedPlan() {
       <div class="detail-note-box">
         <strong>Contexto da viagem</strong>
         <p>${plan.artists.length || plan.tags.length || plan.travelers.length ? escapeHtml([
-          plan.tags.length ? `Motivos: ${plan.tags.join(", ")}` : "",
-          plan.travelers.length ? `Companhias: ${plan.travelers.join(", ")}` : "",
-          plan.artists.length ? `Artistas/contexto: ${plan.artists.join(", ")}` : ""
+          plan.tags.length ? `Tags: ${plan.tags.join(", ")}` : "",
+          plan.travelers.length ? `Acompanhantes: ${plan.travelers.join(", ")}` : "",
+          plan.artists.length ? `Artistas: ${plan.artists.join(", ")}` : ""
         ].filter(Boolean).join(" | ")) : itineraryDays.length ? "O plano já tem estrutura de datas e pode receber mais contexto antes da efetivação." : "Plano sem contexto adicional por enquanto."}</p>
       </div>
     </div>
@@ -5139,9 +5179,9 @@ async function salvarPlanejamento() {
   const uf = isBrazilCountry(country) ? region : "";
   const startDate = els["plan-start"].value;
   const endDate = els["plan-end"].value;
-  const tags = splitListValue(els["plan-tags"].value);
-  const travelers = splitListValue(els["plan-companions"].value);
-  const artists = splitListValue(els["plan-artists"].value);
+  const tags = [...state.formPlanTags];
+  const travelers = [...state.formPlanCompanions];
+  const artists = [...state.formPlanArtists];
   const status = normalizeStatus(els["plan-status"].value);
   const message = els["plan-message"];
   const destination = tripName || city;
