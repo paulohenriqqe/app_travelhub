@@ -658,10 +658,15 @@
     cursor: pointer; }
   .map-stack { display: flex; flex-direction: column; gap: 14px; }
   .map-meta-strip { display: flex; flex-wrap: wrap; gap: 8px; }
+  .map-toolbar .map-meta-strip {
+    flex: 1 1 420px;
+    align-items: center;
+    justify-content: flex-start;
+  }
   .map-meta-card {
-    min-width: 136px;
-    min-height: 54px;
-    padding: 8px 12px;
+    min-width: 124px;
+    min-height: 48px;
+    padding: 6px 10px;
     border-radius: 8px;
     background: var(--white);
     border: 1px solid var(--line);
@@ -682,13 +687,13 @@
   }
   .map-meta-card .metric-number {
     display: inline;
-    font-size: 27px;
+    font-size: 24px;
     line-height: 0.92;
     letter-spacing: 0;
   }
   .map-meta-card .metric-word {
     display: inline;
-    font-size: 16px;
+    font-size: 15px;
     line-height: 1;
     letter-spacing: 0;
     text-transform: none;
@@ -1966,11 +1971,14 @@
     border-color: var(--line);
     border-style: dashed;
   }
-  .map-note {
-    color: var(--ink-3);
-    font-size: 12px;
-    line-height: 1.5;
-    max-width: 420px;
+  .map-help-assist { margin-left: auto; }
+  .map-help-assist .hero-icon-btn {
+    width: 40px;
+    height: 40px;
+    min-height: 40px;
+  }
+  .map-help-assist .hero-popover-card {
+    width: min(320px, calc(100vw - 48px));
   }
 
 
@@ -2035,12 +2043,13 @@
     }
     .map-toolbar::-webkit-scrollbar { height: 4px; }
     .toolbar-group, .segmented { flex-wrap: nowrap; }
-    .map-toggle, .view-toggle, .filter-chip { white-space: nowrap; }
-    .map-note {
-      min-width: 240px;
-      white-space: normal;
+    .map-toolbar .map-meta-strip {
+      flex: 1 1 100%;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-    .map-meta-strip { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .map-help-assist { margin-left: 0; }
+    .map-toggle, .view-toggle, .filter-chip { white-space: nowrap; }
     .map-meta-card { min-width: 0; }
     .rank-panel { padding: 18px; }
     .modal-header { padding: 32px 24px 20px; }
@@ -2178,9 +2187,21 @@
               </div>
             </div>
             <button class="filter-chip" id="toggle-planned-map" aria-pressed="false"><i data-lucide="route"></i> Rotas</button>
-            <div class="map-note" id="map-note">Passe o mouse para destacar; clique para abrir as viagens do recorte.</div>
+            <div class="map-meta-strip" id="map-meta-strip"></div>
+            <div class="hero-assist map-help-assist" id="map-help-assist">
+              <button type="button" class="hero-icon-btn" id="map-help-btn" aria-expanded="false" aria-controls="map-help-card" aria-label="Como ler este mapa">
+                <i data-lucide="circle-help"></i>
+              </button>
+              <div class="hero-popover-card" id="map-help-card">
+                <strong>Como ler o mapa</strong>
+                <div class="hero-help-list">
+                  <span>Passe o mouse para destacar o recorte.</span>
+                  <span>Clique em um país, UF ou cidade para abrir as viagens.</span>
+                  <span>Use `Rotas` para ver deslocamentos e planos no mapa.</span>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="map-meta-strip" id="map-meta-strip"></div>
           <div class="map-layout">
             <div class="map-stack">
               <div class="panel map-panel"><div id="map"></div></div>
@@ -2801,7 +2822,7 @@ function closeAllAutocompleteDropdowns(exceptId = "") {
 }
 
 function closeAssistPanels(exceptId = "") {
-  ["trip-help-assist", "plan-help-assist", "trip-lookup-assist"].forEach(id => {
+  ["trip-help-assist", "plan-help-assist", "trip-lookup-assist", "map-help-assist"].forEach(id => {
     const node = document.getElementById(id);
     if (!node || id === exceptId) return;
     node.classList.remove("open");
@@ -2974,6 +2995,10 @@ function bindEvents() {
   els["plan-help-btn"]?.addEventListener("click", event => {
     event.stopPropagation();
     toggleAssistPanel("plan-help-assist");
+  });
+  els["map-help-btn"]?.addEventListener("click", event => {
+    event.stopPropagation();
+    toggleAssistPanel("map-help-assist");
   });
   els["trip-lookup-btn"]?.addEventListener("click", event => {
     event.stopPropagation();
@@ -5440,13 +5465,15 @@ function renderMapLayer(preserveViewport = false) {
   }
 
   renderCoverageSidebar(collections);
-  els["map-note"].textContent = state.errors.geo
-    ? "Cobertura parcial: a base carregou, mas as camadas territoriais locais ainda não chegaram."
-    : state.showPlannedMap
-      ? "Cobertura em cinza; rotas e estreias planejadas aparecem em azul."
-      : cityMode
-        ? "Mesma cobertura por UFs, com municípios sobrepostos."
-        : "Cobertura por UFs e países. Passe o mouse para destacar e clique para abrir a galeria do recorte.";
+  if (els["map-side-copy"] && !getSelectedMapFeatureData(collections)) {
+    els["map-side-copy"].textContent = state.errors.geo
+      ? "Cobertura parcial: algumas camadas territoriais não carregaram."
+      : state.showPlannedMap
+        ? "Rotas e estreias planejadas aparecem em azul sobre a cobertura."
+        : cityMode
+          ? "Veja municípios sobrepostos na mesma cobertura por UFs."
+          : "Clique no mapa para abrir as viagens deste recorte.";
+  }
 
   baseLayer.addTo(state.mapLayer);
   if (state.showPlannedMap && tripRoutes.length) routeLayer.addTo(state.mapLayer);
