@@ -269,24 +269,24 @@
   .dashboard-hero-grid { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(320px, 0.9fr); gap: 18px; align-items: start; }
   .kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
   .metric-card {
-    padding: 16px 18px;
+    padding: 12px 16px;
     transition: var(--transition);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    gap: 12px;
-    min-height: 86px;
+    gap: 10px;
+    min-height: 74px;
   }
   .metric-card:hover { border-color: var(--blue-light); box-shadow: var(--shadow-md); transform: translateY(-3px); }
   .metric-main {
     display: flex;
     align-items: center;
     min-width: 0;
-    gap: 12px;
+    gap: 10px;
     color: var(--blue-dark);
   }
-  .metric-main svg { width: 20px; height: 20px; color: var(--accent); flex: 0 0 auto; }
+  .metric-main svg { width: 18px; height: 18px; color: var(--accent); flex: 0 0 auto; }
   .metric-value-text {
     display: inline-flex;
     align-items: baseline;
@@ -297,11 +297,11 @@
     white-space: nowrap;
   }
   .metric-number {
-    font-size: 38px;
+    font-size: 32px;
     line-height: 0.92;
   }
   .metric-word {
-    font-size: 24px;
+    font-size: 20px;
     line-height: 1;
   }
   .metric-label,
@@ -659,29 +659,28 @@
   .map-stack { display: flex; flex-direction: column; gap: 14px; }
   .map-meta-strip { display: flex; flex-wrap: wrap; gap: 8px; }
   .map-meta-card {
-    min-width: 126px;
+    min-width: 136px;
     padding: 10px 12px;
     border-radius: 8px;
     background: var(--white);
     border: 1px solid var(--line);
     text-align: left;
     transition: var(--transition);
+    display: inline-flex;
+    align-items: baseline;
+    justify-content: flex-start;
   }
   .map-meta-card:hover { border-color: var(--blue-light); box-shadow: var(--shadow-sm); transform: translateY(-2px); }
-  .map-meta-card strong {
-    display: block;
-    color: var(--blue-dark);
-    font-family: "DM Serif Display", serif;
-    font-size: 22px;
-    line-height: 1;
-    margin-bottom: 4px;
+  .map-meta-card .map-metric-text {
+    gap: 6px;
   }
-  .map-meta-card span {
-    color: var(--ink-3);
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+  .map-meta-card .metric-number {
+    font-size: 26px;
+    line-height: 0.92;
+  }
+  .map-meta-card .metric-word {
+    font-size: 15px;
+    line-height: 1;
   }
   .leaflet-tooltip.uf-label {
     background: transparent;
@@ -1687,9 +1686,9 @@
     .content { padding: 20px 20px 100px; }
     .dashboard-hero-grid { gap: 20px; }
     .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .metric-card { padding: 16px; min-height: 76px; }
-    .metric-number { font-size: 34px; }
-    .metric-word { font-size: 21px; }
+    .metric-card { padding: 12px 14px; min-height: 68px; }
+    .metric-number { font-size: 30px; }
+    .metric-word { font-size: 18px; }
     .filters-panel { flex-direction: column; align-items: stretch; }
     #map { height: 52vh; min-height: 360px; }
     .map-toolbar {
@@ -3902,27 +3901,32 @@ function renderMapMetaStrip() {
   const mappablePlanCount = getMappablePlanCount();
   const items = [
     {
-      label: "Viagens",
+      singular: "viagem",
+      plural: "viagens",
       value: collections.journeys.length,
       action: `openJourneyGroupsModal('Viagens registradas', state.currentJourneyGroups)`
     },
     {
-      label: "Estados",
+      singular: "estado",
+      plural: "estados",
       value: state.currentUfsList.length,
       action: `openListModal('Estados visitados', state.currentUfsList)`
     },
     {
-      label: "Municípios",
+      singular: "município",
+      plural: "municípios",
       value: state.currentCitiesList.length,
       action: `openListModal('Municípios visitados', state.currentCitiesList)`
     },
     {
-      label: "Países",
+      singular: "país",
+      plural: "países",
       value: state.currentCountriesList.length,
       action: `openListModal('Países visitados', state.currentCountriesList)`
     },
     {
-      label: "Planos",
+      singular: "plano",
+      plural: "planos",
       value: mappablePlanCount,
       action: `switchView('planejar')`
     }
@@ -3930,8 +3934,7 @@ function renderMapMetaStrip() {
 
   els["map-meta-strip"].innerHTML = items.map(item => `
     <button type="button" class="map-meta-card" onclick="${item.action}">
-      <strong>${item.value}</strong>
-      <span>${item.label}</span>
+      <span class="metric-value-text map-metric-text">${formatMetricCountLabel(item.value, item.singular, item.plural)}</span>
     </button>
   `).join("");
 }
@@ -4869,6 +4872,7 @@ function renderPlanningMetrics() {
   const metrics = [
     { label: "Planos totais", value: state.planMetrics.total },
     { label: "Em aberto", value: state.planMetrics.open },
+    { label: "Com localização", value: state.plans.filter(plan => plan.city || plan.region || plan.hasConfirmedCoords).length },
     { label: "Já conectados", value: linkedIds.size }
   ];
   els["planning-mini-stats"].innerHTML = metrics.map(metric => `
