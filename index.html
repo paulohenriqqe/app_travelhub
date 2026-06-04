@@ -1539,13 +1539,13 @@
   .soft-support-item span { color: var(--ink-3); font-size: 12px; font-weight: 700; }
   .spotlight-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 14px;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
   }
   .spotlight-card {
     width: 100%;
-    padding: 18px;
-    border-radius: 18px;
+    padding: 14px;
+    border-radius: 16px;
     border: 1px solid rgba(212, 70, 28, 0.18);
     background:
       radial-gradient(circle at top right, rgba(243, 115, 33, 0.18), rgba(255, 255, 255, 0) 38%),
@@ -1553,6 +1553,13 @@
     text-align: left;
     transition: var(--transition);
   }
+  .spotlight-topline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .spotlight-topline .panel-kicker { margin-bottom: 0; }
   .spotlight-card:hover {
     transform: translateY(-2px);
     border-color: rgba(212, 70, 28, 0.32);
@@ -1560,35 +1567,64 @@
   }
   .spotlight-card strong {
     display: block;
-    margin-top: 10px;
+    margin-top: 8px;
     color: var(--blue-dark);
     font-family: "DM Serif Display", serif;
-    font-size: 24px;
+    font-size: 20px;
     line-height: 1.1;
   }
   .spotlight-card span {
     display: block;
-    margin-top: 8px;
+    margin-top: 6px;
     color: var(--ink-2);
-    font-size: 13px;
-    line-height: 1.5;
+    font-size: 12px;
+    line-height: 1.4;
     font-weight: 600;
+  }
+  .spotlight-support {
+    min-height: 17px;
+    color: var(--ink-3);
+    font-size: 11px;
+    font-weight: 700;
   }
   .spotlight-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 14px;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .spotlight-countdown {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 8px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+  }
+  .spotlight-countdown.future {
+    background: rgba(212, 70, 28, 0.11);
+    color: var(--accent);
+  }
+  .spotlight-countdown.active {
+    background: rgba(38, 185, 221, 0.14);
+    color: var(--blue-dark);
+  }
+  .spotlight-countdown.past {
+    background: rgba(148, 163, 184, 0.18);
+    color: var(--ink-2);
   }
   .spotlight-pill {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 6px 10px;
+    padding: 5px 8px;
     border-radius: 999px;
     background: rgba(212, 70, 28, 0.08);
     color: var(--ink-2);
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 800;
     letter-spacing: 0.03em;
   }
@@ -1598,49 +1634,137 @@
     overflow-x: auto;
     background: var(--white);
     border: 1px solid var(--line);
-    border-radius: 14px;
+    border-radius: 18px;
     margin-top: 18px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 16px 36px rgba(10, 47, 76, 0.06);
   }
-  .itinerary-table { width: 100%; border-collapse: collapse; min-width: 680px; }
+  .itinerary-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 760px;
+  }
+  .itinerary-corner {
+    width: 72px;
+    min-width: 72px;
+    background: linear-gradient(180deg, #f5f8fc 0%, #edf3fa 100%);
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
   .itinerary-th {
-    background: var(--paper-2);
-    padding: 14px 12px;
+    background: linear-gradient(180deg, #f7fafe 0%, #eef4fb 100%);
+    padding: 16px 12px 14px;
     text-align: center;
     font-weight: 700;
     color: var(--blue-dark);
-    border: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    border-right: 1px solid var(--line);
     font-size: 12px;
-    text-transform: uppercase;
     letter-spacing: 0.05em;
+    vertical-align: bottom;
   }
-  .itinerary-td { border: 1px solid var(--line); padding: 0; vertical-align: top; }
+  .itinerary-th:last-child { border-right: none; }
+  .itinerary-day-name {
+    display: block;
+    color: var(--ink-3);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .itinerary-day-date {
+    display: block;
+    color: var(--blue-dark);
+    font-size: 18px;
+    font-family: "DM Serif Display", serif;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+  }
+  .itinerary-td {
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 0;
+    vertical-align: top;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 250, 253, 0.96));
+  }
+  .itinerary-td:last-child { border-right: none; }
   .itinerary-row-label {
-    width: 54px;
+    width: 72px;
     text-align: center;
     font-weight: 700;
     color: var(--ink-2);
-    background: var(--paper);
+    background: linear-gradient(180deg, #fbfcfe 0%, #f1f5fa 100%);
     border-right: 1px solid var(--line);
-    padding: 16px 8px;
-    font-size: 12px;
-    letter-spacing: 0.08em;
+    border-bottom: 1px solid var(--line);
+    padding: 18px 10px;
+    font-size: 11px;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
+    line-height: 1.2;
+    vertical-align: middle;
   }
   .itinerary-input, .itinerary-output {
     width: 100%;
-    min-height: 96px;
+    min-height: 108px;
     border: none;
-    padding: 14px;
+    padding: 16px 16px 18px;
     font-family: inherit;
     font-size: 13px;
     color: var(--ink);
     background: transparent;
   }
-  .itinerary-input { resize: vertical; }
+  .itinerary-input {
+    resize: vertical;
+    font-weight: 600;
+    line-height: 1.55;
+  }
+  .itinerary-input::placeholder {
+    color: var(--ink-3);
+    font-weight: 500;
+  }
+  .itinerary-input:focus {
+    background: linear-gradient(180deg, rgba(38, 185, 221, 0.05), rgba(255, 255, 255, 0.92));
+    box-shadow: inset 0 0 0 2px rgba(38, 185, 221, 0.18);
+    outline: none;
+  }
   .itinerary-output {
-    background: linear-gradient(180deg, rgba(248, 250, 252, 0.7), rgba(255, 255, 255, 0.95));
+    display: flex;
+    align-items: flex-start;
+    background: linear-gradient(180deg, rgba(249, 251, 254, 0.92), rgba(255, 255, 255, 0.98));
     line-height: 1.55;
     white-space: pre-wrap;
+    font-weight: 600;
+  }
+  .itinerary-output.empty {
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-3);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    font-size: 11px;
+    text-transform: uppercase;
+    background:
+      radial-gradient(circle at top left, rgba(38, 185, 221, 0.06), transparent 44%),
+      linear-gradient(180deg, rgba(247, 250, 253, 0.86), rgba(255, 255, 255, 0.98));
+  }
+  .itinerary-output-text {
+    display: block;
+    width: 100%;
+  }
+  .itinerary-output.empty .itinerary-output-text::before {
+    content: "Livre";
+  }
+  .itinerary-table thead th:first-child { border-top-left-radius: 18px; }
+  .itinerary-table thead th:last-child { border-top-right-radius: 18px; }
+  .itinerary-table tbody tr:last-child .itinerary-row-label { border-bottom-left-radius: 18px; }
+  .itinerary-table tbody tr:last-child .itinerary-td:last-child { border-bottom-right-radius: 18px; }
+  .itinerary-container::-webkit-scrollbar { height: 8px; }
+  .itinerary-container::-webkit-scrollbar-track { background: transparent; }
+  .itinerary-container::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.8);
+    border-radius: 999px;
   }
   .draft-actions {
     margin-top: 18px;
@@ -2486,7 +2610,7 @@ const LEGACY_TEXT_FIXES = {
   maiaraemarasa: "Maiara e Maraísa"
 };
 
-const APP_VERSION = "2026-06-04-04";
+const APP_VERSION = "2026-06-04-05";
 
 const state = {
   trips: [],
@@ -4105,6 +4229,10 @@ function getUpcomingPlans(limit) {
   const today = new Date().toISOString().slice(0, 10);
   return state.plans
     .filter(plan => !["cancelado", "efetivado"].includes(plan.status))
+    .filter(plan => {
+      const referenceDate = plan.endDate || plan.startDate || "";
+      return !referenceDate || referenceDate >= today;
+    })
     .sort((a, b) => {
       const aDate = a.startDate || a.endDate || "9999-12-31";
       const bDate = b.startDate || b.endDate || "9999-12-31";
@@ -4115,6 +4243,42 @@ function getUpcomingPlans(limit) {
       return (a.destination || "").localeCompare(b.destination || "", "pt");
     })
     .slice(0, limit || 5);
+}
+
+function getPlanCountdown(plan) {
+  const start = parseDateSafe(plan?.startDate || plan?.endDate);
+  const end = parseDateSafe(plan?.endDate || plan?.startDate);
+  if (!start || !end) return null;
+
+  const today = new Date();
+  today.setHours(12, 0, 0, 0);
+
+  if (today < start) {
+    const daysUntil = getDateDiffInDays(today, start);
+    return {
+      label: daysUntil === 0 ? "Comeca hoje" : `Faltam ${formatCountLabel(daysUntil, "dia", "dias")}`,
+      detail: `Saida em ${formatDateShort(plan.startDate || plan.endDate)}`,
+      tone: "future"
+    };
+  }
+
+  if (today > end) {
+    const daysAgo = getDateDiffInDays(end, today);
+    return {
+      label: daysAgo === 0 ? "Encerrou hoje" : `Terminou ha ${formatCountLabel(daysAgo, "dia", "dias")}`,
+      detail: `Fechamento em ${formatDateShort(plan.endDate || plan.startDate)}`,
+      tone: "past"
+    };
+  }
+
+  const totalDays = getDateDiffInDays(start, end) + 1;
+  const currentDay = getDateDiffInDays(start, today) + 1;
+  const remainingDays = getDateDiffInDays(today, end);
+  return {
+    label: totalDays <= 1 ? "Acontece hoje" : `Dia ${currentDay} de ${totalDays}`,
+    detail: remainingDays === 0 ? "Ultimo dia da viagem" : `Faltam ${formatCountLabel(remainingDays, "dia", "dias")} para encerrar`,
+    tone: "active"
+  };
 }
 
 function getPlanLocationLabel(plan) {
@@ -5378,11 +5542,20 @@ function renderStats() {
     }
   });
 
-  const upcomingPlans = getUpcomingPlans(4);
+  const upcomingPlans = getUpcomingPlans(3);
   els["stat-upcoming-plans"].innerHTML = upcomingPlans.length ? upcomingPlans.map(plan => `
     <button type="button" class="spotlight-card" onclick="selectPlan(decodeURIComponent('${encodeURIComponent(plan.id)}')); switchView('planejar')">
-      <div class="panel-kicker">Destino em aberto</div>
+      ${(() => {
+        const countdown = getPlanCountdown(plan);
+        return `
+          <div class="spotlight-topline">
+            <div class="panel-kicker">Proxima viagem</div>
+            ${countdown ? `<span class="spotlight-countdown ${countdown.tone}">${escapeHtml(countdown.label)}</span>` : ""}
+          </div>
+        `;
+      })()}
       <strong>${escapeHtml(plan.destination)}</strong>
+      <span class="spotlight-support">${escapeHtml(getPlanCountdown(plan)?.detail || "Datas e local prontos para acompanhar daqui.")}</span>
       <div class="spotlight-meta">
         <span class="spotlight-pill"><i data-lucide="calendar-range"></i>${formatDateShort(plan.startDate) || "Sem data"}</span>
         <span class="spotlight-pill"><i data-lucide="map-pin"></i>${escapeHtml(getPlanLocationLabel(plan))}</span>
@@ -5608,8 +5781,10 @@ function renderItineraryTable(itinerary, editable, startDate, endDate) {
   if (!days.length && !itinerary.notes) return `<div class="inline-note">Sem roteiro diário cadastrado.</div>`;
   if (!days.length && itinerary.notes) return `<div class="detail-note-box"><strong>Observação salva</strong><p>${escapeHtml(itinerary.notes)}</p></div>`;
 
-  let html = `<div class="itinerary-container"><table class="itinerary-table"><thead><tr><th style="width:54px;background:var(--paper);"></th>`;
-  days.forEach(day => { html += `<th class="itinerary-th">${escapeHtml(formatDayLabel(day))}</th>`; });
+  let html = `<div class="itinerary-container"><table class="itinerary-table"><thead><tr><th class="itinerary-corner"></th>`;
+  days.forEach(day => {
+    html += `<th class="itinerary-th"><span class="itinerary-day-name">${escapeHtml(formatWeekdayShort(day))}</span><span class="itinerary-day-date">${escapeHtml(formatDayLabel(day))}</span></th>`;
+  });
   html += `</tr></thead><tbody>`;
 
   ITINERARY_SLOTS.forEach(slot => {
@@ -5619,7 +5794,7 @@ function renderItineraryTable(itinerary, editable, startDate, endDate) {
       if (editable) {
         html += `<td class="itinerary-td"><textarea class="itinerary-input" id="draft-${slot.key}-${index}" placeholder="O que acontece aqui?">${escapeHtml(value)}</textarea></td>`;
       } else {
-        html += `<td class="itinerary-td"><div class="itinerary-output">${escapeHtml(value || "-")}</div></td>`;
+        html += `<td class="itinerary-td"><div class="itinerary-output ${value ? "" : "empty"}"><span class="itinerary-output-text">${value ? escapeHtml(value) : ""}</span></div></td>`;
       }
     });
     html += `</tr>`;
@@ -6426,6 +6601,12 @@ function getDaysBetween(startDate, endDate) {
   return days;
 }
 
+function getDateDiffInDays(fromDate, toDate) {
+  if (!(fromDate instanceof Date) || !(toDate instanceof Date)) return 0;
+  const msPerDay = 24 * 60 * 60 * 1000;
+  return Math.round((toDate.getTime() - fromDate.getTime()) / msPerDay);
+}
+
 function parseDateSafe(value) {
   if (!value) return null;
   const normalized = normalizeDateValue(value);
@@ -6469,6 +6650,14 @@ function formatDayLabel(value) {
   const date = new Date(`${normalized}T12:00:00`);
   const months = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
   return `${date.getDate()} ${months[date.getMonth()]}`;
+}
+
+function formatWeekdayShort(value) {
+  const normalized = normalizeDateValue(value);
+  if (!normalized) return "Dia";
+  const date = new Date(`${normalized}T12:00:00`);
+  const weekdays = ["dom", "seg", "ter", "qua", "qui", "sex", "sab"];
+  return weekdays[date.getDay()];
 }
 
 function getYearFromDate(value) {
