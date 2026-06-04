@@ -570,10 +570,12 @@
   .trip-card-actions, .plan-item-actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 14px;
+    margin-top: 14px;
+  }
+  .trip-card-actions, .plan-item-actions {
+    gap: 10px;
     align-items: center;
-    margin-top: 16px;
-    margin-bottom: 20px;
   }
   .icon-action-btn {
     width: 32px;
@@ -1234,7 +1236,6 @@
     gap: 12px;
     align-items: center;
     margin-top: 20px;
-    margin-bottom: 10px;
   }
   .detail-status-wrap {
     display: grid;
@@ -4264,18 +4265,19 @@ function renderMapLayer(preserveViewport = false) {
           const selected = isMapFeatureSelected("country", key);
           const dimmed = hasMapSelection("country") && !selected;
           return {
-            stroke: !highlightBrazilShape,
             color: selected
-              ? "rgba(9,117,153,0.74)"
-              : isBrazil
-                ? "rgba(89,96,102,0.22)"
+              ? "rgba(10,47,76,0.92)"
+              : highlightBrazilShape
+                ? "rgba(212,70,28,0.48)"
+                : isBrazil
+                  ? "rgba(89,96,102,0.56)"
                 : visited
-                  ? (cityMode ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.45)")
-                  : "rgba(255,255,255,0.32)",
-            weight: selected ? 1.05 : isBrazil ? 0.35 : cityMode ? 0.52 : 0.48,
-            fillColor: selected && !highlightBrazilShape ? "rgba(9,117,153,0.34)" : fillColor,
-            fillOpacity: highlightBrazilShape ? 0 : dimmed ? 0.24 : cityMode ? 0.94 : 0.96,
-            opacity: highlightBrazilShape ? 0 : dimmed ? 0.42 : 1
+                  ? (cityMode ? "rgba(255,255,255,0.72)" : "rgba(255,255,255,0.58)")
+                  : "rgba(255,255,255,0.42)",
+            weight: selected ? 2.2 : highlightBrazilShape ? 1.7 : isBrazil ? 1.2 : cityMode ? 0.62 : 0.58,
+            fillColor,
+            fillOpacity: dimmed ? 0.24 : cityMode ? 0.94 : 0.96,
+            opacity: dimmed ? 0.42 : 1
           };
         },
         onEachFeature: (feature, layer) => {
@@ -4310,10 +4312,10 @@ function renderMapLayer(preserveViewport = false) {
         L.geoJSON(brazilFrame, {
           pane: "coveragePane",
           style: {
-            color: "rgba(255,255,255,0)",
-            weight: 0,
+            color: "rgba(212,70,28,0.62)",
+            weight: 2.4,
             fillOpacity: 0,
-            opacity: 0
+            opacity: 1
           }
         }).addTo(baseLayer);
       }
@@ -4340,14 +4342,14 @@ function renderMapLayer(preserveViewport = false) {
           return {
             stroke: true,
             color: selected
-              ? "rgba(255,255,255,0.92)"
+              ? "rgba(10,47,76,0.9)"
               : cityMode
-                ? (visited ? "rgba(255,255,255,0.42)" : "rgba(87,94,99,0.18)")
-                : (visited ? "rgba(255,255,255,0.58)" : "rgba(83,112,130,0.14)"),
-            weight: selected ? 0.95 : cityMode ? (visited ? 0.58 : 0.42) : (visited ? 0.48 : 0.36),
-            fillColor: selected ? "rgba(9,117,153,0.62)" : fillColor,
-            fillOpacity: cityMode ? (selected ? 0.28 : 0) : dimmed ? 0.18 : selected ? 0.9 : 0.96,
-            opacity: dimmed ? 0.28 : cityMode ? 0.72 : 0.78
+                ? (visited ? "rgba(102,76,58,0.58)" : "rgba(87,94,99,0.3)")
+                : (visited ? "rgba(255,255,255,0.72)" : "rgba(83,112,130,0.24)"),
+            weight: selected ? 2 : cityMode ? (visited ? 0.9 : 0.58) : (visited ? 0.64 : 0.48),
+            fillColor,
+            fillOpacity: cityMode ? 0 : dimmed ? 0.2 : 0.96,
+            opacity: dimmed ? 0.34 : cityMode ? 0.9 : 0.84
           };
         },
         onEachFeature: (feature, layer) => {
@@ -4364,9 +4366,8 @@ function renderMapLayer(preserveViewport = false) {
           layer.on("mouseover", () => {
             layer.setStyle({
               stroke: true,
-              color: "rgba(255,255,255,0.86)",
-              weight: 0.85,
-              fillOpacity: cityMode ? 0.18 : 0.98,
+              color: "rgba(10,47,76,0.42)",
+              weight: 1.05,
               opacity: 0.82
             });
           });
