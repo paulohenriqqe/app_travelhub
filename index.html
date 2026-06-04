@@ -566,6 +566,11 @@
     gap: 6px;
     color: var(--ink-3);
   }
+  .trip-detail-plus {
+    color: var(--accent);
+    font-weight: 900;
+    margin-right: -2px;
+  }
   .trip-detail-stack .trip-detail-sub {
     color: var(--ink-3);
     font-size: 11px;
@@ -4167,8 +4172,7 @@ function renderTripCard(trip) {
         <span><i data-lucide="users"></i>${formatPeopleCount(trip.travelers.length)}</span>
         ${trip.artists.length ? `
           <div class="trip-detail-stack">
-            <span class="trip-detail-main"><i data-lucide="music-2"></i>${escapeHtml(trip.artists[0])}</span>
-            ${artistSummary ? `<span class="trip-detail-sub">${escapeHtml(artistSummary)}</span>` : ""}
+            <span class="trip-detail-main"><i data-lucide="music-2"></i>${artistSummary ? `<span class="trip-detail-plus">${escapeHtml(artistSummary)}</span>` : ""}${escapeHtml(trip.artists[0])}</span>
           </div>
         ` : `<span><i data-lucide="calendar"></i>${formatDateShort(trip.startDate)}</span>`}
       </div>
@@ -4398,8 +4402,6 @@ function renderMapLayer(preserveViewport = false) {
           }
           layer.on("mouseover", () => {
             layer.setStyle({
-              color: "rgba(10,47,76,0.7)",
-              weight: 1.8,
               fillColor: "rgba(243, 115, 33, 0.28)",
               fillOpacity: cityMode ? 0.38 : 0.7,
               opacity: 1
@@ -4487,9 +4489,6 @@ function renderMapLayer(preserveViewport = false) {
           );
           layer.on("mouseover", () => {
             layer.setStyle({
-              stroke: true,
-              color: "rgba(10,47,76,0.56)",
-              weight: 1.35,
               fillColor: "rgba(243, 115, 33, 0.28)",
               fillOpacity: cityMode ? 0.24 : 0.68,
               opacity: 0.95
