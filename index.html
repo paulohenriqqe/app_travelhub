@@ -274,33 +274,29 @@
     cursor: pointer;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     gap: 12px;
-    min-height: 92px;
+    min-height: 86px;
   }
   .metric-card:hover { border-color: var(--blue-light); box-shadow: var(--shadow-md); transform: translateY(-3px); }
   .metric-main {
     display: flex;
     align-items: center;
     min-width: 0;
-    gap: 10px;
+    gap: 12px;
     color: var(--blue-dark);
   }
-  .metric-label {
-    color: var(--ink-3);
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-  }
-  .metric-main svg { width: 18px; height: 18px; color: var(--accent); flex: 0 0 auto; }
-  .metric-value {
+  .metric-main svg { width: 20px; height: 20px; color: var(--accent); flex: 0 0 auto; }
+  .metric-value-text {
     font-family: "DM Serif Display", serif;
-    font-size: 34px;
+    font-size: 30px;
     line-height: 1;
     color: var(--blue-dark);
+    white-space: nowrap;
   }
-  .metric-sub { color: var(--ink-3); font-size: 12px; font-weight: 700; text-align: right; }
+  .metric-label,
+  .metric-value,
+  .metric-sub { display: none; }
   .dashboard-upcoming-panel { padding: 18px; }
   .dashboard-upcoming-panel .spotlight-grid { grid-template-columns: 1fr; }
 
@@ -1681,9 +1677,8 @@
     .content { padding: 20px 20px 100px; }
     .dashboard-hero-grid { gap: 20px; }
     .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .metric-card { padding: 18px; }
-    .metric-value { font-size: 32px; }
-    .metric-sub { font-size: 12px; }
+    .metric-card { padding: 16px; min-height: 76px; }
+    .metric-value-text { font-size: 28px; }
     .filters-panel { flex-direction: column; align-items: stretch; }
     #map { height: 52vh; min-height: 360px; }
     .map-toolbar {
@@ -4049,36 +4044,28 @@ function renderKpis() {
 
   const homeHtml = `
     <article class="metric-card" onclick="openJourneyGroupsModal('Viagens registradas', state.currentJourneyGroups)">
-      <div class="metric-main"><span class="metric-value">${journeyCount}</span><span class="metric-label">Viagens</span><i data-lucide="plane"></i></div>
-      <div class="metric-sub">${formatCountLabel(journeyCount, "jornada", "jornadas")}</div>
+      <div class="metric-main"><i data-lucide="plane"></i><span class="metric-value-text">${formatCountLabel(journeyCount, "viagem", "viagens")}</span></div>
     </article>
     <article class="metric-card" onclick="openListModal('Anos registrados', state.currentYearsList)">
-      <div class="metric-main"><span class="metric-value">${years.length}</span><span class="metric-label">Anos</span><i data-lucide="calendar-range"></i></div>
-      <div class="metric-sub">${formatCountLabel(years.length, "ano", "anos")}</div>
+      <div class="metric-main"><i data-lucide="calendar-range"></i><span class="metric-value-text">${formatCountLabel(years.length, "ano", "anos")}</span></div>
     </article>
     <article class="metric-card" onclick="openListModal('Cidades visitadas', state.currentCitiesList)">
-      <div class="metric-main"><span class="metric-value">${cities.length}</span><span class="metric-label">Cidades</span><i data-lucide="map-pin"></i></div>
-      <div class="metric-sub">${formatCountLabel(cities.length, "destino", "destinos")}</div>
+      <div class="metric-main"><i data-lucide="map-pin"></i><span class="metric-value-text">${formatCountLabel(cities.length, "cidade", "cidades")}</span></div>
     </article>
     <article class="metric-card" onclick="openListModal('Países visitados', state.currentCountriesList)">
-      <div class="metric-main"><span class="metric-value">${countries.length}</span><span class="metric-label">Países</span><i data-lucide="globe-2"></i></div>
-      <div class="metric-sub">${formatCountLabel(countries.length, "país", "países")}</div>
+      <div class="metric-main"><i data-lucide="globe-2"></i><span class="metric-value-text">${formatCountLabel(countries.length, "país", "países")}</span></div>
     </article>
     <article class="metric-card" onclick="openListModal('Regiões visitadas', state.currentUfsList)">
-      <div class="metric-main"><span class="metric-value">${regions.length}</span><span class="metric-label">Regiões</span><i data-lucide="map"></i></div>
-      <div class="metric-sub">${formatCountLabel(brazilRegions.length, "UF", "UFs")}</div>
+      <div class="metric-main"><i data-lucide="map"></i><span class="metric-value-text">${formatCountLabel(regions.length, "região", "regiões")}</span></div>
     </article>
     <article class="metric-card" onclick="openListModal('Motivos registrados', state.currentTagsList)">
-      <div class="metric-main"><span class="metric-value">${uniqueTags.length}</span><span class="metric-label">Motivos</span><i data-lucide="hash"></i></div>
-      <div class="metric-sub">${formatCountLabel(uniqueTags.length, "motivo", "motivos")}</div>
+      <div class="metric-main"><i data-lucide="hash"></i><span class="metric-value-text">${formatCountLabel(uniqueTags.length, "motivo", "motivos")}</span></div>
     </article>
     <article class="metric-card" onclick="openListModal('Companhias recorrentes', state.currentCompanionsList)">
-      <div class="metric-main"><span class="metric-value">${uniqueCompanions.length}</span><span class="metric-label">Pessoas</span><i data-lucide="users"></i></div>
-      <div class="metric-sub">Acompanhantes</div>
+      <div class="metric-main"><i data-lucide="users"></i><span class="metric-value-text">${formatCountLabel(uniqueCompanions.length, "pessoa", "pessoas")}</span></div>
     </article>
     <article class="metric-card" onclick="openListModal('Artistas presentes', state.currentArtistsList)">
-      <div class="metric-main"><span class="metric-value">${uniqueArtists.length}</span><span class="metric-label">Artistas</span><i data-lucide="music-2"></i></div>
-      <div class="metric-sub">${formatCountLabel(uniqueArtists.length, "artista", "artistas")}</div>
+      <div class="metric-main"><i data-lucide="music-2"></i><span class="metric-value-text">${formatCountLabel(uniqueArtists.length, "artista", "artistas")}</span></div>
     </article>
   `;
 
