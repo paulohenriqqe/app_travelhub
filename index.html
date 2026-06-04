@@ -858,17 +858,17 @@
     display: grid;
     place-items: center;
     border-radius: 999px;
-    background: radial-gradient(circle at 35% 30%, #ff8a5d, var(--accent));
+    background: radial-gradient(circle at 35% 30%, #8f9aa4, #56616b);
     color: var(--white);
     border: 2px solid rgba(255, 255, 255, 0.96);
-    box-shadow: 0 10px 20px rgba(10, 47, 76, 0.18), 0 0 0 4px rgba(212, 70, 28, 0.1);
+    box-shadow: 0 10px 20px rgba(10, 47, 76, 0.16), 0 0 0 4px rgba(96, 108, 118, 0.1);
     font-size: 11px;
     font-weight: 900;
     line-height: 1;
   }
   .atlas-marker-icon.plan .atlas-marker-dot {
-    background: radial-gradient(circle at 35% 30%, #26b9dd, #097599);
-    box-shadow: 0 10px 20px rgba(9, 117, 153, 0.16), 0 0 0 4px rgba(38, 185, 221, 0.12);
+    background: radial-gradient(circle at 35% 30%, #86b8eb, #4b78ad);
+    box-shadow: 0 10px 20px rgba(45, 90, 144, 0.18), 0 0 0 4px rgba(104, 153, 212, 0.12);
   }
   .atlas-marker-icon.compact .atlas-marker-dot {
     border-width: 1.5px;
@@ -1802,12 +1802,11 @@
             <div class="toolbar-group">
               <span class="toolbar-caption">Nível</span>
               <div class="segmented">
-                <button class="view-toggle active" data-mode="states"><i data-lucide="map"></i> Estados</button>
-                <button class="view-toggle" data-mode="cities"><i data-lucide="map-pin"></i> Municípios</button>
+                <button class="view-toggle active" type="button" disabled><i data-lucide="map"></i> Cobertura UF</button>
               </div>
             </div>
-            <button class="filter-chip active" id="toggle-planned-map" aria-pressed="true"><i data-lucide="route"></i> Planos</button>
-            <div class="map-note" id="map-note">Cobertura por estados.</div>
+            <button class="filter-chip active" id="toggle-planned-map" aria-pressed="true"><i data-lucide="route"></i> Rotas</button>
+            <div class="map-note" id="map-note">Passe o mouse para destacar; clique para abrir as viagens do recorte.</div>
           </div>
           <div class="map-meta-strip" id="map-meta-strip"></div>
           <div class="map-layout">
@@ -3350,15 +3349,15 @@ function mixHexColors(fromHex, toHex, ratio) {
 function getIntensityColor(value, max, palette = "country") {
   const safeMax = Math.max(max || 1, 1);
   const ratio = clamp(value / safeMax, 0, 1);
-  if (palette === "state") return mixHexColors("#f6d8c5", "#d4461c", Math.pow(ratio, 0.82));
-  return mixHexColors("#f4e3d6", "#f37321", Math.pow(ratio, 0.82));
+  if (palette === "state") return mixHexColors("#dfe5ea", "#4d5863", Math.pow(ratio, 0.82));
+  return mixHexColors("#e5eaee", "#5a6672", Math.pow(ratio, 0.82));
 }
 
 function getAtlasWashColor(value, max, palette = "country") {
   const safeMax = Math.max(max || 1, 1);
   const ratio = clamp(value / safeMax, 0, 1);
-  if (palette === "state") return mixHexColors("#f8ede5", "#e9b189", Math.pow(ratio, 0.95));
-  return mixHexColors("#f7efe8", "#efbf9e", Math.pow(ratio, 0.92));
+  if (palette === "state") return mixHexColors("#eff3f6", "#b4c1cb", Math.pow(ratio, 0.95));
+  return mixHexColors("#f1f4f7", "#bfccd6", Math.pow(ratio, 0.92));
 }
 
 function getCountryLabelPt(key, fallback = "", iso2 = "") {
@@ -3508,6 +3507,27 @@ function buildMapCollections() {
   });
 
   return { journeys, countries, regions, cities };
+}
+
+function buildPlannedCoverageCollections() {
+  const countries = new Map();
+  const regions = new Map();
+  const plans = state.plans.filter(plan => plan.status !== "cancelado" && !!getMapCoordinates(plan));
+
+  plans.forEach(plan => {
+    const country = normalizeCountryValue(plan.country || "Brasil");
+    const countryKey = getGeoCountryKey(country);
+    if (!countries.has(countryKey)) countries.set(countryKey, { label: country, plans: [] });
+    countries.get(countryKey).plans.push(plan);
+
+    if (isBrazilCountry(country) && (plan.region || plan.uf)) {
+      const regionKey = normalizeLookupKey(plan.region || plan.uf);
+      if (!regions.has(regionKey)) regions.set(regionKey, { label: plan.region || plan.uf, plans: [] });
+      regions.get(regionKey).plans.push(plan);
+    }
+  });
+
+  return { countries, regions, plans };
 }
 
 function getTripsForLocationLabel(label) {
@@ -3770,15 +3790,19 @@ function getMappablePlanCount() {
   return state.plans.filter(plan => plan.status !== "cancelado" && !!getMapCoordinates(plan)).length;
 }
 
+function getRouteOverlayCount() {
+  return getMappablePlanCount() + buildTripRoutes(state.filtered).length;
+}
+
 function syncPlannedMapToggleState() {
   const toggle = els["toggle-planned-map"];
   if (!toggle) return;
-  const hasMappablePlans = getMappablePlanCount() > 0;
-  if (!hasMappablePlans) state.showPlannedMap = false;
-  toggle.disabled = !hasMappablePlans;
-  toggle.classList.toggle("active", hasMappablePlans && state.showPlannedMap);
-  toggle.setAttribute("aria-pressed", hasMappablePlans && state.showPlannedMap ? "true" : "false");
-  toggle.setAttribute("aria-disabled", hasMappablePlans ? "false" : "true");
+  const hasOverlay = getRouteOverlayCount() > 0;
+  if (!hasOverlay) state.showPlannedMap = false;
+  toggle.disabled = !hasOverlay;
+  toggle.classList.toggle("active", hasOverlay && state.showPlannedMap);
+  toggle.setAttribute("aria-pressed", hasOverlay && state.showPlannedMap ? "true" : "false");
+  toggle.setAttribute("aria-disabled", hasOverlay ? "false" : "true");
 }
 
 function getSelectedMapFeatureData(collections) {
@@ -4281,8 +4305,11 @@ function renderMapLayer(preserveViewport = false) {
   syncPlannedMapToggleState();
   renderMapMetaStrip();
 
-  const cityMode = state.mapDetail === "cities";
+  state.mapDetail = "states";
+  const cityMode = false;
   const collections = buildMapCollections();
+  const plannedCollections = buildPlannedCoverageCollections();
+  const tripRoutes = state.showPlannedMap ? buildTripRoutes(state.filtered) : [];
   const viewportPoints = [];
   const focusBounds = getMapFocusBounds();
   const maxCountryTrips = Math.max(...[...collections.countries.values()].map(item => item.trips.length), 1);
@@ -4291,6 +4318,7 @@ function renderMapLayer(preserveViewport = false) {
   const brazilChoroplethActive = hasBrazilStateLayer && !cityMode;
 
   const baseLayer = L.layerGroup();
+  const routeLayer = L.layerGroup();
   const cityMarkerLayer = L.layerGroup();
   const planLayer = L.layerGroup();
 
@@ -4311,31 +4339,38 @@ function renderMapLayer(preserveViewport = false) {
         style: feature => {
           const key = getWorldFeatureKey(feature);
           const item = collections.countries.get(key);
+          const plannedItem = plannedCollections.countries.get(key);
           const tripsCount = item?.trips.length || 0;
           const visited = tripsCount > 0;
+          const plannedCount = plannedItem?.plans.length || 0;
+          const hasPlanned = plannedCount > 0;
+          const isFirstPlanned = hasPlanned && !visited;
           const isBrazil = key === "brazil";
           const highlightBrazilShape = isBrazil && brazilChoroplethActive;
-          const fillColor = cityMode
-            ? (isBrazil ? "rgba(219, 226, 232, 0.94)" : "rgba(211, 218, 224, 0.9)")
-            : highlightBrazilShape
-              ? "rgba(243, 115, 33, 0.14)"
-              : (visited ? getIntensityColor(tripsCount, maxCountryTrips, "country") : "rgba(210, 218, 224, 0.9)");
           const selected = isMapFeatureSelected("country", key);
           const dimmed = hasMapSelection("country") && !selected;
+          const fillColor = selected
+            ? "rgb(141, 156, 170)"
+            : isFirstPlanned
+              ? "rgb(132, 178, 226)"
+              : highlightBrazilShape
+                ? "rgb(222, 228, 233)"
+                : (visited ? getIntensityColor(tripsCount, maxCountryTrips, "country") : "rgb(214, 221, 227)");
           return {
             color: selected
-              ? "rgba(10,47,76,0.92)"
-              : highlightBrazilShape
-                ? "rgba(212,70,28,0.48)"
-                : isBrazil
-                  ? "rgba(89,96,102,0.56)"
-                : visited
-                  ? (cityMode ? "rgba(255,255,255,0.72)" : "rgba(255,255,255,0.58)")
-                  : "rgba(255,255,255,0.42)",
-            weight: selected ? 2.2 : highlightBrazilShape ? 1.7 : isBrazil ? 1.2 : cityMode ? 0.62 : 0.58,
+              ? "rgba(54, 76, 96, 0.92)"
+              : state.showPlannedMap && hasPlanned
+                ? "rgba(79, 121, 173, 0.72)"
+                : highlightBrazilShape
+                  ? "rgba(171, 181, 191, 0.56)"
+                  : isBrazil
+                    ? "rgba(171, 181, 191, 0.56)"
+                    : "rgba(229, 235, 240, 0.88)",
+            weight: selected ? 1.8 : state.showPlannedMap && hasPlanned ? 1.35 : highlightBrazilShape ? 1.15 : 0.82,
             fillColor,
-            fillOpacity: dimmed ? 0.24 : cityMode ? 0.94 : 0.96,
-            opacity: dimmed ? 0.42 : 1
+            fillOpacity: selected ? 0.34 : dimmed ? 0.18 : isFirstPlanned ? 0.28 : 0.96,
+            opacity: dimmed ? 0.36 : 1,
+            dashArray: state.showPlannedMap && hasPlanned ? (isFirstPlanned ? "5 6" : "8 6") : null
           };
         },
         onEachFeature: (feature, layer) => {
@@ -4351,9 +4386,23 @@ function renderMapLayer(preserveViewport = false) {
               : `<b>${escapeHtml(label)}</b>`,
             { sticky: true }
           );
-          layer.on("click", event => {
-            L.DomEvent.stopPropagation(event);
-            focusMapSelection("country", key);
+          if (visited) {
+            layer.on("click", event => {
+              L.DomEvent.stopPropagation(event);
+              focusMapSelection("country", key);
+            });
+          }
+          layer.on("mouseover", () => {
+            layer.setStyle({
+              color: "rgba(73, 99, 123, 0.92)",
+              weight: 1.75,
+              fillColor: "rgb(160, 175, 188)",
+              fillOpacity: 0.24,
+              opacity: 1
+            });
+          });
+          layer.on("mouseout", () => {
+            if (worldLayer) worldLayer.resetStyle(layer);
           });
           if (visited) {
             if (!cityMode && bounds && bounds.isValid()) addCoverageCenter(layer);
@@ -4370,8 +4419,8 @@ function renderMapLayer(preserveViewport = false) {
         L.geoJSON(brazilFrame, {
           pane: "coveragePane",
           style: {
-            color: "rgba(212,70,28,0.62)",
-            weight: 2.4,
+            color: "rgba(184, 193, 201, 0.9)",
+            weight: 1.4,
             fillOpacity: 0,
             opacity: 1
           }
@@ -4390,24 +4439,31 @@ function renderMapLayer(preserveViewport = false) {
         style: feature => {
           const key = getBrazilFeatureKey(feature);
           const item = collections.regions.get(key);
+          const plannedItem = plannedCollections.regions.get(key);
           const tripsCount = item?.trips.length || 0;
           const visited = tripsCount > 0;
-          const fillColor = cityMode
-            ? "rgba(255,255,255,0)"
-            : (visited ? getIntensityColor(tripsCount, maxRegionTrips, "state") : "rgba(210, 217, 223, 0.72)");
+          const plannedCount = plannedItem?.plans.length || 0;
+          const hasPlanned = plannedCount > 0;
+          const isFirstPlanned = hasPlanned && !visited;
           const selected = isMapFeatureSelected("region", key);
           const dimmed = hasMapSelection("region") && !selected;
+          const fillColor = selected
+            ? "rgb(129, 145, 159)"
+            : isFirstPlanned
+              ? "rgb(111, 166, 224)"
+              : (visited ? getIntensityColor(tripsCount, maxRegionTrips, "state") : "rgb(217, 224, 230)");
           return {
             stroke: true,
             color: selected
-              ? "rgba(10,47,76,0.9)"
-              : cityMode
-                ? (visited ? "rgba(102,76,58,0.58)" : "rgba(87,94,99,0.3)")
-                : (visited ? "rgba(255,255,255,0.72)" : "rgba(83,112,130,0.24)"),
-            weight: selected ? 2 : cityMode ? (visited ? 0.9 : 0.58) : (visited ? 0.64 : 0.48),
+              ? "rgba(54, 76, 96, 0.94)"
+              : state.showPlannedMap && hasPlanned
+                ? "rgba(76, 118, 170, 0.72)"
+                : "rgba(241, 245, 248, 0.92)",
+            weight: selected ? 1.95 : state.showPlannedMap && hasPlanned ? 1.2 : 0.82,
             fillColor,
-            fillOpacity: cityMode ? 0 : dimmed ? 0.2 : 0.96,
-            opacity: dimmed ? 0.34 : cityMode ? 0.9 : 0.84
+            fillOpacity: dimmed ? 0.18 : selected ? 0.38 : isFirstPlanned ? 0.34 : 0.96,
+            opacity: dimmed ? 0.32 : 0.92,
+            dashArray: state.showPlannedMap && hasPlanned ? (isFirstPlanned ? "5 6" : "8 6") : null
           };
         },
         onEachFeature: (feature, layer) => {
@@ -4424,9 +4480,11 @@ function renderMapLayer(preserveViewport = false) {
           layer.on("mouseover", () => {
             layer.setStyle({
               stroke: true,
-              color: "rgba(10,47,76,0.42)",
-              weight: 1.05,
-              opacity: 0.82
+              color: "rgba(73, 99, 123, 0.92)",
+              weight: 1.55,
+              fillColor: "rgb(151, 168, 183)",
+              fillOpacity: 0.24,
+              opacity: 1
             });
           });
           layer.on("mouseout", () => {
@@ -4445,6 +4503,20 @@ function renderMapLayer(preserveViewport = false) {
     }
   } catch (error) {
     state.errors.geo = "A camada de UFs não renderizou, mas as cidades continuam disponíveis.";
+  }
+
+  if (state.showPlannedMap && tripRoutes.length) {
+      tripRoutes.forEach(route => {
+        L.polyline(route.points, {
+          pane: "coveragePane",
+          color: "rgba(74, 115, 166, 0.62)",
+          weight: 2.2,
+          opacity: 0.82,
+          dashArray: "9 10",
+          lineCap: "round",
+          lineJoin: "round"
+        }).addTo(routeLayer);
+      });
   }
 
   if (cityMode) {
@@ -4468,7 +4540,7 @@ function renderMapLayer(preserveViewport = false) {
 
   if (state.showPlannedMap) {
       state.plans
-        .filter(plan => plan.city && plan.status !== "cancelado")
+        .filter(plan => plan.status !== "cancelado" && !!getMapCoordinates(plan))
         .forEach(plan => {
           const coords = getMapCoordinates(plan);
           if (!coords) return;
@@ -4486,11 +4558,12 @@ function renderMapLayer(preserveViewport = false) {
   renderCoverageSidebar(collections);
   els["map-note"].textContent = state.errors.geo
     ? "Cobertura parcial: a base carregou, mas as camadas territoriais locais ainda não chegaram."
-    : cityMode
-      ? "Municípios: toque nos pontos para ver as viagens."
-      : "Estados: clique nas UFs; fora do Brasil, clique no país para abrir o recorte internacional.";
+    : state.showPlannedMap
+      ? "Cobertura em cinza; rotas e estreias planejadas aparecem em azul."
+      : "Cobertura por UFs e países. Passe o mouse para destacar e clique para abrir a galeria do recorte.";
 
   baseLayer.addTo(state.mapLayer);
+  if (state.showPlannedMap && tripRoutes.length) routeLayer.addTo(state.mapLayer);
   if (cityMode) {
     cityMarkerLayer.addTo(state.mapLayer);
   }
@@ -4568,7 +4641,7 @@ function renderStats() {
       responsive: true,
       maintainAspectRatio: false,
       layout: {
-        padding: { top: 28, right: 16, bottom: 0, left: 8 }
+        padding: { top: 28, right: 28, bottom: 0, left: 28 }
       },
       scales: {
         y: {
@@ -4587,6 +4660,7 @@ function renderStats() {
           border: { display: false }
         },
         x: {
+          offset: true,
           ticks: {
             color: "rgba(77, 91, 105, 0.9)",
             font: { size: 12, weight: "700" }
