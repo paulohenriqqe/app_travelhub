@@ -660,27 +660,38 @@
   .map-meta-strip { display: flex; flex-wrap: wrap; gap: 8px; }
   .map-meta-card {
     min-width: 136px;
-    padding: 10px 12px;
+    min-height: 54px;
+    padding: 8px 12px;
     border-radius: 8px;
     background: var(--white);
     border: 1px solid var(--line);
     text-align: left;
     transition: var(--transition);
     display: inline-flex;
-    align-items: baseline;
+    align-items: center;
     justify-content: flex-start;
   }
   .map-meta-card:hover { border-color: var(--blue-light); box-shadow: var(--shadow-sm); transform: translateY(-2px); }
-  .map-meta-card .map-metric-text {
-    gap: 6px;
+  .map-meta-card .metric-value-text.map-metric-text {
+    display: inline-flex !important;
+    align-items: baseline;
+    gap: 5px;
+    white-space: nowrap;
+    font-family: "DM Serif Display", serif;
+    color: var(--blue-dark);
   }
   .map-meta-card .metric-number {
-    font-size: 26px;
+    display: inline;
+    font-size: 27px;
     line-height: 0.92;
+    letter-spacing: 0;
   }
   .map-meta-card .metric-word {
-    font-size: 15px;
+    display: inline;
+    font-size: 16px;
     line-height: 1;
+    letter-spacing: 0;
+    text-transform: none;
   }
   .leaflet-tooltip.uf-label {
     background: transparent;
@@ -830,10 +841,10 @@
   }
   .atlas-entry {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     gap: 12px;
-    padding: 10px 12px;
+    padding: 12px 14px;
     border-radius: 8px;
     background: var(--paper);
     border: 1px solid var(--line);
@@ -847,19 +858,19 @@
     display: block;
     color: var(--ink);
     font-size: 14px;
-    margin-bottom: 4px;
+    margin-bottom: 0;
   }
-  .atlas-entry span {
-    color: var(--ink-3);
-    font-size: 12px;
-    font-weight: 700;
+  .atlas-entry span,
+  .atlas-entry small,
+  .atlas-entry p {
+    display: none !important;
   }
   .atlas-entry-badge {
     min-width: 36px;
     text-align: right;
     color: var(--accent);
     font-family: "DM Serif Display", serif;
-    font-size: 20px;
+    font-size: 22px;
     line-height: 1;
   }
   .atlas-marker-icon {
@@ -1643,6 +1654,14 @@
     font-size: 12px;
     line-height: 1.5;
     max-width: 420px;
+  }
+
+
+  /* Atlas lateral: mostra apenas nome + valor, sem subtítulo duplicado. */
+  .atlas-entry .atlas-entry-subtitle,
+  .atlas-entry .atlas-entry-copy,
+  .atlas-entry .atlas-entry-description {
+    display: none !important;
   }
 
   @media (max-width: 1200px) {
@@ -2449,7 +2468,6 @@ function showToast(message, tone = "info", title) {
     <i data-lucide="${meta.icon}"></i>
     <div>
       <strong>${escapeHtml(meta.title)}</strong>
-      <span>${escapeHtml(message)}</span>
     </div>
   `;
   refreshIcons();
@@ -4372,7 +4390,6 @@ function renderCoverageSidebar(collections) {
           ${previewTrips.length ? previewTrips.map(trip => `
             <button type="button" class="selection-trip-item" onclick="openTripModal(decodeURIComponent('${encodeURIComponent(trip.id)}'))">
               <strong>${escapeHtml(trip.name)}</strong>
-              <span>${escapeHtml(formatTripLocation(trip) || trip.country)} | ${formatDateRange(trip.startDate, trip.endDate)}</span>
             </button>
           `).join("") : `<div class="inline-note">Ainda não há viagens registradas nesse recorte.</div>`}
         </div>
@@ -4383,15 +4400,12 @@ function renderCoverageSidebar(collections) {
     ` : `<div class="inline-note">Nada selecionado ainda.</div>`;
   }
 
-  const renderSection = (title, items, emptyText, kind, scopeCopy) => `
+  const renderSection = (title, items, emptyText, kind) => `
     <section class="atlas-section">
       <h3 class="atlas-section-title">${title}</h3>
       ${items.length ? items.map(item => `
         <button type="button" class="atlas-entry" onclick="focusMapSelection('${kind}', decodeURIComponent('${encodeURIComponent(item.key)}'))">
-          <div>
-            <strong>${escapeHtml(item.label)}</strong>
-            <span>${formatCountLabel(item.trips.length, "registro", "registros")} ${scopeCopy}</span>
-          </div>
+          <strong>${escapeHtml(item.label)}</strong>
           <div class="atlas-entry-badge">${item.trips.length}</div>
         </button>
       `).join("") : `<div class="inline-note">${emptyText}</div>`}
@@ -4399,15 +4413,15 @@ function renderCoverageSidebar(collections) {
   `;
 
   const primarySection = state.mapDetail === "states"
-    ? renderSection("UFs com mais presença", regions, "As UFs visitadas aparecem aqui quando houver viagens brasileiras.", "region", "nessa UF")
-    : renderSection("Municípios com mais presença", cities, "Os municípios aparecem aqui quando houver pontos suficientes no mapa.", "city", "nessa cidade");
+    ? renderSection("UFs com mais presença", regions, "As UFs visitadas aparecem aqui quando houver viagens brasileiras.", "region")
+    : renderSection("Municípios com mais presença", cities, "Os municípios aparecem aqui quando houver pontos suficientes no mapa.", "city");
 
   const supportSection = state.mapDetail === "states"
-    ? renderSection("Municípios em evidência", cities, "Os municípios com recorrência entram aqui assim que houver base suficiente.", "city", "nessa cidade")
-    : renderSection("Estados mais revisitados", regions, "As UFs mais revisitadas entram aqui quando houver viagens brasileiras.", "region", "nessa UF");
+    ? renderSection("Municípios em evidência", cities, "Os municípios com recorrência entram aqui assim que houver base suficiente.", "city")
+    : renderSection("Estados mais revisitados", regions, "As UFs mais revisitadas entram aqui quando houver viagens brasileiras.", "region");
 
   els["map-rank"].innerHTML = `
-    ${renderSection("Países destacados", countries, "Nenhum país com dados suficientes para destacar.", "country", "nesse território")}
+    ${renderSection("Países destacados", countries, "Nenhum país com dados suficientes para destacar.", "country")}
     ${primarySection}
     ${supportSection}
   `;
@@ -4838,7 +4852,6 @@ function renderStats() {
     <button type="button" class="spotlight-card" onclick="selectPlan(decodeURIComponent('${encodeURIComponent(plan.id)}')); switchView('planejar')">
       <div class="panel-kicker">Destino em aberto</div>
       <strong>${escapeHtml(plan.destination)}</strong>
-      <span>${escapeHtml(getPlanLocationLabel(plan))} | ${formatDateRange(plan.startDate, plan.endDate)}</span>
       <div class="spotlight-meta">
         <span class="spotlight-pill"><i data-lucide="calendar-range"></i>${formatDateShort(plan.startDate) || "Sem data"}</span>
         <span class="spotlight-pill"><i data-lucide="map-pin"></i>${escapeHtml(plan.city || plan.region || plan.country || "Sem local")}</span>
@@ -5055,7 +5068,6 @@ function renderSelectedPlan() {
           <div class="summary-row" onclick="openTripModal(decodeURIComponent('${encodeURIComponent(trip.id)}'))">
             <div>
               <strong>${escapeHtml(trip.name)}</strong>
-              <span>${escapeHtml(formatTripLocation(trip) || trip.country)}</span>
             </div>
             <span>${formatDateShort(trip.startDate)}</span>
           </div>
@@ -5680,9 +5692,7 @@ function openJourneyGroupsModal(title, journeyGroups) {
         <button type="button" class="summary-row" onclick="openTripsCollectionModal('Viagem: ${escapeHtml(group.name)}', getTripsForJourneyKey(decodeURIComponent('${encodeURIComponent(group.key)}')), 'Jornada com ${formatCountLabel(group.count, "registro", "registros")}')">
           <div>
             <strong>${escapeHtml(group.name)}</strong>
-            <span>${escapeHtml(getJourneyScopeLabel(group))} | ${formatDateRange(group.startDate, group.endDate)}</span>
           </div>
-          <span>${formatCountLabel(group.count, "linha", "linhas")}</span>
         </button>
       `).join("")}
     </div>
