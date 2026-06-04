@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -853,6 +853,12 @@
   .chart-panel { padding: 24px; }
   .chart-title { margin: 0 0 20px; font-size: 18px; font-family: "DM Serif Display", serif; color: var(--blue-dark); }
   .chart-container { position: relative; height: 280px; width: 100%; }
+  .time-chart-panel { overflow: visible; }
+  .time-chart-container {
+    height: 360px;
+    min-height: 340px;
+  }
+  .time-chart-container canvas { overflow: visible; }
   .horizontal-list { display: flex; flex-direction: column; gap: 16px; }
   .horizontal-row { display: grid; grid-template-columns: minmax(100px, 140px) 1fr 30px; gap: 16px; align-items: center; }
   button.horizontal-row {
@@ -1751,9 +1757,9 @@
           </section>
 
           <div class="stats-grid">
-            <div class="panel chart-panel" style="grid-column:1/-1;">
+            <div class="panel chart-panel time-chart-panel" style="grid-column:1/-1;">
               <h2 class="chart-title">Evolução das viagens no tempo</h2>
-              <div class="chart-container"><canvas id="timeChart"></canvas></div>
+              <div class="chart-container time-chart-container"><canvas id="timeChart"></canvas></div>
             </div>
             <div class="panel chart-panel"><h2 class="chart-title">Regiões mais revisitadas</h2><div class="horizontal-list" id="stat-ufs"></div></div>
             <div class="panel chart-panel"><h2 class="chart-title">Localizações mais revisitadas</h2><div class="horizontal-list" id="stat-cities"></div></div>
@@ -4471,9 +4477,22 @@ function renderStats() {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      layout: { padding: { top: 34, right: 24, bottom: 14, left: 24 } },
       scales: {
-        y: { display: false, beginAtZero: true },
-        x: { grid: { display: false }, border: { display: false } }
+        y: {
+          display: false,
+          beginAtZero: true,
+          grace: "35%"
+        },
+        x: {
+          grid: { display: false },
+          border: { display: false },
+          ticks: {
+            color: "rgba(10, 47, 76, 0.82)",
+            font: { weight: "800", size: 16 },
+            padding: 14
+          }
+        }
       },
       plugins: {
         legend: { display: false },
@@ -4482,15 +4501,16 @@ function renderStats() {
           formatter: value => value,
           anchor: "end",
           align: "top",
-          offset: 8,
+          offset: 10,
           color: "#ffffff",
-          font: { weight: "800", size: 12 },
-          backgroundColor: "rgba(10, 47, 76, 0.92)",
-          borderColor: "rgba(10, 47, 76, 0)",
-          borderWidth: 0,
+          font: { weight: "900", size: 14 },
+          backgroundColor: "rgba(9, 117, 153, 0.96)",
+          borderColor: "rgba(255, 255, 255, 0.92)",
+          borderWidth: 1,
           borderRadius: 999,
-          padding: { top: 6, right: 12, bottom: 6, left: 12 },
-          clamp: true
+          padding: { top: 7, right: 13, bottom: 7, left: 13 },
+          clamp: false,
+          clip: false
         },
         tooltip: { displayColors: false }
       }
@@ -4883,7 +4903,7 @@ async function salvarPlanejamento() {
       ? "Plano atualizado com sucesso."
       : itineraryHasEntries(itinerary)
         ? "Plano salvo com sucesso e pronto para acompanhamento."
-        : "Plano salvo com sucesso. Ele ficou sem roteiro detalhado, mas o status ja pode ser acompanhado.";
+        : "Plano salvo com sucesso. Ele ficou sem roteiro detalhado, mas o status já pode ser acompanhado.";
     resetPlanEditor();
     message.style.color = "var(--success)";
     message.textContent = successMessage;
@@ -4920,9 +4940,9 @@ async function deletePlanById(planId) {
     applyFilters();
     if (message) {
       message.style.color = "var(--success)";
-      message.textContent = "Plano excluido com sucesso.";
+      message.textContent = "Plano excluído com sucesso.";
     }
-    showToast("Plano excluido com sucesso.", "success", "Plano removido");
+    showToast("Plano excluído com sucesso.", "success", "Plano removido");
   } catch (error) {
     if (message) {
       message.style.color = "var(--danger)";
@@ -5288,6 +5308,23 @@ function resetTripForm(clearBanner) {
   if (clearBanner) clearPendingConversion(true);
 }
 
+function normalizeBackendMessage(message) {
+  return String(message || "")
+    .replace(/nao/gi, match => match[0] === "N" ? "Não" : "não")
+    .replace(/acao/gi, match => match[0] === "A" ? "Ação" : "ação")
+    .replace(/atualizacao/gi, match => match[0] === "A" ? "Atualização" : "atualização")
+    .replace(/exclusao/gi, match => match[0] === "E" ? "Exclusão" : "exclusão")
+    .replace(/efetivacao/gi, match => match[0] === "E" ? "Efetivação" : "efetivação")
+    .replace(/obrigatorio/gi, match => match[0] === "O" ? "Obrigatório" : "obrigatório")
+    .replace(/invalida/gi, match => match[0] === "I" ? "Inválida" : "inválida")
+    .replace(/excluido/gi, match => match[0] === "E" ? "Excluído" : "excluído")
+    .replace(/excluida/gi, match => match[0] === "E" ? "Excluída" : "excluída")
+    .replace(/criada/gi, match => match[0] === "C" ? "Criada" : "criada")
+    .replace(/Aba nao encontrada/g, "Aba não encontrada")
+    .replace(/Plano nao encontrado/g, "Plano não encontrado")
+    .replace(/Viagem nao encontrada/g, "Viagem não encontrada");
+}
+
 async function postToAppsScript(action, payload) {
   if (!isConfiguredUrl(GOOGLE_SCRIPT_URL, "SEU_ID_AQUI")) {
     throw new Error("Configure GOOGLE_SCRIPT_URL com a URL real do seu Google Apps Script antes de salvar.");
@@ -5303,10 +5340,10 @@ async function postToAppsScript(action, payload) {
   try { data = text ? JSON.parse(text) : {}; } catch (error) {}
 
   if (!response.ok) {
-    throw new Error(data.message || text || "Falha ao falar com o Apps Script.");
+    throw new Error(normalizeBackendMessage(data.message || text || "Falha ao falar com o Apps Script."));
   }
   if (data.ok === false) {
-    throw new Error(data.message || "O Apps Script retornou erro.");
+    throw new Error(normalizeBackendMessage(data.message || "O Apps Script retornou erro."));
   }
   return data;
 }
@@ -5402,7 +5439,7 @@ async function deleteTrip(tripId) {
     state.trips = state.trips.filter(item => item.id !== trip.id);
     closeModal();
     applyFilters();
-    showToast("Viagem excluida com sucesso.", "success", "Viagem removida");
+    showToast("Viagem excluída com sucesso.", "success", "Viagem removida");
   } catch (error) {
     els["modal-body"].insertAdjacentHTML("afterbegin", `<div class="empty-state" style="margin-bottom:16px;">${escapeHtml(error.message || "Não foi possível excluir a viagem.")}</div>`);
     showToast(error.message || "Não foi possível excluir a viagem.", "error", "Erro ao excluir");
