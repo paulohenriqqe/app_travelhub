@@ -2230,21 +2230,12 @@
                     <label>Nome da viagem</label>
                     <input type="text" class="form-input" id="plan-name" placeholder="Ex: Fim de semana em Ouro Preto">
                   </div>
-                  <div class="field field-half">
-                    <label>País</label>
-                    <input type="text" class="form-input" id="plan-country" value="Brasil" placeholder="Ex: Brasil">
-                  </div>
-                  <div class="field field-half" id="plan-region-field">
-                    <label>UF</label>
-                    <select class="form-input" id="plan-uf" disabled>
-                      <option value="">Carregando UFs...</option>
-                    </select>
-                  </div>
-                  <div class="field field-full" id="plan-city-field">
-                    <label>Cidade principal</label>
-                    <select class="form-input" id="plan-dest" disabled>
-                      <option value="">Selecione a UF</option>
-                    </select>
+                  <div class="field field-full">
+                    <label>Localizações planejadas</label>
+                    <div class="city-blocks" id="plan-city-blocks"></div>
+                    <button type="button" class="add-city-btn" id="plan-add-city-btn" style="margin-top:12px;">
+                      <i data-lucide="plus"></i> Adicionar outra localização
+                    </button>
                   </div>
                   <div class="field"><label>Data de início</label><input type="date" class="form-input" id="plan-start"></div>
                   <div class="field"><label>Data de fim</label><input type="date" class="form-input" id="plan-end"></div>
@@ -2495,7 +2486,7 @@ const LEGACY_TEXT_FIXES = {
   maiaraemarasa: "Maiara e Maraísa"
 };
 
-const APP_VERSION = "2026-06-04-03";
+const APP_VERSION = "2026-06-04-04";
 
 const state = {
   trips: [],
@@ -2522,6 +2513,7 @@ const state = {
   formPlanTags: [],
   formPlanArtists: [],
   formPlanCompanions: [],
+  formPlanCities: [],
   editingTripId: null,
   editingTripSource: null,
   editingPlanId: null,
@@ -2543,6 +2535,7 @@ const state = {
 
 const els = {};
 let cityBlockCounter = 0;
+let planCityBlockCounter = 0;
 let toastTimer = null;
 const TAXONOMY_FIELD_META = {
   tags: { stateProp: "formTags", inputId: "tags-input", areaId: "tags-area", dropdownId: "tags-dropdown", listKey: "tags", placeholder: "Digite para buscar ou criar tag..." },
@@ -2735,8 +2728,9 @@ document.addEventListener("DOMContentLoaded", () => {
   initIBGEForm();
   renderListasView();
   addCityBlock();
+  addPlanCityBlock();
   updateTripFormUi();
-  updatePlanEditorUi();
+  resetPlanEditor();
   loadData();
 });
 
@@ -2747,7 +2741,7 @@ function cacheElements() {
     "stat-tags", "stat-companions", "stat-artists", "stat-upcoming-plans", "trip-modal", "modal-header", "modal-body", "city-blocks", "add-city-btn", "name-suggestions", "lista-grid",
     "form-message", "plan-conversion-banner", "conversion-banner-title", "conversion-banner-copy", "planning-source-note", "planning-mini-stats",
     "plan-list", "plan-detail-panel", "plan-draft-summary", "plan-grid-container", "plan-grid-title", "itinerary-table-wrapper", "plan-message",
-    "detail-plan-message", "plan-name", "plan-country", "plan-dest", "plan-uf", "plan-start", "plan-end", "plan-status", "save-plan-btn", "toggle-planned-map",
+    "detail-plan-message", "plan-name", "plan-start", "plan-end", "plan-status", "save-plan-btn", "toggle-planned-map", "plan-city-blocks", "plan-add-city-btn",
     "trip-form-title", "trip-submit-btn", "cancel-trip-edit-btn", "plan-editor-title", "cancel-plan-edit-btn", "app-toast",
     "trip-lookup-btn", "trip-lookup-input", "trip-lookup-results", "trip-help-btn", "plan-help-btn"
   ].forEach(id => { els[id] = document.getElementById(id); });
@@ -2811,15 +2805,9 @@ function bindEvents() {
     if (els["trip-modal"].classList.contains("open")) closeModal();
   });
   els["add-city-btn"].addEventListener("click", addCityBlock);
+  els["plan-add-city-btn"]?.addEventListener("click", addPlanCityBlock);
   document.getElementById("f-start").addEventListener("change", updateNameSuggestions);
   document.getElementById("f-end").addEventListener("change", updateNameSuggestions);
-  document.getElementById("plan-country").setAttribute("list", "global-country-options");
-  document.getElementById("plan-country").addEventListener("change", () => syncPlanRegionOptions(false));
-  document.getElementById("plan-country").addEventListener("blur", event => {
-    event.target.value = normalizeCountryValue(event.target.value || "Brasil");
-    syncPlanRegionOptions(false);
-  });
-  syncPlanRegionOptions(true);
   document.addEventListener("click", e => {
     if (!e.target.closest(".autocomplete-wrapper")) closeAllAutocompleteDropdowns();
     if (!e.target.closest(".hero-assist")) closeAssistPanels();
@@ -3296,7 +3284,7 @@ async function initIBGEForm() {
     const response = await fetch("https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome");
     state.ibgeUFs = await response.json();
     state.formCities.filter(city => isBrazilCountry(city.country)).forEach(city => renderCityBlock(city.id));
-    syncPlanRegionOptions(true);
+    state.formPlanCities.filter(city => isBrazilCountry(city.country)).forEach(city => renderPlanCityBlock(city.id));
   } catch (error) {}
 }
 
@@ -3510,8 +3498,8 @@ async function loadGlobalRegionData() {
       return acc;
     }, {});
     renderGlobalCountryOptions();
-    syncPlanRegionOptions();
     state.formCities.filter(city => !isBrazilCountry(city.country)).forEach(city => renderCityBlock(city.id));
+    state.formPlanCities.filter(city => !isBrazilCountry(city.country)).forEach(city => renderPlanCityBlock(city.id));
   } catch (error) {
     state.globalGeo = { countries: [], subdivisions: {} };
   }
@@ -3528,130 +3516,15 @@ function renderGlobalCountryOptions() {
   list.innerHTML = getGlobalCountrySuggestions().map(country => `<option value="${escapeHtml(country)}"></option>`).join("");
 }
 
-function cachePlanLocationInputs() {
-  els["plan-uf"] = document.getElementById("plan-uf");
-  els["plan-dest"] = document.getElementById("plan-dest");
-}
-
-function syncPlanRegionOptions(preserveCity = true) {
-  const list = document.getElementById("plan-region-options");
-  const country = normalizeCountryValue(document.getElementById("plan-country")?.value || "Brasil");
-  if (list) {
-    list.innerHTML = getGlobalSubdivisionSuggestions(country).map(region => `<option value="${escapeHtml(region)}"></option>`).join("");
-  }
-  renderPlanLocationControls(preserveCity);
-}
-
-function renderPlanLocationControls(preserveCity = true) {
-  const countryInput = document.getElementById("plan-country");
-  const regionField = document.getElementById("plan-region-field");
-  const cityField = document.getElementById("plan-city-field");
-  if (!countryInput || !regionField || !cityField) return;
-
-  const country = normalizeCountryValue(countryInput.value || "Brasil");
-  const previousRegion = document.getElementById("plan-uf")?.value || "";
-  const previousCity = preserveCity ? (document.getElementById("plan-dest")?.value || "") : "";
-  const region = normalizeRegionValue(previousRegion, country);
-  const city = cleanTextValue(previousCity);
-
-  if (isBrazilCountry(country)) {
-    regionField.innerHTML = `
-      <label>UF</label>
-      <select class="form-input" id="plan-uf" ${state.ibgeUFs.length ? "" : "disabled"}>
-        <option value="">${state.ibgeUFs.length ? "Selecione a UF" : "Carregando UFs..."}</option>
-      </select>
-    `;
-    cityField.innerHTML = `
-      <label>Cidade principal</label>
-      <select class="form-input" id="plan-dest" disabled>
-        <option value="">Selecione a UF</option>
-      </select>
-    `;
-    cachePlanLocationInputs();
-    populatePlanBrazilRegionSelect(region);
-    els["plan-uf"]?.addEventListener("change", event => onPlanBrazilRegionChange(event.target.value, ""));
-    if (region) onPlanBrazilRegionChange(region, city);
-    return;
-  }
-
-  const regionOptions = getGlobalSubdivisionSuggestions(country);
-  regionField.innerHTML = `
-    <label>Região / estado</label>
-    <input type="text" class="form-input" id="plan-uf" maxlength="48" value="${escapeHtml(region)}" placeholder="Ex: Lisboa, Califórnia" list="plan-region-options">
-  `;
-  cityField.innerHTML = `
-    <label>Cidade principal</label>
-    <input type="text" class="form-input" id="plan-dest" value="${escapeHtml(city)}" placeholder="Ex: Lisboa">
-  `;
-  const list = document.getElementById("plan-region-options");
-  if (list) list.innerHTML = regionOptions.map(item => `<option value="${escapeHtml(item)}"></option>`).join("");
-  cachePlanLocationInputs();
-}
-
-function populatePlanBrazilRegionSelect(selectedRegion = "") {
-  const select = document.getElementById("plan-uf");
-  if (!select) return;
-  if (!state.ibgeUFs.length) {
-    select.innerHTML = `<option value="">Carregando UFs...</option>`;
-    select.disabled = true;
-    return;
-  }
-  select.disabled = false;
-  select.innerHTML = `<option value="">Selecione a UF</option>` + state.ibgeUFs.map(uf => `<option value="${uf.sigla}">${uf.nome}</option>`).join("");
-  if (selectedRegion) select.value = selectedRegion;
-}
-
-async function onPlanBrazilRegionChange(region, selectedCity = "") {
-  const regionValue = normalizeRegionValue(region, "Brasil");
-  const citySelect = document.getElementById("plan-dest");
-  if (!citySelect) return;
-  if (!regionValue) {
-    citySelect.innerHTML = `<option value="">Selecione a UF</option>`;
-    citySelect.disabled = true;
-    return;
-  }
-
-  citySelect.disabled = false;
-  citySelect.innerHTML = `<option value="">Carregando cidades...</option>`;
-
-  if (state.ibgeCitiesCache[regionValue]) {
-    fillPlanCitySelect(citySelect, state.ibgeCitiesCache[regionValue], selectedCity);
-    return;
-  }
-
-  try {
-    const response = await fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${regionValue}/municipios`);
-    const cities = await response.json();
-    state.ibgeCitiesCache[regionValue] = cities;
-    fillPlanCitySelect(citySelect, cities, selectedCity);
-  } catch (error) {
-    citySelect.innerHTML = `<option value="">Erro ao carregar cidades</option>`;
-  }
-}
-
-function fillPlanCitySelect(select, cities, selectedCity) {
-  select.innerHTML = `<option value="">Selecione a Cidade</option>` + cities.map(city => `<option value="${city.nome}">${city.nome}</option>`).join("");
-  if (selectedCity) {
-    const option = [...select.options].find(item => normalizeLookupKey(item.value) === normalizeLookupKey(selectedCity));
-    if (option) select.value = option.value;
-  }
-}
-
-async function setPlanLocationValues(plan = {}) {
-  const countryInput = document.getElementById("plan-country");
-  if (!countryInput) return;
-  const country = normalizeCountryValue(plan.country || "Brasil");
-  const region = normalizeRegionValue(plan.region || plan.uf || "", country);
-  const city = cleanTextValue(plan.city || "");
-  countryInput.value = country;
-  renderPlanLocationControls(false);
-  if (isBrazilCountry(country)) {
-    populatePlanBrazilRegionSelect(region);
-    if (els["plan-uf"]) els["plan-uf"].value = region;
-    await onPlanBrazilRegionChange(region, city);
+function setPlanLocationValues(plan = {}) {
+  state.formPlanCities = [];
+  planCityBlockCounter = 0;
+  if (els["plan-city-blocks"]) els["plan-city-blocks"].innerHTML = "";
+  const locations = getPlanLocations(plan);
+  if (locations.length) {
+    locations.forEach(location => addPlanCityBlock(location));
   } else {
-    if (els["plan-uf"]) els["plan-uf"].value = region;
-    if (els["plan-dest"]) els["plan-dest"].value = city;
+    addPlanCityBlock();
   }
 }
 
@@ -3732,36 +3605,62 @@ function normalizePlan(row, index) {
   const travelers = splitListValue(getField(["Acompanhantes", "Companhias"]), "companions");
   const lat = safeParseFloat(getField(["Latitude", "Lat"]));
   const lng = safeParseFloat(getField(["Longitude", "Lng", "Lon", "Long"]));
+  const locationsRaw = getField(["Localizacoes", "Localizações", "Localizacoes Planejadas", "Localizações Planejadas"]);
   const status = normalizeStatus(getField(["Status"]));
   const itineraryRaw = getField(["Itinerario Diario", "Itinerário Diário", "Roteiro", "Itinerario"]);
   const itinerary = parseItinerary(itineraryRaw, startDate, endDate);
+  const locations = parsePlanLocations(locationsRaw, { country, region, uf: isBrazilCountry(country) ? region : "", city, lat, lng });
+  const primaryLocation = locations[0] || buildLocationDraft({ country, region, uf: isBrazilCountry(country) ? region : "", city, lat, lng });
   const year = getYearFromDate(startDate);
-  const destination = name || city || "Plano sem destino";
-  const hasConfirmedCoords = Number.isFinite(lat) && Number.isFinite(lng);
+  const destination = name || primaryLocation.city || "Plano sem destino";
+  const hasConfirmedCoords = Number.isFinite(primaryLocation.lat) && Number.isFinite(primaryLocation.lng);
+  const locationSearch = locations.map(location => `${location.city} ${location.region} ${location.country}`).join(" ");
 
   return {
     id,
     name,
     destination,
-    city,
-    region,
-    uf: isBrazilCountry(country) ? region : "",
-    country,
+    city: primaryLocation.city,
+    region: primaryLocation.region,
+    uf: primaryLocation.uf,
+    country: primaryLocation.country || country,
     startDate,
     endDate,
     tags,
     artists,
     travelers,
-    lat,
-    lng,
+    locations,
+    lat: primaryLocation.lat,
+    lng: primaryLocation.lng,
     hasConfirmedCoords,
     status,
     itinerary,
     itineraryRaw,
     year,
     sourceRef: { id },
-    searchIndex: `${id} ${destination} ${city} ${region} ${country} ${tags.join(" ")} ${artists.join(" ")} ${travelers.join(" ")} ${status}`.toLowerCase()
+    searchIndex: `${id} ${destination} ${primaryLocation.city} ${primaryLocation.region} ${primaryLocation.country} ${locationSearch} ${tags.join(" ")} ${artists.join(" ")} ${travelers.join(" ")} ${status}`.toLowerCase()
   };
+}
+
+function parsePlanLocations(rawValue, fallbackLocation = {}) {
+  const fallback = buildLocationDraft(fallbackLocation);
+  if (!rawValue) {
+    return fallback.city || fallback.region || (fallback.country && normalizeLookupKey(fallback.country) !== "brasil")
+      ? [fallback]
+      : [];
+  }
+  try {
+    const parsed = JSON.parse(rawValue);
+    if (!Array.isArray(parsed)) throw new Error("invalid");
+    const locations = parsed
+      .map(location => buildLocationDraft(location))
+      .filter(location => hasLocationDraftValue(location));
+    return locations.length ? locations : (hasLocationDraftValue(fallback) ? [fallback] : []);
+  } catch (error) {
+    return hasLocationDraftValue(fallback)
+      ? [fallback]
+      : [];
+  }
 }
 
 function normalizeStatus(value) {
@@ -4219,7 +4118,10 @@ function getUpcomingPlans(limit) {
 }
 
 function getPlanLocationLabel(plan) {
-  const label = formatLocationLabel(plan);
+  const primary = (Array.isArray(plan.locations) && plan.locations.length ? plan.locations[0] : plan) || plan;
+  const label = formatLocationLabel(primary);
+  const extraCount = Math.max(0, (plan.locations?.length || 0) - 1);
+  if (label && extraCount) return `${label} + ${formatCountLabel(extraCount, "local", "locais")}`;
   if (label) return label;
   return plan.destination && plan.destination !== "Plano sem destino"
     ? "Destino sem cidade definida"
@@ -4465,6 +4367,229 @@ async function fillCityBlockFromPlan(blockId, plan) {
   cityObj.lng = Number.isFinite(plan.lng) ? plan.lng : null;
   renderCityBlock(blockId);
   updateNameSuggestions();
+}
+
+async function setTripLocationValues(locations = []) {
+  state.formCities = [];
+  cityBlockCounter = 0;
+  if (els["city-blocks"]) els["city-blocks"].innerHTML = "";
+  const normalizedLocations = (locations || [])
+    .map(location => buildLocationDraft(location))
+    .filter(location => hasLocationDraftValue(location));
+  if (!normalizedLocations.length) {
+    addCityBlock();
+    return;
+  }
+  normalizedLocations.forEach(location => addCityBlock());
+  for (let index = 0; index < normalizedLocations.length; index++) {
+    const blockId = state.formCities[index]?.id;
+    if (!blockId) continue;
+    await fillCityBlockFromPlan(blockId, normalizedLocations[index]);
+  }
+}
+
+function buildLocationDraft(location = {}) {
+  const country = normalizeCountryValue(location.country || "Brasil");
+  const region = normalizeRegionValue(location.region || location.uf || "", country);
+  return {
+    country,
+    region,
+    uf: isBrazilCountry(country) ? region : "",
+    city: cleanTextValue(location.city || ""),
+    lat: Number.isFinite(location.lat) ? location.lat : safeParseFloat(location.lat),
+    lng: Number.isFinite(location.lng) ? location.lng : safeParseFloat(location.lng),
+    hasConfirmedCoords: !!location.hasConfirmedCoords
+  };
+}
+
+function hasLocationDraftValue(location = {}) {
+  return !!(
+    cleanTextValue(location.city || "") ||
+    cleanTextValue(location.region || location.uf || "") ||
+    (location.country && normalizeLookupKey(location.country) !== "brasil")
+  );
+}
+
+function getPlanLocations(plan = {}) {
+  const explicitLocations = Array.isArray(plan.locations) ? plan.locations : [];
+  const normalized = explicitLocations
+    .map(location => buildLocationDraft(location))
+    .filter(location => hasLocationDraftValue(location));
+  if (normalized.length) return normalized;
+  const legacy = buildLocationDraft(plan);
+  return hasLocationDraftValue(legacy)
+    ? [legacy]
+    : [];
+}
+
+function addPlanCityBlock(initialLocation = {}) {
+  const container = els["plan-city-blocks"];
+  if (!container) return;
+  const id = ++planCityBlockCounter;
+  const draft = buildLocationDraft(initialLocation);
+  state.formPlanCities.push({ id, ...draft });
+  const block = document.createElement("div");
+  block.className = "city-block";
+  block.id = `plan-city-block-${id}`;
+  container.appendChild(block);
+  renderPlanCityBlock(id);
+  refreshIcons();
+}
+
+function removePlanCityBlock(id) {
+  const index = state.formPlanCities.findIndex(city => city.id === id);
+  if (index !== -1) state.formPlanCities.splice(index, 1);
+  const block = document.getElementById(`plan-city-block-${id}`);
+  if (block) block.remove();
+  document.querySelectorAll("#plan-city-blocks .city-block").forEach((element, idx) => {
+    const label = element.querySelector(".city-block-label");
+    if (label) label.textContent = `Localização ${idx + 1}`;
+  });
+}
+
+function renderPlanCityBlock(id) {
+  const cityObj = state.formPlanCities.find(city => city.id === id);
+  const block = document.getElementById(`plan-city-block-${id}`);
+  if (!cityObj || !block) return;
+
+  const brazilMode = isBrazilCountry(cityObj.country);
+  const globalSubdivisionOptions = getGlobalSubdivisionSuggestions(cityObj.country);
+  block.innerHTML = `
+    <div class="city-block-header">
+      <div class="city-block-label">Localização ${state.formPlanCities.findIndex(city => city.id === id) + 1}</div>
+      ${state.formPlanCities.length > 1 ? `<button type="button" class="remove-city-btn" onclick="removePlanCityBlock(${id})"><i data-lucide="x"></i></button>` : ""}
+    </div>
+    <div class="city-block-grid ${brazilMode ? "" : "compact-grid"}">
+      <div class="field">
+        <label>País *</label>
+        <input class="form-input" id="plan-country-${id}" value="${escapeHtml(cityObj.country || "Brasil")}" placeholder="Ex: Brasil" list="global-country-options">
+      </div>
+      ${brazilMode ? `
+        <div class="field">
+          <label>UF *</label>
+          <select class="form-input" id="plan-region-${id}"><option value="">${state.ibgeUFs.length ? "Selecione a UF" : "Carregando..."}</option></select>
+        </div>
+        <div class="field">
+          <label>Cidade *</label>
+          <select class="form-input" id="plan-city-${id}" ${cityObj.region ? "" : "disabled"}><option value="">${cityObj.region ? "Carregando..." : "Selecione a UF"}</option></select>
+        </div>
+      ` : `
+        <div class="field">
+          <label>Região / estado</label>
+          <input class="form-input" id="plan-region-${id}" value="${escapeHtml(cityObj.region || "")}" placeholder="Ex: Lisboa, Califórnia" list="plan-global-region-options-${id}">
+          <datalist id="plan-global-region-options-${id}">${globalSubdivisionOptions.map(region => `<option value="${escapeHtml(region)}"></option>`).join("")}</datalist>
+        </div>
+        <div class="field">
+          <label>Cidade *</label>
+          <input class="form-input" id="plan-city-${id}" value="${escapeHtml(cityObj.city || "")}" placeholder="Ex: Lisboa">
+        </div>
+      `}
+    </div>
+    <div class="inline-note" style="margin-top:12px;">${cityObj.hasConfirmedCoords || (Number.isFinite(cityObj.lat) && Number.isFinite(cityObj.lng))
+      ? "Coordenadas já confirmadas para esta localização."
+      : "Latitude e longitude serão confirmadas automaticamente ao salvar."}</div>
+  `;
+
+  const countryInput = document.getElementById(`plan-country-${id}`);
+  if (countryInput) {
+    countryInput.addEventListener("change", event => onPlanCountryChange(id, event.target.value));
+    countryInput.addEventListener("blur", event => {
+      event.target.value = normalizeCountryValue(event.target.value || "Brasil");
+      onPlanCountryChange(id, event.target.value);
+    });
+  }
+
+  if (brazilMode) {
+    populatePlanBrazilRegionSelectBlock(id);
+    const regionSelect = document.getElementById(`plan-region-${id}`);
+    const citySelect = document.getElementById(`plan-city-${id}`);
+    if (regionSelect) regionSelect.addEventListener("change", event => onPlanBrazilRegionChangeBlock(id, event.target.value));
+    if (citySelect) {
+      citySelect.addEventListener("change", event => {
+        cityObj.city = cleanTextValue(event.target.value);
+        cityObj.lat = null;
+        cityObj.lng = null;
+      });
+    }
+    if (cityObj.region) onPlanBrazilRegionChangeBlock(id, cityObj.region, true);
+  } else {
+    const regionInput = document.getElementById(`plan-region-${id}`);
+    const cityInput = document.getElementById(`plan-city-${id}`);
+    if (regionInput) {
+      regionInput.addEventListener("change", event => {
+        cityObj.region = normalizeRegionValue(event.target.value, cityObj.country);
+        cityObj.uf = "";
+      });
+    }
+    if (cityInput) {
+      cityInput.addEventListener("change", event => {
+        cityObj.city = cleanTextValue(event.target.value);
+        cityObj.lat = null;
+        cityObj.lng = null;
+      });
+    }
+  }
+
+  refreshIcons();
+}
+
+function populatePlanBrazilRegionSelectBlock(id) {
+  const select = document.getElementById(`plan-region-${id}`);
+  const cityObj = state.formPlanCities.find(city => city.id === id);
+  if (!select || !cityObj) return;
+  if (state.ibgeUFs.length) {
+    select.innerHTML = `<option value="">Selecione a UF</option>` + state.ibgeUFs.map(uf => `<option value="${uf.sigla}">${uf.nome}</option>`).join("");
+    select.value = cityObj.region || "";
+  } else {
+    setTimeout(() => populatePlanBrazilRegionSelectBlock(id), 400);
+  }
+}
+
+function onPlanCountryChange(blockId, value) {
+  const cityObj = state.formPlanCities.find(city => city.id === blockId);
+  if (!cityObj) return;
+  cityObj.country = normalizeCountryValue(value || "Brasil");
+  cityObj.region = "";
+  cityObj.uf = "";
+  cityObj.city = "";
+  cityObj.lat = null;
+  cityObj.lng = null;
+  renderPlanCityBlock(blockId);
+}
+
+async function onPlanBrazilRegionChangeBlock(blockId, region, preserveCity) {
+  const cityObj = state.formPlanCities.find(city => city.id === blockId);
+  if (!cityObj) return;
+  cityObj.country = "Brasil";
+  cityObj.region = normalizeRegionValue(region, cityObj.country);
+  cityObj.uf = cityObj.region;
+  if (!preserveCity) cityObj.city = "";
+  cityObj.lat = null;
+  cityObj.lng = null;
+
+  const select = document.getElementById(`plan-city-${blockId}`);
+  if (!select) return;
+  if (!cityObj.region) {
+    select.innerHTML = `<option value="">Selecione a UF</option>`;
+    select.disabled = true;
+    return;
+  }
+
+  select.disabled = false;
+  select.innerHTML = `<option value="">Carregando...</option>`;
+
+  if (state.ibgeCitiesCache[cityObj.region]) {
+    fillCitySelect(select, state.ibgeCitiesCache[cityObj.region], cityObj.city);
+  } else {
+    try {
+      const response = await fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${cityObj.region}/municipios`);
+      const cities = await response.json();
+      state.ibgeCitiesCache[cityObj.region] = cities;
+      fillCitySelect(select, cities, cityObj.city);
+    } catch (error) {
+      select.innerHTML = `<option value="">Erro ao carregar cidades</option>`;
+    }
+  }
 }
 
 function populateFilters() {
@@ -5260,7 +5385,7 @@ function renderStats() {
       <strong>${escapeHtml(plan.destination)}</strong>
       <div class="spotlight-meta">
         <span class="spotlight-pill"><i data-lucide="calendar-range"></i>${formatDateShort(plan.startDate) || "Sem data"}</span>
-        <span class="spotlight-pill"><i data-lucide="map-pin"></i>${escapeHtml(plan.city || plan.region || plan.country || "Sem local")}</span>
+        <span class="spotlight-pill"><i data-lucide="map-pin"></i>${escapeHtml(getPlanLocationLabel(plan))}</span>
       </div>
     </button>
   `).join("") : `<div class="empty-state">A agenda futura aparece aqui quando os planos tiverem localização e datas definidas.</div>`;
@@ -5365,7 +5490,7 @@ function resetPlanEditor() {
   state.formPlanArtists = [];
   state.formPlanCompanions = [];
   els["plan-name"].value = "";
-  setPlanLocationValues({ country: "Brasil", region: "", city: "" });
+  setPlanLocationValues({});
   els["plan-start"].value = "";
   els["plan-end"].value = "";
   els["plan-status"].value = "planejado";
@@ -5384,11 +5509,7 @@ function beginPlanEdit(planId) {
   if (!plan) return;
   state.editingPlanId = plan.id;
   els["plan-name"].value = plan.name || "";
-  setPlanLocationValues({
-    country: plan.country || "Brasil",
-    region: plan.region || plan.uf || "",
-    city: plan.city || ""
-  });
+  setPlanLocationValues(plan);
   state.formPlanTags = [...plan.tags];
   state.formPlanCompanions = [...plan.travelers];
   state.formPlanArtists = [...plan.artists];
@@ -5429,6 +5550,7 @@ function renderSelectedPlan() {
     </div>
 
     <div class="meta-cloud">
+      ${(plan.locations || []).map(location => `<span class="meta-pill"><i data-lucide="map-pin"></i>${escapeHtml(formatLocationLabel(location) || location.city || location.country)}</span>`).join("")}
       ${plan.tags.map(tag => `<span class="meta-pill"><i data-lucide="hash"></i>${escapeHtml(tag)}</span>`).join("")}
       ${plan.travelers.map(person => `<span class="meta-pill"><i data-lucide="users"></i>${escapeHtml(person)}</span>`).join("")}
       ${plan.artists.map(artist => `<span class="meta-pill"><i data-lucide="music-2"></i>${escapeHtml(artist)}</span>`).join("")}
@@ -5509,7 +5631,10 @@ function renderItineraryTable(itinerary, editable, startDate, endDate) {
 
 function gerarGradeRoteiro() {
   const tripName = els["plan-name"].value.trim();
-  const city = els["plan-dest"].value.trim();
+  const primaryLocation = state.formPlanCities
+    .map(location => buildLocationDraft(location))
+    .find(location => location.city) || {};
+  const city = primaryLocation.city || "";
   const startDate = els["plan-start"].value;
   const endDate = els["plan-end"].value;
   const message = els["plan-message"];
@@ -5537,10 +5662,14 @@ function gerarGradeRoteiro() {
 
 async function salvarPlanejamento() {
   const tripName = els["plan-name"].value.trim();
-  const country = normalizeCountryValue(els["plan-country"].value || "Brasil");
-  const city = els["plan-dest"].value.trim();
-  const region = normalizeRegionValue(els["plan-uf"].value, country);
-  const uf = isBrazilCountry(country) ? region : "";
+  const locations = state.formPlanCities
+    .map(location => buildLocationDraft(location))
+    .filter(location => location.city && location.country && (!isBrazilCountry(location.country) || location.region));
+  const primaryLocation = locations[0] || buildLocationDraft(state.formPlanCities[0] || {});
+  const country = primaryLocation.country || "Brasil";
+  const city = primaryLocation.city || "";
+  const region = primaryLocation.region || "";
+  const uf = primaryLocation.uf || (isBrazilCountry(country) ? region : "");
   const startDate = els["plan-start"].value;
   const endDate = els["plan-end"].value;
   const tags = [...state.formPlanTags];
@@ -5552,7 +5681,12 @@ async function salvarPlanejamento() {
 
   if (!destination) {
     message.style.color = "var(--danger)";
-    message.textContent = "Informe ao menos o nome da viagem ou a cidade principal antes de salvar.";
+    message.textContent = "Informe ao menos o nome da viagem ou uma localização principal antes de salvar.";
+    return;
+  }
+  if (state.formPlanCities.length && !locations.length) {
+    message.style.color = "var(--danger)";
+    message.textContent = "Complete pelo menos uma localização do plano. Para Brasil, informe país, UF e cidade; para outros países, país e cidade.";
     return;
   }
   if (!startDate || !endDate) {
@@ -5579,6 +5713,10 @@ async function salvarPlanejamento() {
     uf,
     dataInicio: startDate,
     dataFim: endDate,
+    locations,
+    localizacoes: locations,
+    locationsJson: JSON.stringify(locations),
+    localizacoesJson: JSON.stringify(locations),
     tags,
     tagsTexto: joinListValue(tags),
     acompanhantes: travelers,
@@ -5610,6 +5748,7 @@ async function salvarPlanejamento() {
       city,
       region,
       uf,
+      locations,
       startDate,
       endDate,
       tags,
@@ -5623,8 +5762,13 @@ async function salvarPlanejamento() {
       itineraryRaw: payload.itinerarioDiario,
       year: getYearFromDate(startDate),
       sourceRef: { id: payload.id },
-      searchIndex: `${payload.id} ${destination} ${city} ${region} ${country} ${tags.join(" ")} ${artists.join(" ")} ${travelers.join(" ")} ${status}`.toLowerCase()
+      searchIndex: `${payload.id} ${destination} ${city} ${region} ${country} ${locations.map(location => `${location.city} ${location.region} ${location.country}`).join(" ")} ${tags.join(" ")} ${artists.join(" ")} ${travelers.join(" ")} ${status}`.toLowerCase()
     };
+    if (localPlan.locations[0] && Number.isFinite(resolvedLat) && Number.isFinite(resolvedLng)) {
+      localPlan.locations[0].lat = resolvedLat;
+      localPlan.locations[0].lng = resolvedLng;
+      localPlan.locations[0].hasConfirmedCoords = true;
+    }
     if (state.editingPlanId) {
       state.plans = state.plans.map(plan => plan.id === state.editingPlanId ? localPlan : plan);
     } else {
@@ -5727,6 +5871,7 @@ function startPlanConversion(planId) {
     country: plan.country,
     region: plan.region,
     city: plan.city,
+    cities: getPlanLocations(plan),
     startDate: plan.startDate,
     endDate: plan.endDate
   };
@@ -5738,7 +5883,7 @@ function startPlanConversion(planId) {
   state.formArtists = [...plan.artists];
   state.formCompanions = [...plan.travelers];
   renderFormTaxonomies();
-  if (state.formCities[0]) fillCityBlockFromPlan(state.formCities[0].id, plan);
+  setTripLocationValues(getPlanLocations(plan));
   renderConversionBanner();
   updateNameSuggestions();
   showToast(`Formulário pronto para efetivar ${plan.destination}.`, "info", "Plano");
@@ -5782,16 +5927,14 @@ function beginTripEdit(tripId) {
   state.formArtists = [...trip.artists];
   state.formCompanions = [...trip.travelers];
   renderFormTaxonomies();
-  if (state.formCities[0]) {
-    fillCityBlockFromPlan(state.formCities[0].id, {
-      country: trip.country,
-      region: trip.region,
-      uf: trip.uf,
-      city: trip.city,
-      lat: trip.lat,
-      lng: trip.lng
-    });
-  }
+  setTripLocationValues([{
+    country: trip.country,
+    region: trip.region,
+    uf: trip.uf,
+    city: trip.city,
+    lat: trip.lat,
+    lng: trip.lng
+  }]);
   updateTripFormUi();
   updateNameSuggestions();
   showToast(`Editando a viagem ${trip.name}.`, "info", "Viagem");
