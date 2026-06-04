@@ -307,7 +307,7 @@
   .metric-label,
   .metric-value,
   .metric-sub { display: none; }
-  .dashboard-upcoming-panel { padding: 18px; }
+  .dashboard-upcoming-panel { padding: 14px; }
   .dashboard-upcoming-panel .spotlight-grid { grid-template-columns: 1fr; }
 
   .journey-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 24px; }
@@ -1545,19 +1545,17 @@
   .spotlight-card {
     position: relative;
     width: 100%;
-    padding: 14px;
+    padding: 12px;
     border-radius: 16px;
     border: 1px solid rgba(212, 70, 28, 0.18);
-    background:
-      radial-gradient(circle at top right, rgba(243, 115, 33, 0.18), rgba(255, 255, 255, 0) 38%),
-      linear-gradient(180deg, #ffffff 0%, #fff8f3 100%);
+    background: var(--white);
     text-align: left;
     transition: var(--transition);
   }
   .spotlight-topline {
     position: absolute;
-    top: 14px;
-    right: 14px;
+    top: 12px;
+    right: 12px;
   }
   .spotlight-card:hover {
     transform: translateY(-2px);
@@ -1567,15 +1565,15 @@
   .spotlight-card strong {
     display: block;
     margin-top: 0;
-    padding-right: 124px;
+    padding-right: 116px;
     color: var(--blue-dark);
     font-family: "DM Serif Display", serif;
-    font-size: 20px;
+    font-size: 18px;
     line-height: 1.1;
   }
   .spotlight-card span {
     display: block;
-    margin-top: 6px;
+    margin-top: 4px;
     color: var(--ink-2);
     font-size: 12px;
     line-height: 1.4;
@@ -1590,8 +1588,8 @@
   .spotlight-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 10px;
+    gap: 5px;
+    margin-top: 8px;
   }
   .spotlight-countdown {
     display: inline-flex;
@@ -1620,7 +1618,7 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 5px 8px;
+    padding: 4px 7px;
     border-radius: 999px;
     background: rgba(212, 70, 28, 0.08);
     color: var(--ink-2);
@@ -2141,7 +2139,7 @@
           <div class="dashboard-hero-grid">
             <div class="kpi-grid" id="kpi-grid"></div>
             <section class="panel dashboard-upcoming-panel">
-              <div class="panel-label" style="margin-bottom:12px;">Próximas viagens</div>
+              <div class="panel-label" style="margin-bottom:8px;">Próximas viagens</div>
               <div class="spotlight-grid" id="stat-upcoming-plans"></div>
             </section>
           </div>
