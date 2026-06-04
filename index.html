@@ -4319,7 +4319,7 @@ function renderMapLayer(preserveViewport = false) {
   const maxCountryTrips = Math.max(...[...collections.countries.values()].map(item => item.trips.length), 1);
   const maxRegionTrips = Math.max(...[...collections.regions.values()].map(item => item.trips.length), 1);
   const hasBrazilStateLayer = !!state.geoData.brazil?.features?.length;
-  const brazilChoroplethActive = hasBrazilStateLayer && !cityMode;
+  const brazilChoroplethActive = hasBrazilStateLayer;
 
   const baseLayer = L.layerGroup();
   const routeLayer = L.layerGroup();
@@ -4353,9 +4353,7 @@ function renderMapLayer(preserveViewport = false) {
           const highlightBrazilShape = isBrazil && brazilChoroplethActive;
           const selected = isMapFeatureSelected("country", key);
           const dimmed = hasMapSelection("country") && !selected;
-          const fillColor = cityMode
-            ? (isBrazil ? "rgba(219, 226, 232, 0.94)" : "rgba(211, 218, 224, 0.9)")
-            : selected
+          const fillColor = selected
               ? "rgb(241, 178, 136)"
               : isFirstPlanned
                 ? "rgb(132, 178, 226)"
@@ -4372,11 +4370,11 @@ function renderMapLayer(preserveViewport = false) {
                   : isBrazil
                     ? "rgba(89, 96, 102, 0.56)"
                     : visited
-                      ? (cityMode ? "rgba(255,255,255,0.72)" : "rgba(255,255,255,0.58)")
+                      ? "rgba(255,255,255,0.58)"
                       : "rgba(255,255,255,0.42)",
             weight: selected ? 2 : state.showPlannedMap && hasPlanned ? 1.35 : highlightBrazilShape ? 1.5 : isBrazil ? 1.1 : 0.62,
             fillColor,
-            fillOpacity: selected ? 0.62 : dimmed ? 0.2 : cityMode ? 0.94 : isFirstPlanned ? 0.28 : 0.96,
+            fillOpacity: selected ? 0.62 : dimmed ? 0.2 : isFirstPlanned ? 0.28 : 0.96,
             opacity: dimmed ? 0.36 : 1,
             dashArray: state.showPlannedMap && hasPlanned ? (isFirstPlanned ? "5 6" : "8 6") : null
           };
@@ -4403,7 +4401,7 @@ function renderMapLayer(preserveViewport = false) {
           layer.on("mouseover", () => {
             layer.setStyle({
               fillColor: "rgba(243, 115, 33, 0.28)",
-              fillOpacity: cityMode ? 0.38 : 0.7,
+              fillOpacity: 0.7,
               opacity: 1
             });
           });
@@ -4425,10 +4423,10 @@ function renderMapLayer(preserveViewport = false) {
         L.geoJSON(brazilFrame, {
           pane: "coveragePane",
           style: {
-            color: "rgba(212, 70, 28, 0.5)",
-            weight: 1.7,
+            color: "rgba(255,255,255,0.22)",
+            weight: 0.45,
             fillOpacity: 0,
-            opacity: 1
+            opacity: 0.72
           }
         }).addTo(baseLayer);
       }
@@ -4453,9 +4451,7 @@ function renderMapLayer(preserveViewport = false) {
           const isFirstPlanned = hasPlanned && !visited;
           const selected = isMapFeatureSelected("region", key);
           const dimmed = hasMapSelection("region") && !selected;
-          const fillColor = cityMode
-            ? "rgba(255,255,255,0)"
-            : selected
+          const fillColor = selected
               ? "rgb(235, 136, 83)"
               : isFirstPlanned
                 ? "rgb(111, 166, 224)"
@@ -4466,13 +4462,11 @@ function renderMapLayer(preserveViewport = false) {
               ? "rgba(10,47,76,0.9)"
               : state.showPlannedMap && hasPlanned
                 ? "rgba(76, 118, 170, 0.72)"
-                : cityMode
-                  ? (visited ? "rgba(102,76,58,0.58)" : "rgba(87,94,99,0.3)")
-                  : (visited ? "rgba(255,255,255,0.72)" : "rgba(83,112,130,0.24)"),
-            weight: selected ? 2 : state.showPlannedMap && hasPlanned ? 1.2 : cityMode ? (visited ? 0.9 : 0.58) : (visited ? 0.64 : 0.48),
+                : (visited ? "rgba(255,255,255,0.72)" : "rgba(255,255,255,0.34)"),
+            weight: selected ? 0.7 : state.showPlannedMap && hasPlanned ? 0.7 : 0.45,
             fillColor,
-            fillOpacity: cityMode ? (selected ? 0.34 : 0) : dimmed ? 0.2 : selected ? 0.78 : isFirstPlanned ? 0.34 : 0.96,
-            opacity: dimmed ? 0.34 : cityMode ? 0.9 : 0.84,
+            fillOpacity: dimmed ? 0.2 : selected ? 0.78 : isFirstPlanned ? 0.34 : 0.96,
+            opacity: dimmed ? 0.34 : 0.84,
             dashArray: state.showPlannedMap && hasPlanned ? (isFirstPlanned ? "5 6" : "8 6") : null
           };
         },
@@ -4490,7 +4484,7 @@ function renderMapLayer(preserveViewport = false) {
           layer.on("mouseover", () => {
             layer.setStyle({
               fillColor: "rgba(243, 115, 33, 0.28)",
-              fillOpacity: cityMode ? 0.24 : 0.68,
+              fillOpacity: 0.68,
               opacity: 0.95
             });
           });
@@ -4567,7 +4561,9 @@ function renderMapLayer(preserveViewport = false) {
     ? "Cobertura parcial: a base carregou, mas as camadas territoriais locais ainda não chegaram."
     : state.showPlannedMap
       ? "Cobertura em cinza; rotas e estreias planejadas aparecem em azul."
-      : "Cobertura por UFs e países. Passe o mouse para destacar e clique para abrir a galeria do recorte.";
+      : cityMode
+        ? "Mesma cobertura por UFs, com municípios sobrepostos."
+        : "Cobertura por UFs e países. Passe o mouse para destacar e clique para abrir a galeria do recorte.";
 
   baseLayer.addTo(state.mapLayer);
   if (state.showPlannedMap && tripRoutes.length) routeLayer.addTo(state.mapLayer);
