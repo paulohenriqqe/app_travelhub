@@ -1556,10 +1556,9 @@
   .spotlight-topline {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     gap: 8px;
   }
-  .spotlight-topline .panel-kicker { margin-bottom: 0; }
   .spotlight-card:hover {
     transform: translateY(-2px);
     border-color: rgba(212, 70, 28, 0.32);
@@ -5549,7 +5548,6 @@ function renderStats() {
         const countdown = getPlanCountdown(plan);
         return `
           <div class="spotlight-topline">
-            <div class="panel-kicker">Proxima viagem</div>
             ${countdown ? `<span class="spotlight-countdown ${countdown.tone}">${escapeHtml(countdown.label)}</span>` : ""}
           </div>
         `;
