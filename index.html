@@ -507,74 +507,78 @@
   }
   .clear-button:hover { background: var(--paper-2); color: var(--ink); }
 
-  .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)); gap: 12px; }
+  .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(204px, 1fr)); gap: 10px; }
   .trip-card {
-    padding: 14px;
+    padding: 12px 12px 11px;
     cursor: pointer;
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    min-height: 164px;
+    gap: 6px;
+    min-height: 146px;
     border: 1px solid transparent;
     transition: var(--transition);
   }
-  .trip-card:hover { border-color: var(--line-strong); box-shadow: var(--shadow-md); transform: translateY(-4px); }
-  .trip-topline { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 0; }
-  .trip-badges { display: flex; flex-wrap: wrap; gap: 6px; }
+  .trip-card:hover { border-color: var(--line-strong); box-shadow: var(--shadow-md); transform: translateY(-3px); }
+  .trip-topline { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 0; }
+  .trip-badges { display: flex; flex-wrap: wrap; gap: 4px; }
   .uf-badge, .status-chip, .origin-chip {
     display: inline-flex;
     align-items: center;
-    padding: 4px 10px;
+    padding: 3px 9px;
     border-radius: 999px;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
     letter-spacing: 0.05em;
   }
   .uf-badge { background: var(--blue-pale); color: var(--blue-dark); }
-  .date-text { color: var(--ink-3); font-size: 12px; font-weight: 700; }
+  .date-text { color: var(--ink-3); font-size: 11px; font-weight: 700; }
   .trip-title {
     margin: 0;
     font-family: "DM Serif Display", serif;
-    font-size: 18px;
-    line-height: 1.15;
+    font-size: 16px;
+    line-height: 1.08;
     color: var(--blue-dark);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
-  .trip-city { display: flex; align-items: center; gap: 6px; color: var(--ink-2); font-size: 13px; font-weight: 500; line-height: 1.3; }
-  .trip-city svg { width: 14px; height: 14px; color: var(--accent); }
-  .trip-links { margin-top: 0; color: var(--ink-3); font-size: 11px; font-weight: 600; line-height: 1.3; }
-  .tag-row { display: flex; flex-wrap: wrap; gap: 5px; margin: 2px 0 0; }
+  .trip-city { display: flex; align-items: center; gap: 5px; color: var(--ink-2); font-size: 12px; font-weight: 500; line-height: 1.25; }
+  .trip-city svg { width: 13px; height: 13px; color: var(--accent); flex-shrink: 0; }
+  .trip-links { margin-top: 0; color: var(--ink-3); font-size: 10px; font-weight: 600; line-height: 1.25; }
+  .tag-row { display: flex; flex-wrap: wrap; gap: 4px; margin: 1px 0 0; }
   .tag {
     display: inline-flex;
-    padding: 3px 8px;
+    padding: 2px 7px;
     border-radius: 6px;
     background: var(--paper-2);
     color: var(--ink-2);
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 700;
   }
   .trip-details {
     margin-top: auto;
-    padding-top: 10px;
+    padding-top: 8px;
     border-top: 1px solid var(--line);
     display: flex;
     justify-content: space-between;
-    gap: 8px;
+    gap: 6px;
     color: var(--ink-3);
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 600;
   }
-  .trip-details span { display: flex; align-items: center; gap: 6px; }
+  .trip-details span { display: flex; align-items: center; gap: 5px; }
   .trip-detail-stack {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 2px;
+    gap: 1px;
     text-align: right;
   }
   .trip-detail-stack .trip-detail-main {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     color: var(--ink-3);
   }
   .trip-detail-plus {
@@ -584,7 +588,7 @@
   }
   .trip-detail-stack .trip-detail-sub {
     color: var(--ink-3);
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
   }
   .trip-card-actions, .plan-item-actions {
@@ -5167,7 +5171,7 @@ function renderTripCard(trip) {
       <h2 class="trip-title">${escapeHtml(trip.name)}</h2>
       <div class="trip-city"><i data-lucide="map-pin"></i>${escapeHtml(formatTripLocation(trip) || trip.city || trip.country)}</div>
       ${linkedPlan ? `<div class="trip-links">Ligada ao plano ${escapeHtml(linkedPlan.destination)}</div>` : ""}
-      ${trip.tags.length ? `<div class="tag-row">${trip.tags.slice(0, 3).map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}</div>` : ""}
+      ${trip.tags.length ? `<div class="tag-row">${trip.tags.slice(0, 2).map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}</div>` : ""}
       <div class="trip-details">
         <span><i data-lucide="users"></i>${formatPeopleCount(trip.travelers.length)}</span>
         ${trip.artists.length ? `
