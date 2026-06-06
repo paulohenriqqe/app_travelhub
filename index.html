@@ -1881,6 +1881,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 16px;
     width: 100%;
     padding: 14px 16px;
     border: none;
@@ -1894,24 +1895,35 @@
   }
   .modal-list-bar {
     position: absolute;
-    inset: 7px auto 7px 0;
+    inset: 0 auto 0 0;
     width: var(--bar-width, 0%);
     max-width: 100%;
-    border-radius: 999px;
-    background: rgba(243, 115, 33, 0.12);
+    border-radius: 0 999px 999px 0;
+    background: rgba(243, 115, 33, 0.14);
+    opacity: 0.9;
     pointer-events: none;
   }
-  .modal-list-label, .modal-list-badge { position: relative; z-index: 1; }
-  .modal-list-item:hover { color: var(--blue-dark); }
-  .modal-list-item:last-child { border-bottom: none; }
+  .modal-list-label {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    min-width: 0;
+  }
   .modal-list-badge {
-    background: var(--accent-bg);
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+    margin-left: 12px;
+    background: transparent;
     color: var(--accent);
-    padding: 4px 12px;
-    border-radius: 20px;
+    padding: 0;
+    border-radius: 0;
     font-size: 13px;
     font-weight: 700;
+    text-align: right;
   }
+  .modal-list-item:hover { color: var(--blue-dark); }
+  .modal-list-item:last-child { border-bottom: none; }
 
   .mobile-nav { display: none; }
   .result-count { color: var(--ink-3); font-size: 14px; font-weight: 500; }
