@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -514,7 +514,7 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    min-height: 188px;
+    min-height: 164px;
     border: 1px solid transparent;
     transition: var(--transition);
   }
@@ -1871,16 +1871,16 @@
     line-height: 1.35;
   }
   .modal-header {
-    padding: 30px 32px 18px;
+    padding: 30px 88px 18px 32px;
     border-bottom: 1px solid var(--line);
     background: var(--paper);
     border-radius: 24px 24px 0 0;
   }
   .modal-body { padding: 24px 32px; display: flex; flex-direction: column; gap: 16px; }
   .trip-modal-header-shell {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 14px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
     align-items: start;
   }
   .trip-modal-header-main {
@@ -1919,8 +1919,8 @@
   .trip-modal-actions {
     display: flex;
     gap: 8px;
-    align-items: flex-start;
-    justify-content: flex-end;
+    align-items: center;
+    justify-content: flex-start;
     flex-wrap: wrap;
   }
   .trip-modal-grid {
@@ -2141,9 +2141,8 @@
     .map-toggle, .view-toggle, .filter-chip { white-space: nowrap; }
     .map-meta-card { min-width: 0; }
     .rank-panel { padding: 18px; }
-    .modal-header { padding: 32px 24px 20px; }
+    .modal-header { padding: 32px 72px 20px 24px; }
     .modal-body { padding: 24px; }
-    .trip-modal-header-shell,
     .trip-modal-grid { grid-template-columns: 1fr; }
     .trip-modal-actions { justify-content: flex-start; }
     .trip-modal-title { font-size: 26px; }
@@ -5169,10 +5168,6 @@ function renderTripCard(trip) {
       <div class="trip-city"><i data-lucide="map-pin"></i>${escapeHtml(formatTripLocation(trip) || trip.city || trip.country)}</div>
       ${linkedPlan ? `<div class="trip-links">Ligada ao plano ${escapeHtml(linkedPlan.destination)}</div>` : ""}
       ${trip.tags.length ? `<div class="tag-row">${trip.tags.slice(0, 3).map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}</div>` : ""}
-      <div class="trip-card-actions">
-        <button type="button" class="icon-action-btn edit-btn" aria-label="Editar viagem" title="Editar viagem" onclick="event.stopPropagation(); beginTripEdit(decodeURIComponent('${encodeURIComponent(trip.id)}'))"><i data-lucide="pencil"></i></button>
-        <button type="button" class="icon-action-btn delete-btn" aria-label="Excluir viagem" title="Excluir viagem" onclick="event.stopPropagation(); deleteTrip(decodeURIComponent('${encodeURIComponent(trip.id)}'))"><i data-lucide="trash-2"></i></button>
-      </div>
       <div class="trip-details">
         <span><i data-lucide="users"></i>${formatPeopleCount(trip.travelers.length)}</span>
         ${trip.artists.length ? `
