@@ -8040,11 +8040,11 @@ function renderTravelEvolutionChart() {
   if (state.chartInstance) state.chartInstance.destroy();
   // Ajuste aqui se quiser o rótulo laranja ainda mais sutil.
   const lineLabelStyle = {
-    fontSize: 10,
-    minWidth: 26,
-    height: 18,
-    paddingX: 10,
-    opacity: 0.9
+    fontSize: 9,
+    minWidth: 22,
+    height: 14,
+    paddingX: 8,
+    opacity: 0.72
   };
   const barBaseLabelPlugin = {
     id: "travelhubBarBaseLabels",
@@ -8086,9 +8086,21 @@ function renderTravelEvolutionChart() {
           chartArea.bottom - height - 4,
           Math.max(chartArea.top + 4, point.y - height / 2)
         );
+        const radius = height / 2;
         chartCtx.fillStyle = `rgba(212, 70, 28, ${lineLabelStyle.opacity})`;
-        chartCtx.fillRect(x, y, width, height);
-        chartCtx.fillStyle = "rgba(255, 255, 255, 0.98)";
+        chartCtx.beginPath();
+        chartCtx.moveTo(x + radius, y);
+        chartCtx.lineTo(x + width - radius, y);
+        chartCtx.quadraticCurveTo(x + width, y, x + width, y + radius);
+        chartCtx.lineTo(x + width, y + height - radius);
+        chartCtx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        chartCtx.lineTo(x + radius, y + height);
+        chartCtx.quadraticCurveTo(x, y + height, x, y + height - radius);
+        chartCtx.lineTo(x, y + radius);
+        chartCtx.quadraticCurveTo(x, y, x + radius, y);
+        chartCtx.closePath();
+        chartCtx.fill();
+        chartCtx.fillStyle = "rgba(255, 255, 255, 0.94)";
         chartCtx.fillText(label, point.x, y + height / 2 + 0.5);
       });
       chartCtx.restore();
