@@ -2121,6 +2121,175 @@
     display: none !important;
   }
 
+  /* UX FIX: reduz padding do container principal de conteúdo */
+  .content {
+    padding: 20px 28px 80px;
+  }
+
+  /* UX FIX: compacta sidebar - gap entre seções e padding interno */
+  .sidebar {
+    gap: 16px;
+    padding: 20px 16px;
+  }
+
+  /* UX FIX: itens de menu mais compactos */
+  .nav-item {
+    min-height: 36px;
+    padding: 7px 12px;
+    font-size: 14px;
+  }
+
+  /* UX FIX: topbar menos alta */
+  .topbar {
+    min-height: 60px;
+    padding: 0 28px;
+  }
+
+  /* UX FIX: menos espaço entre blocos do dashboard */
+  .dashboard-stack {
+    gap: 14px;
+  }
+
+  /* UX FIX: formulário com menos padding */
+  .form-panel {
+    padding: 24px;
+  }
+
+  /* UX FIX: header do form menos espaçado do conteúdo */
+  .form-shell-header {
+    margin-bottom: 16px;
+  }
+
+  /* UX FIX: blocos de cidade mais compactos */
+  .city-block {
+    padding: 12px;
+  }
+  .city-block-header {
+    margin-bottom: 8px;
+  }
+  .city-blocks {
+    gap: 8px;
+    margin-top: 2px;
+  }
+
+  /* UX FIX: grade de campos com gap menor */
+  .form-grid {
+    gap: 10px;
+  }
+
+  /* UX FIX: título de seção do form menos espaçado abaixo */
+  .form-section-title {
+    margin: 0 0 10px;
+  }
+
+  /* UX FIX: painel de filtros mais compacto */
+  .filters-panel {
+    padding: 12px 16px;
+    gap: 10px;
+  }
+
+  /* UX FIX: painéis da seção de viagens com menos padding */
+  .journey-panel,
+  .journey-side-panel {
+    padding: 16px;
+  }
+
+  /* UX FIX: painel de gráfico mais compacto */
+  .chart-panel {
+    padding: 16px;
+  }
+  .chart-title {
+    margin: 0 0 12px;
+    font-size: 16px;
+  }
+  .chart-container {
+    height: 260px;
+  }
+
+  /* UX FIX: mini stats menos inflados */
+  .mini-stat {
+    padding: 10px 12px;
+  }
+  .mini-stat strong {
+    font-size: 20px;
+    margin-top: 3px;
+  }
+
+  /* UX FIX: painel lateral do mapa mais denso */
+  .atlas-panel-copy {
+    margin: 0 0 10px;
+  }
+  .atlas-section {
+    padding-top: 12px;
+    margin-top: 12px;
+  }
+  .atlas-section-title {
+    margin: 0 0 8px;
+  }
+  .atlas-entry + .atlas-entry {
+    margin-top: 6px;
+  }
+
+  /* UX FIX: ranking lateral mais compacto */
+  .rank-list {
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .rank-panel {
+    padding: 14px;
+  }
+
+  /* UX FIX: banner de conversão menos espaçado */
+  .conversion-banner {
+    margin-bottom: 14px;
+    padding: 12px 14px;
+  }
+
+  /* UX FIX: botões de ação mais próximos do último campo */
+  .form-actions-row {
+    margin-top: 6px;
+    gap: 8px;
+  }
+
+  /* UX FIX: sugestões de nome menos espaçadas */
+  .name-suggestions {
+    margin-top: 4px;
+    gap: 6px;
+  }
+
+  /* UX FIX: mantém inputs internos de tags com alvo clicável mínimo */
+  .tag-text-input {
+    min-height: 32px;
+  }
+
+  /* UX FIX: stack do mapa mais compacto */
+  .map-stack {
+    gap: 10px;
+  }
+  .map-toolbar {
+    gap: 10px;
+  }
+
+  /* UX FIX: h2 contextual de seção menor, sem dominar o layout */
+  .chart-title,
+  .panel-title {
+    font-size: 18px;
+  }
+
+  /* UX FIX: textos de instrução/hint em tamanho reduzido */
+  .hero-help-list {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  .atlas-panel-copy {
+    font-size: 11px;
+  }
+
+  /* UX FIX: panel-copy mais discreto */
+  .panel-copy {
+    font-size: 13px;
+  }
+
   @media (max-width: 1200px) {
     .dashboard-hero-grid, .journey-grid, .plan-layout, .detail-grid { grid-template-columns: 1fr; }
     .kpi-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
@@ -2479,7 +2648,6 @@
                 <button class="view-toggle" data-mode="cities"><i data-lucide="map-pin"></i> Cidades</button>
               </div>
             </div>
-            <button class="filter-chip" id="toggle-planned-map" aria-pressed="false"><i data-lucide="route"></i> Rotas</button>
             <div class="map-meta-strip" id="map-meta-strip"></div>
             <div class="hero-assist map-help-assist" id="map-help-assist">
               <button type="button" class="hero-icon-btn" id="map-help-btn" aria-expanded="false" aria-controls="map-help-card" aria-label="Como ler este mapa">
@@ -2490,7 +2658,6 @@
                 <div class="hero-help-list">
                   <span>Passe o mouse para destacar o recorte.</span>
                   <span>Clique em um país, UF ou cidade para abrir as viagens.</span>
-                  <span>Use `Rotas` para ver deslocamentos e planos no mapa.</span>
                 </div>
               </div>
             </div>
@@ -3210,7 +3377,7 @@ function cacheElements() {
     "stat-tags", "stat-companions", "stat-artists", "stat-upcoming-plans", "trip-modal", "modal-header", "modal-body", "city-blocks", "add-city-btn", "name-suggestions", "lista-grid",
     "form-message", "plan-conversion-banner", "conversion-banner-title", "conversion-banner-copy", "planning-source-note", "planning-mini-stats",
     "plan-list", "plan-detail-panel", "plan-draft-summary", "plan-grid-container", "plan-grid-title", "itinerary-table-wrapper", "plan-message",
-    "detail-plan-message", "plan-name", "plan-start", "plan-end", "plan-status", "save-plan-btn", "toggle-planned-map", "plan-city-blocks", "plan-add-city-btn",
+    "detail-plan-message", "plan-name", "plan-start", "plan-end", "plan-status", "save-plan-btn", "plan-city-blocks", "plan-add-city-btn",
     "trip-form-title", "trip-submit-btn", "cancel-trip-edit-btn", "plan-editor-title", "cancel-plan-edit-btn", "app-toast",
     "trip-lookup-btn", "trip-lookup-input", "trip-lookup-results", "trip-help-btn", "plan-help-btn"
   ].forEach(id => { els[id] = document.getElementById(id); });
@@ -3260,12 +3427,14 @@ function bindEvents() {
     updateActiveButtons("[data-mode]", state.mapDetail);
     renderMapLayer();
   }));
-  els["toggle-planned-map"].addEventListener("click", () => {
-    state.showPlannedMap = !state.showPlannedMap;
-    els["toggle-planned-map"].classList.toggle("active", state.showPlannedMap);
-    els["toggle-planned-map"].setAttribute("aria-pressed", state.showPlannedMap ? "true" : "false");
-    renderMapLayer();
-  });
+  if (els["toggle-planned-map"]) {
+    els["toggle-planned-map"].addEventListener("click", () => {
+      state.showPlannedMap = !state.showPlannedMap;
+      els["toggle-planned-map"].classList.toggle("active", state.showPlannedMap);
+      els["toggle-planned-map"].setAttribute("aria-pressed", state.showPlannedMap ? "true" : "false");
+      renderMapLayer();
+    });
+  }
   document.getElementById("trip-form").addEventListener("submit", handleFormSubmit);
   els["trip-modal"].addEventListener("click", e => { if (e.target === els["trip-modal"]) closeModal(); });
   document.addEventListener("keydown", e => {
