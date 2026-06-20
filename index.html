@@ -1309,6 +1309,34 @@
     gap: 10px;
     transition: background 0.15s;
   }
+  .ac-item-label {
+    min-width: 0;
+    flex: 1 1 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .ac-remove {
+    width: 24px;
+    height: 24px;
+    flex: 0 0 24px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ink-3);
+    font-size: 14px;
+    font-weight: 900;
+    line-height: 1;
+  }
+  .ac-remove:hover {
+    background: rgba(212, 70, 28, 0.12);
+    color: var(--accent);
+  }
   .ac-item:hover, .ac-item.selected { background: var(--blue-pale); color: var(--blue-dark); }
   .ac-item svg { width: 14px; height: 14px; color: var(--ink-3); }
   .ac-item.new-item { color: var(--accent); font-weight: 700; }
@@ -3112,6 +3140,148 @@
     margin-top: -6px;
   }
 
+  /* UX FIX: ações e gráficos mais alinhados e menos pesados */
+  #topbar-primary-action.primary-action {
+    min-height: 40px;
+    padding: 8px 15px;
+    font-size: 13px;
+    box-shadow: 0 3px 10px rgba(212, 70, 28, 0.18);
+  }
+  #topbar-primary-action.primary-action svg {
+    width: 18px;
+    height: 18px;
+  }
+  .chart-title-row.compact-chart-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 0;
+  }
+  .chart-title-row .chart-title {
+    margin-bottom: 0;
+    line-height: 1.05;
+  }
+  .chart-toggle-stack {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: flex-end;
+    gap: 5px 6px;
+    max-width: 238px;
+    margin-top: -2px;
+  }
+  .compact-toggle {
+    gap: 4px;
+  }
+  .compact-toggle button {
+    min-height: 26px;
+    padding: 4px 8px;
+  }
+  .destination-chart-container {
+    margin-top: -12px;
+  }
+  .fallback-year {
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    font: inherit;
+  }
+
+  /* UX FIX: próximas viagens com um card por vez */
+  .dashboard-upcoming-panel {
+    min-height: 118px;
+    padding: 10px 12px;
+  }
+  .dashboard-upcoming-panel .panel-label {
+    margin-bottom: 2px !important;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+  }
+  .upcoming-carousel {
+    grid-template-columns: 26px minmax(0, 1fr) 26px;
+    gap: 6px;
+    min-height: 88px;
+  }
+  .upcoming-track {
+    overflow-x: hidden;
+    padding: 0;
+    scrollbar-width: none;
+  }
+  .upcoming-carousel .upcoming-card {
+    flex: 0 0 100%;
+    min-height: 86px;
+    padding: 7px 0;
+  }
+  .upcoming-card strong {
+    font-size: 19px;
+  }
+  .upcoming-main {
+    gap: 4px;
+  }
+  .upcoming-days {
+    min-width: 56px;
+    padding: 7px 8px;
+    border-radius: 12px;
+  }
+  .upcoming-days strong {
+    font-size: 22px;
+  }
+  .upcoming-nav {
+    width: 26px;
+    height: 26px;
+  }
+
+  /* UX FIX: botões do painel do mapa mais discretos */
+  .selection-card-header .small-action,
+  .selection-card-actions .secondary-action {
+    min-height: 34px;
+    padding: 7px 11px;
+    border-radius: 10px;
+    font-size: 12px;
+    box-shadow: none;
+  }
+  .selection-card-actions {
+    margin-top: 8px;
+  }
+
+  /* UX FIX: chips sem contorno azul quadrado e com remoção clara */
+  .tag-input-area,
+  .tag-input-area:focus-within {
+    border-color: var(--line) !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  .tag-input-area::-webkit-scrollbar {
+    display: none;
+  }
+  .tag-text-input,
+  .tag-text-input:focus,
+  .tag-text-input:focus-visible {
+    border-color: transparent !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  .tag-chip {
+    padding: 5px 7px 5px 10px;
+    border-radius: 999px;
+  }
+  .tag-chip button {
+    width: 18px;
+    height: 18px;
+    margin-left: 4px;
+    border-radius: 999px;
+    background: rgba(10, 47, 76, 0.08);
+    color: var(--blue-dark);
+    font-size: 12px;
+    line-height: 1;
+  }
+  .tag-chip button:hover {
+    background: rgba(212, 70, 28, 0.12);
+    color: var(--accent);
+  }
+
   /* UX FIX: respeita usuários que preferem menos movimento */
   @media (prefers-reduced-motion: reduce) {
     *,
@@ -4779,7 +4949,8 @@ function renderDropdown(input, dropdown, listKey, stateKey) {
   if (items.length) {
     html += items.slice(0, 8).map((item, index) => `
       <div class="ac-item ${index === 0 ? "selected" : ""}" role="option" aria-selected="${index === 0 ? "true" : "false"}" data-ac-action="select" data-ac-value="${encodeURIComponent(item)}">
-        <i data-lucide="check-circle-2"></i> ${escapeHtml(item)}
+        <span class="ac-item-label"><i data-lucide="check-circle-2"></i> ${escapeHtml(item)}</span>
+        <button type="button" class="ac-remove" aria-label="Remover ${escapeHtml(item)} da lista" title="Remover da lista" data-ac-remove="${encodeURIComponent(item)}">x</button>
       </div>
     `).join("");
   }
@@ -4787,7 +4958,7 @@ function renderDropdown(input, dropdown, listKey, stateKey) {
   if (canCreate) {
     html += `
       <div class="ac-item new-item selected" role="option" aria-selected="true" data-ac-action="create" data-ac-value="${encodeURIComponent(query)}">
-        <i data-lucide="plus-circle"></i> Criar "${escapeHtml(query)}"
+        <span class="ac-item-label"><i data-lucide="plus-circle"></i> Criar "${escapeHtml(query)}"</span>
       </div>
     `;
   }
@@ -4800,6 +4971,12 @@ function renderDropdown(input, dropdown, listKey, stateKey) {
   dropdown.dataset.activeIndex = "0";
   const area = document.getElementById(meta.areaId);
   dropdown.querySelectorAll(".ac-item").forEach((item, index) => {
+    item.querySelector(".ac-remove")?.addEventListener("mousedown", event => {
+      event.preventDefault();
+      event.stopPropagation();
+      const value = decodeURIComponent(event.currentTarget.dataset.acRemove || "");
+      removeAutocompleteListItem(stateKey, listKey, value, input, area, dropdown);
+    });
     item.addEventListener("mouseenter", () => setAutocompleteActiveOption(dropdown, index));
     item.addEventListener("mousedown", event => {
       event.preventDefault();
@@ -4808,6 +4985,18 @@ function renderDropdown(input, dropdown, listKey, stateKey) {
   });
   dropdown.classList.add("open");
   refreshIcons();
+}
+
+function removeAutocompleteListItem(stateKey, listKey, value, input, area, dropdown) {
+  const meta = TAXONOMY_FIELD_META[stateKey];
+  if (!meta || !value) return;
+  removeFromList(listKey, value);
+  state[meta.stateProp] = (state[meta.stateProp] || []).filter(item => normalizeLookupKey(item) !== normalizeLookupKey(value));
+  renderChips(stateKey, area, input, listKey);
+  const freshInput = document.getElementById(meta.inputId);
+  const freshDropdown = document.getElementById(meta.dropdownId);
+  if (freshInput && freshDropdown) renderDropdown(freshInput, freshDropdown, listKey, stateKey);
+  showToast(`${value} removido da lista.`, "info", "Lista");
 }
 
 function getAutocompleteOptions(stateKey, listKey, rawValue) {
@@ -4908,7 +5097,7 @@ function renderChips(stateKey, area, input, listKey) {
   if (!meta || !area) return;
   const arr = state[meta.stateProp];
   area.innerHTML = arr.map(value => `
-    <span class="tag-chip">${escapeHtml(value)}<button type="button" onclick="removeFormTag('${stateKey}',decodeURIComponent('${encodeURIComponent(value)}'),'${listKey}')">x</button></span>
+    <span class="tag-chip">${escapeHtml(value)}<button type="button" aria-label="Remover ${escapeHtml(value)}" title="Remover" onclick="removeFormTag('${stateKey}',decodeURIComponent('${encodeURIComponent(value)}'),'${listKey}')">x</button></span>
   `).join("") + `<input class="tag-text-input" id="${meta.inputId}" placeholder="${arr.length ? "" : meta.placeholder}"><button type="button" class="tag-clear-btn" aria-label="Limpar busca">x</button>`;
   const newInput = area.querySelector("input");
   setupAutocomplete(stateKey, meta.inputId, meta.areaId, meta.dropdownId, listKey);
@@ -6524,7 +6713,7 @@ function applyFilters() {
 
 function clearFilters() {
   state.filters = { search: "", year: "", uf: "", tag: "" };
-  ["filter-search", "filter-year", "filter-uf", "filter-tag"].forEach(id => { els[id].value = ""; });
+  syncFilterControls();
   applyFilters();
 }
 
@@ -6837,6 +7026,9 @@ function renderCoverageSidebar(collections) {
   const selectedTotalDays = selected
     ? selectedJourneyGroups.reduce((sum, trip) => sum + getTripTotalDays(trip), 0)
     : 0;
+  const visibleSelectionCount = previewTrips.length + previewPlans.length;
+  const totalSelectionCount = selectedJourneyGroups.length + selectedPlans.length;
+  const shouldShowAllButton = totalSelectionCount > visibleSelectionCount;
 
   if (els["map-side-copy"]) {
     els["map-side-copy"].style.display = selected ? "none" : "";
@@ -6866,7 +7058,7 @@ function renderCoverageSidebar(collections) {
             </button>
           `).join("") : `<div class="inline-note">Ainda não há viagens registradas nesse recorte.</div>`}
         </div>
-        ${previewTrips.length || previewPlans.length ? `<div class="selection-card-actions">
+        ${shouldShowAllButton ? `<div class="selection-card-actions">
           <button type="button" class="secondary-action" onclick="openSelectedMapCollectionModal()">Ver todas</button>
         </div>` : ""}
       </section>
@@ -7330,15 +7522,15 @@ function renderTravelEvolutionChart() {
       if (!meta || meta.hidden) return;
       const { ctx: chartCtx, chartArea } = chart;
       chartCtx.save();
-      chartCtx.font = "900 13px 'DM Sans', sans-serif";
+      chartCtx.font = "900 12px 'DM Sans', sans-serif";
       chartCtx.textAlign = "center";
       chartCtx.textBaseline = "middle";
       meta.data.forEach((point, index) => {
         const value = chart.data.datasets[1].data[index];
         if (!value) return;
         const label = String(value);
-        const width = Math.max(42, chartCtx.measureText(label).width + 22);
-        const height = 30;
+        const width = Math.max(34, chartCtx.measureText(label).width + 16);
+        const height = 24;
         const x = point.x - width / 2;
         const y = Math.min(
           chartArea.bottom - height - 4,
@@ -7397,6 +7589,14 @@ function renderTravelEvolutionChart() {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      onClick: (event, elements) => {
+        const index = elements?.[0]?.index;
+        const item = yearlyStats[index];
+        if (item) applyDashboardChartFilter("year", String(item.year));
+      },
+      onHover: (event, elements) => {
+        if (event?.native?.target) event.native.target.style.cursor = elements?.length ? "pointer" : "";
+      },
       layout: {
         padding: { top: 20, right: 26, bottom: 14, left: 18 }
       },
@@ -7501,6 +7701,14 @@ function renderDestinationChart() {
       indexAxis: "y",
       responsive: true,
       maintainAspectRatio: false,
+      onClick: (event, elements) => {
+        const index = elements?.[0]?.index;
+        const item = stats[index];
+        if (item) applyDestinationChartFilter(item.label);
+      },
+      onHover: (event, elements) => {
+        if (event?.native?.target) event.native.target.style.cursor = elements?.length ? "pointer" : "";
+      },
       layout: { padding: { top: 8, right: 28, bottom: 0, left: 0 } },
       scales: {
         x: {
@@ -7555,12 +7763,39 @@ function renderDestinationFallback(stats) {
   const max = Math.max(...stats.map(item => item.value), 1);
   const metricClass = state.destinationMetricMode === "days" ? "days" : "trips";
   fallback.innerHTML = `<div class="destination-rank-list">${stats.map(item => `
-    <button type="button" class="destination-rank-row ${metricClass}" onclick="openDestinationStatsModal(decodeURIComponent('${encodeURIComponent(item.label)}'))">
+    <button type="button" class="destination-rank-row ${metricClass}" onclick="applyDestinationChartFilter(decodeURIComponent('${encodeURIComponent(item.label)}'))">
       <span>${escapeHtml(item.label)}</span>
       <strong>${item.value}</strong>
       <em style="width:${Math.max(8, (item.value / max) * 100)}%"></em>
     </button>
   `).join("")}</div>`;
+}
+
+function applyDashboardChartFilter(type, value) {
+  state.filters = { search: "", year: "", uf: "", tag: "" };
+  if (type === "year") state.filters.year = value;
+  syncFilterControls();
+  applyFilters();
+  showToast(`Filtro aplicado: ${value}.`, "info", "Dashboard");
+}
+
+function applyDestinationChartFilter(label) {
+  state.filters = { search: "", year: "", uf: "", tag: "" };
+  if (state.destinationChartMode === "regions") {
+    state.filters.uf = label;
+  } else {
+    state.filters.search = label.toLowerCase();
+  }
+  syncFilterControls(state.destinationChartMode === "regions" ? "" : label);
+  applyFilters();
+  showToast(`Resultados filtrados por ${label}.`, "info", "Top 5");
+}
+
+function syncFilterControls(searchDisplayValue = "") {
+  if (els["filter-search"]) els["filter-search"].value = searchDisplayValue || state.filters.search;
+  if (els["filter-year"]) els["filter-year"].value = state.filters.year;
+  if (els["filter-uf"]) els["filter-uf"].value = state.filters.uf;
+  if (els["filter-tag"]) els["filter-tag"].value = state.filters.tag;
 }
 
 function openDestinationStatsModal(label) {
@@ -7596,11 +7831,11 @@ function renderTravelEvolutionFallback(yearlyStats) {
     const barHeight = Math.max(8, (item.trips / maxTrips) * 82);
     const dayTop = 88 - ((item.days / maxDays) * 76);
     return `
-      <div class="fallback-year">
+      <button type="button" class="fallback-year" onclick="applyDashboardChartFilter('year', '${escapeHtml(String(item.year))}')">
         <div class="fallback-day-label" style="top:${dayTop}%">${item.days || ""}</div>
         <div class="fallback-bar" style="height:${barHeight}%"><span class="fallback-bar-label">${item.trips || ""}</span></div>
         <span class="fallback-year-label">${item.year}</span>
-      </div>
+      </button>
     `;
   }).join("");
 }
