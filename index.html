@@ -1775,6 +1775,45 @@
     background: rgba(148, 163, 184, 0.8);
     border-radius: 999px;
   }
+  .itinerary-mobile-list { display: none; }
+  .itinerary-day-card {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--white);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+  }
+  .itinerary-day-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 14px;
+    background: linear-gradient(180deg, #f7fafe 0%, #eef4fb 100%);
+    border-bottom: 1px solid var(--line);
+  }
+  .itinerary-mobile-slot {
+    padding: 12px 14px 14px;
+    border-bottom: 1px solid var(--line);
+  }
+  .itinerary-mobile-slot:last-child { border-bottom: none; }
+  .itinerary-mobile-label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--ink-3);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .itinerary-mobile-list .itinerary-input,
+  .itinerary-mobile-list .itinerary-output {
+    min-height: 82px;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--paper);
+  }
   .draft-actions {
     margin-top: 18px;
     display: flex;
@@ -2098,27 +2137,33 @@
       min-height: auto;
       padding: 14px 16px;
       flex-direction: row;
-      align-items: flex-start;
-      gap: 12px;
+      align-items: center;
+      gap: 10px;
     }
-    .page-title { font-size: 24px; line-height: 1.05; }
+    .topbar > div:first-child { min-width: 0; }
+    .page-title { font-size: 23px; line-height: 1.05; }
     .top-actions {
       margin-left: auto;
       align-items: center;
       flex-direction: row;
-      gap: 8px;
+      gap: 6px;
       flex-shrink: 0;
+      min-width: 0;
     }
     .sync-pill {
       padding: 5px 9px;
       font-size: 11px;
       justify-content: center;
+      max-width: 92px;
+      overflow: hidden;
     }
+    #sync-text { overflow: hidden; text-overflow: ellipsis; }
     .primary-action {
       min-height: 38px;
-      padding: 8px 14px;
+      padding: 8px 12px;
       font-size: 12px;
       gap: 6px;
+      white-space: nowrap;
     }
     .content { padding: 20px 20px 100px; }
     .dashboard-hero-grid { gap: 20px; }
@@ -2186,6 +2231,158 @@
     }
     .mobile-nav .nav-item svg { width: 18px; height: 18px; margin: 0 auto; }
     .mobile-nav .nav-item.active { background: var(--blue-pale); color: var(--blue-dark); }
+    .dashboard-stack { gap: 14px; }
+    .source-note, .inline-note, .empty-state { padding: 13px 14px; font-size: 13px; line-height: 1.45; }
+    .plan-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .plan-main { order: 1; gap: 14px; }
+    .plan-sidebar { order: 2; gap: 14px; }
+    .plan-panel { padding: 16px; border-radius: 14px; }
+    .plan-form-grid {
+      grid-template-columns: 1fr;
+      gap: 13px;
+      margin-top: 16px;
+    }
+    .plan-form-grid .field,
+    .plan-form-grid .field-full { grid-column: 1 / -1; }
+    .city-block { padding: 13px; border-radius: 10px; }
+    .city-block-grid,
+    .city-block-grid.compact-grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .city-block .inline-note { margin-top: 10px !important; }
+    .add-city-btn,
+    #generate-plan-grid-btn,
+    .detail-status-wrap .secondary-action,
+    .detail-actions .primary-action {
+      width: 100%;
+      min-height: 44px;
+      justify-content: center;
+    }
+    .tag-input-area { min-height: 42px; }
+    .draft-actions {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .draft-summary { font-size: 12px; line-height: 1.45; }
+    #plan-grid-title {
+      margin-top: 20px !important;
+      text-align: left !important;
+      font-size: 18px;
+      line-height: 1.15;
+    }
+    .itinerary-container { display: none; }
+    .itinerary-mobile-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .itinerary-day-card-header .itinerary-day-date { font-size: 17px; }
+    .itinerary-day-card-header .itinerary-day-name { margin-bottom: 0; }
+    .itinerary-mobile-list .itinerary-input,
+    .itinerary-mobile-list .itinerary-output {
+      min-height: 78px;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .form-actions-row {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+    }
+    .form-actions-row .primary-action,
+    .form-actions-row .secondary-action {
+      flex: 1 1 auto;
+      width: 100%;
+      justify-content: center;
+      min-height: 44px;
+    }
+    .plan-list {
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .plan-item {
+      padding: 13px;
+      border-radius: 12px;
+    }
+    .plan-item:hover,
+    .plan-item.active {
+      transform: none;
+      box-shadow: var(--shadow-sm);
+    }
+    .plan-item-title {
+      margin: 7px 0 3px;
+      font-size: 18px;
+      line-height: 1.1;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .plan-item-copy { font-size: 12px; line-height: 1.35; }
+    .plan-item-meta {
+      gap: 8px;
+      margin-top: 10px;
+      font-size: 10px;
+      line-height: 1.35;
+    }
+    .plan-item-actions {
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .meta-cloud {
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .meta-pill {
+      max-width: 100%;
+      padding: 5px 8px;
+      font-size: 10px;
+      line-height: 1.2;
+    }
+    .detail-header-top {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .detail-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .detail-status-wrap {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 1fr;
+      max-width: none;
+    }
+    .detail-actions .primary-action {
+      grid-column: 1 / -1;
+      font-size: 12px;
+    }
+    .detail-actions .icon-action-btn {
+      width: 100%;
+      min-height: 42px;
+      border-radius: 10px;
+    }
+    .detail-grid {
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .detail-stat-box,
+    .detail-note-box {
+      padding: 14px;
+      border-radius: 12px;
+    }
+    .detail-section-title { margin: 20px 0 10px; }
     .form-panel { padding: 20px; }
     .form-shell-header {
       flex-direction: column;
@@ -5941,6 +6138,9 @@ function renderItineraryTable(itinerary, editable, startDate, endDate) {
   const days = itinerary.days.length ? itinerary.days : getDaysBetween(startDate, endDate);
   if (!days.length && !itinerary.notes) return `<div class="inline-note">Sem roteiro diário cadastrado.</div>`;
   if (!days.length && itinerary.notes) return `<div class="detail-note-box"><strong>Observação salva</strong><p>${escapeHtml(itinerary.notes)}</p></div>`;
+  if (window.matchMedia("(max-width: 768px)").matches) {
+    return renderItineraryMobileCards(itinerary, editable, days);
+  }
 
   let html = `<div class="itinerary-container"><table class="itinerary-table"><thead><tr><th class="itinerary-corner"></th>`;
   days.forEach(day => {
@@ -5961,6 +6161,33 @@ function renderItineraryTable(itinerary, editable, startDate, endDate) {
     html += `</tr>`;
   });
   html += `</tbody></table></div>`;
+  if (itinerary.notes) html += `<div class="inline-note" style="margin-top:14px;">${escapeHtml(itinerary.notes)}</div>`;
+  return html;
+}
+
+function renderItineraryMobileCards(itinerary, editable, days) {
+  let html = `<div class="itinerary-mobile-list">`;
+  days.forEach((day, index) => {
+    html += `
+      <section class="itinerary-day-card">
+        <div class="itinerary-day-card-header">
+          <span class="itinerary-day-name">${escapeHtml(formatWeekdayShort(day))}</span>
+          <span class="itinerary-day-date">${escapeHtml(formatDayLabel(day))}</span>
+        </div>
+    `;
+    ITINERARY_SLOTS.forEach(slot => {
+      const value = itinerary.slots?.[day]?.[slot.key] || "";
+      html += `<div class="itinerary-mobile-slot"><span class="itinerary-mobile-label">${escapeHtml(slot.label)}</span>`;
+      if (editable) {
+        html += `<textarea class="itinerary-input" id="draft-${slot.key}-${index}" placeholder="O que acontece aqui?">${escapeHtml(value)}</textarea>`;
+      } else {
+        html += `<div class="itinerary-output ${value ? "" : "empty"}"><span class="itinerary-output-text">${value ? escapeHtml(value) : ""}</span></div>`;
+      }
+      html += `</div>`;
+    });
+    html += `</section>`;
+  });
+  html += `</div>`;
   if (itinerary.notes) html += `<div class="inline-note" style="margin-top:14px;">${escapeHtml(itinerary.notes)}</div>`;
   return html;
 }
