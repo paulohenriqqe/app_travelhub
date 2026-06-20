@@ -1,0 +1,15 @@
+# TravelHub UI Notes
+
+Use these preferences for future TravelHub edits.
+
+- Prefer compact, product-like UI over report-style screens.
+- Avoid long explanatory copy. Keep labels short and let interactions be obvious.
+- Avoid card-inside-card patterns, heavy gray backgrounds, rounded boxes around simple groups, and excessive shadows.
+- Use the compact MG map panel style as the default pattern: simple headings, one-line rows, thin dividers, clear numbers.
+- In forms, prefer clean sections separated by lines instead of gray boxes.
+- Chips for tags, companions, artists, locations, and similar lists should stay on one horizontal line with overflow, not expand the panel vertically.
+- Autocomplete should prefer selecting existing matches; only create when no match exists.
+- Provide a clear way to erase typed autocomplete searches.
+- Charts should use consistent metric colors: blue for trips, orange for days. Bar fill and border should match, with square bar corners.
+- Feedback such as save success should use fading toast alerts instead of persistent inline text when possible.
+- Planned items should appear as planned, but should not inflate effective trip counts.

@@ -2272,7 +2272,7 @@
     height: 280px;
   }
   .year-chart-container {
-    height: 292px;
+    height: 260px;
     overflow: visible;
   }
   .chart-mini-legend {
@@ -2339,9 +2339,9 @@
     position: relative;
     width: min(42px, 72%);
     min-height: 6px;
-    border-radius: 9px 9px 3px 3px;
+    border-radius: 0;
     background: rgba(38, 185, 221, 0.58);
-    border: 1px solid rgba(9, 117, 153, 0.28);
+    border: 1px solid rgba(38, 185, 221, 0.58);
   }
   .fallback-bar-label {
     position: absolute;
@@ -2383,7 +2383,7 @@
     font-weight: 800;
   }
   .destination-chart-container {
-    height: 292px;
+    height: 260px;
   }
   .destination-chart-fallback {
     display: none;
@@ -2424,13 +2424,22 @@
     font-family: "DM Serif Display", serif;
     font-size: 22px;
   }
+  .destination-rank-row.trips strong {
+    color: var(--blue-med);
+  }
+  .destination-rank-row.days strong {
+    color: var(--accent);
+  }
   .destination-rank-row em {
     position: absolute;
     left: 0;
     bottom: 0;
     height: 3px;
-    border-radius: 999px;
+    border-radius: 0;
     background: var(--blue-light);
+  }
+  .destination-rank-row.days em {
+    background: var(--accent);
   }
   .compact-toggle {
     display: inline-flex;
@@ -2743,6 +2752,7 @@
   }
   .form-panel {
     padding: 18px;
+    box-shadow: none;
   }
   .form-shell-header {
     margin-bottom: 14px;
@@ -2751,11 +2761,15 @@
     font-size: 22px;
   }
   .form-section {
-    padding: 10px 12px;
-    margin-bottom: 10px;
+    padding: 0 0 12px;
+    margin-bottom: 12px;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    border-radius: 0;
+    background: transparent;
   }
   .form-section-title {
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
   .form-grid,
   .plan-form-grid {
@@ -2769,26 +2783,45 @@
   }
   .tag-input-area {
     min-height: 38px;
-    padding: 6px 8px;
+    padding: 5px 6px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-radius: 8px;
+    background: var(--white);
+    scrollbar-width: thin;
+  }
+  .tag-input-area:focus-within {
+    box-shadow: none;
   }
   .city-blocks {
     gap: 8px;
   }
   .city-block {
-    padding: 8px;
+    padding: 0 0 10px;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    border-radius: 0;
+    background: transparent;
   }
   .city-block-header {
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
   .add-city-btn {
     min-height: 36px;
     padding: 8px 10px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--line);
+    border-radius: 8px;
+    background: transparent;
   }
   .plan-layout {
     gap: 14px;
   }
   .plan-panel {
     padding: 12px;
+    box-shadow: none;
   }
   .planning-inline-stats {
     gap: 8px;
@@ -2796,6 +2829,9 @@
   .planning-inline-stat {
     padding: 9px 10px;
     min-height: 54px;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
   }
   .planning-inline-stat strong {
     font-size: 22px;
@@ -2805,13 +2841,71 @@
   }
   .plan-detail-compact-meta {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: center;
     gap: 7px;
     margin-top: 10px;
     color: var(--ink-3);
     font-size: 12px;
     font-weight: 700;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .meta-cloud {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: thin;
+  }
+  .meta-pill,
+  .tag-chip {
+    flex: 0 0 auto;
+  }
+  .tag-text-input {
+    flex: 0 0 180px;
+    min-width: 140px;
+  }
+  .tag-clear-btn {
+    width: 26px;
+    height: 26px;
+    flex: 0 0 26px;
+    display: none;
+    place-items: center;
+    border: 0;
+    border-radius: 999px;
+    background: var(--paper-2);
+    color: var(--ink-3);
+    font-size: 14px;
+    font-weight: 900;
+    line-height: 1;
+  }
+  .tag-input-area.has-query .tag-clear-btn {
+    display: grid;
+  }
+  .plan-list-filter {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+  .plan-list-filter button {
+    min-height: 30px;
+    padding: 5px 9px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--white);
+    color: var(--ink-2);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .plan-list-filter button.active {
+    border-color: rgba(38, 185, 221, 0.36);
+    background: var(--blue-pale);
+    color: var(--blue-dark);
   }
   .detail-actions {
     margin-top: 12px;
@@ -3340,36 +3434,6 @@
             <div>
               <h2 class="chart-title form-shell-title" id="trip-form-title">Dados principais</h2>
             </div>
-            <div class="form-shell-actions">
-              <div class="hero-assist hero-search-assist" id="trip-lookup-assist">
-                <button type="button" class="hero-search-trigger" id="trip-lookup-btn" aria-expanded="false" aria-controls="trip-lookup-panel">
-                  <i data-lucide="search"></i>
-                  <span>Buscar anteriores</span>
-                </button>
-                <div class="hero-search-panel" id="trip-lookup-panel">
-                  <span class="hero-search-title">Buscar viagens anteriores</span>
-                  <div class="hero-search-input-wrap">
-                    <i data-lucide="search"></i>
-                    <input type="search" class="hero-search-input" id="trip-lookup-input" placeholder="Nome, cidade, tag, artista...">
-                  </div>
-                  <div class="hero-search-results" id="trip-lookup-results"></div>
-                </div>
-              </div>
-              <div class="hero-assist" id="trip-help-assist">
-                <button type="button" class="hero-icon-btn" id="trip-help-btn" aria-expanded="false" aria-controls="trip-help-card" aria-label="Como preencher esta tela">
-                  <i data-lucide="circle-help"></i>
-                </button>
-                <div class="hero-popover-card" id="trip-help-card">
-                  <strong>Como preencher</strong>
-                  <div class="hero-help-list">
-                    <span>Escolha um nome curto e fácil de achar depois.</span>
-                    <span>Adicione uma ou mais cidades visitadas.</span>
-                    <span>Use tags, artistas e acompanhantes para dar contexto.</span>
-                    <span>Use a lupa para reaproveitar uma viagem antiga.</span>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
 
           <form id="trip-form">
@@ -3390,7 +3454,7 @@
             </div>
 
             <div class="form-section">
-              <div class="form-section-title"><i data-lucide="map-pin"></i> Cidades visitadas <span style="font-size:11px;color:var(--ink-3);font-weight:400;margin-left:8px;text-transform:none;letter-spacing:0;">Adicione uma cidade por parada da viagem.</span></div>
+              <div class="form-section-title"><i data-lucide="map-pin"></i> Cidades visitadas</div>
               <div class="city-blocks" id="city-blocks"></div>
               <button type="button" class="add-city-btn" id="add-city-btn" style="margin-top:12px;">
                 <i data-lucide="plus"></i> Adicionar outra cidade
@@ -3400,9 +3464,9 @@
             <div class="form-section">
               <div class="form-section-title"><i data-lucide="hash"></i> Tags / motivo</div>
               <div class="field field-full">
-                <label>Tags <span style="color:var(--ink-3);font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">novas tags entram nas listas automaticamente</span></label>
+                <label>Tags</label>
                 <div class="autocomplete-wrapper" id="ac-tags-wrapper">
-                  <div class="tag-input-area" id="tags-area"><input class="tag-text-input" id="tags-input" placeholder="Digite para buscar ou criar tag..."></div>
+                  <div class="tag-input-area" id="tags-area"><input class="tag-text-input" id="tags-input" placeholder="Digite para buscar..."><button type="button" class="tag-clear-btn" aria-label="Limpar busca">x</button></div>
                   <div class="autocomplete-dropdown" id="tags-dropdown"></div>
                 </div>
               </div>
@@ -3412,7 +3476,7 @@
               <div class="form-section-title"><i data-lucide="music-2"></i> Artistas</div>
               <div class="field field-full">
                 <div class="autocomplete-wrapper" id="ac-artists-wrapper">
-                  <div class="tag-input-area" id="artists-area"><input class="tag-text-input" id="artists-input" placeholder="Digite para buscar ou adicionar artista..."></div>
+                  <div class="tag-input-area" id="artists-area"><input class="tag-text-input" id="artists-input" placeholder="Digite para buscar..."><button type="button" class="tag-clear-btn" aria-label="Limpar busca">x</button></div>
                   <div class="autocomplete-dropdown" id="artists-dropdown"></div>
                 </div>
               </div>
@@ -3422,7 +3486,7 @@
               <div class="form-section-title"><i data-lucide="users"></i> Acompanhantes</div>
               <div class="field field-full">
                 <div class="autocomplete-wrapper" id="ac-companions-wrapper">
-                  <div class="tag-input-area" id="companions-area"><input class="tag-text-input" id="companions-input" placeholder="Digite para buscar ou adicionar acompanhante..."></div>
+                  <div class="tag-input-area" id="companions-area"><input class="tag-text-input" id="companions-input" placeholder="Digite para buscar..."><button type="button" class="tag-clear-btn" aria-label="Limpar busca">x</button></div>
                   <div class="autocomplete-dropdown" id="companions-dropdown"></div>
                 </div>
               </div>
@@ -3449,7 +3513,7 @@
               </section>
 
               <section class="panel plan-panel">
-                <div class="panel-label">Planos oficiais</div>
+                <div class="panel-label">Em planejamento</div>
                 <div class="plan-list" id="plan-list"></div>
               </section>
             </aside>
@@ -3459,22 +3523,6 @@
                 <div class="form-shell-header">
                   <div>
                     <h2 class="panel-title" id="plan-editor-title">Criar novo plano</h2>
-                  </div>
-                  <div class="form-shell-actions">
-                    <div class="hero-assist" id="plan-help-assist">
-                      <button type="button" class="hero-icon-btn" id="plan-help-btn" aria-expanded="false" aria-controls="plan-help-card" aria-label="Como preencher este plano">
-                        <i data-lucide="circle-help"></i>
-                      </button>
-                      <div class="hero-popover-card" id="plan-help-card">
-                        <strong>Como preencher</strong>
-                        <div class="hero-help-list">
-                          <span>Defina destino, datas e status inicial.</span>
-                          <span>Use tags, artistas e acompanhantes para contexto.</span>
-                          <span>Gere o roteiro diário só quando fizer sentido.</span>
-                          <span>Depois você pode efetivar o plano sem retrabalho.</span>
-                        </div>
-                      </div>
-                    </div>
                   </div>
                 </div>
 
@@ -3495,21 +3543,21 @@
                   <div class="field">
                     <label>Tags</label>
                     <div class="autocomplete-wrapper" id="ac-plan-tags-wrapper">
-                      <div class="tag-input-area" id="plan-tags-area"><input class="tag-text-input" id="plan-tags-input" placeholder="Digite para buscar ou criar tag..."></div>
+                      <div class="tag-input-area" id="plan-tags-area"><input class="tag-text-input" id="plan-tags-input" placeholder="Digite para buscar..."><button type="button" class="tag-clear-btn" aria-label="Limpar busca">x</button></div>
                       <div class="autocomplete-dropdown" id="plan-tags-dropdown"></div>
                     </div>
                   </div>
                   <div class="field">
                     <label>Acompanhantes</label>
                     <div class="autocomplete-wrapper" id="ac-plan-companions-wrapper">
-                      <div class="tag-input-area" id="plan-companions-area"><input class="tag-text-input" id="plan-companions-input" placeholder="Digite para buscar ou adicionar acompanhante..."></div>
+                      <div class="tag-input-area" id="plan-companions-area"><input class="tag-text-input" id="plan-companions-input" placeholder="Digite para buscar..."><button type="button" class="tag-clear-btn" aria-label="Limpar busca">x</button></div>
                       <div class="autocomplete-dropdown" id="plan-companions-dropdown"></div>
                     </div>
                   </div>
                   <div class="field field-full">
                     <label>Artistas</label>
                     <div class="autocomplete-wrapper" id="ac-plan-artists-wrapper">
-                      <div class="tag-input-area" id="plan-artists-area"><input class="tag-text-input" id="plan-artists-input" placeholder="Digite para buscar ou adicionar artista..."></div>
+                      <div class="tag-input-area" id="plan-artists-area"><input class="tag-text-input" id="plan-artists-input" placeholder="Digite para buscar..."><button type="button" class="tag-clear-btn" aria-label="Limpar busca">x</button></div>
                       <div class="autocomplete-dropdown" id="plan-artists-dropdown"></div>
                     </div>
                   </div>
@@ -3542,7 +3590,7 @@
               </section>
 
               <section class="panel plan-panel" id="plan-detail-panel">
-                <div class="empty-state">Selecione um plano na coluna ao lado para ver o roteiro, o status e o fluxo de efetivação.</div>
+                <div class="empty-state">Selecione um plano.</div>
               </section>
             </div>
           </div>
@@ -3773,6 +3821,7 @@ const state = {
   mapDetail: "states",
   showPlannedMap: false,
   selectedMapFeature: null,
+  planListFilter: "open",
   destinationChartMode: "cities",
   destinationMetricMode: "trips",
   map: null,
@@ -3815,12 +3864,12 @@ let cityBlockCounter = 0;
 let planCityBlockCounter = 0;
 let toastTimer = null;
 const TAXONOMY_FIELD_META = {
-  tags: { stateProp: "formTags", inputId: "tags-input", areaId: "tags-area", dropdownId: "tags-dropdown", listKey: "tags", placeholder: "Digite para buscar ou criar tag..." },
-  artists: { stateProp: "formArtists", inputId: "artists-input", areaId: "artists-area", dropdownId: "artists-dropdown", listKey: "artists", placeholder: "Digite para buscar ou adicionar artista..." },
-  companions: { stateProp: "formCompanions", inputId: "companions-input", areaId: "companions-area", dropdownId: "companions-dropdown", listKey: "companions", placeholder: "Digite para buscar ou adicionar acompanhante..." },
-  planTags: { stateProp: "formPlanTags", inputId: "plan-tags-input", areaId: "plan-tags-area", dropdownId: "plan-tags-dropdown", listKey: "tags", placeholder: "Digite para buscar ou criar tag..." },
-  planArtists: { stateProp: "formPlanArtists", inputId: "plan-artists-input", areaId: "plan-artists-area", dropdownId: "plan-artists-dropdown", listKey: "artists", placeholder: "Digite para buscar ou adicionar artista..." },
-  planCompanions: { stateProp: "formPlanCompanions", inputId: "plan-companions-input", areaId: "plan-companions-area", dropdownId: "plan-companions-dropdown", listKey: "companions", placeholder: "Digite para buscar ou adicionar acompanhante..." }
+  tags: { stateProp: "formTags", inputId: "tags-input", areaId: "tags-area", dropdownId: "tags-dropdown", listKey: "tags", placeholder: "Digite para buscar..." },
+  artists: { stateProp: "formArtists", inputId: "artists-input", areaId: "artists-area", dropdownId: "artists-dropdown", listKey: "artists", placeholder: "Digite para buscar..." },
+  companions: { stateProp: "formCompanions", inputId: "companions-input", areaId: "companions-area", dropdownId: "companions-dropdown", listKey: "companions", placeholder: "Digite para buscar..." },
+  planTags: { stateProp: "formPlanTags", inputId: "plan-tags-input", areaId: "plan-tags-area", dropdownId: "plan-tags-dropdown", listKey: "tags", placeholder: "Digite para buscar..." },
+  planArtists: { stateProp: "formPlanArtists", inputId: "plan-artists-input", areaId: "plan-artists-area", dropdownId: "plan-artists-dropdown", listKey: "artists", placeholder: "Digite para buscar..." },
+  planCompanions: { stateProp: "formPlanCompanions", inputId: "plan-companions-input", areaId: "plan-companions-area", dropdownId: "plan-companions-dropdown", listKey: "companions", placeholder: "Digite para buscar..." }
 };
 
 function repairMojibake(value) {
@@ -4044,6 +4093,7 @@ function showToast(message, tone = "info", title) {
     <i data-lucide="${meta.icon}"></i>
     <div>
       <strong>${escapeHtml(meta.title)}</strong>
+      <span>${escapeHtml(message)}</span>
     </div>
   `;
   refreshIcons();
@@ -4051,7 +4101,7 @@ function showToast(message, tone = "info", title) {
   requestAnimationFrame(() => toast.classList.add("show"));
   toastTimer = window.setTimeout(() => {
     toast.classList.remove("show");
-  }, 2600);
+  }, 4000);
 }
 
 function bindEvents() {
@@ -4280,8 +4330,19 @@ function setupAutocomplete(stateKey, inputId, areaId, dropdownId, listKey) {
   const area = document.getElementById(areaId);
   const dropdown = document.getElementById(dropdownId);
   if (!meta || !input || !area || !dropdown) return;
+  const clearBtn = area.querySelector(".tag-clear-btn");
+  const syncQueryState = () => area.classList.toggle("has-query", !!input.value.trim());
   area.addEventListener("click", () => input.focus());
-  input.addEventListener("input", () => renderDropdown(input, dropdown, listKey, stateKey));
+  clearBtn?.addEventListener("click", event => {
+    event.stopPropagation();
+    input.value = "";
+    area.classList.remove("has-query");
+    dropdown.classList.remove("open");
+  });
+  input.addEventListener("input", () => {
+    syncQueryState();
+    renderDropdown(input, dropdown, listKey, stateKey);
+  });
   input.addEventListener("keydown", event => {
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault();
@@ -4295,6 +4356,10 @@ function setupAutocomplete(stateKey, inputId, areaId, dropdownId, listKey) {
       return;
     }
     if (event.key === "Escape") {
+      if (input.value) {
+        input.value = "";
+        area.classList.remove("has-query");
+      }
       dropdown.classList.remove("open");
       return;
     }
@@ -4307,9 +4372,11 @@ function setupAutocomplete(stateKey, inputId, areaId, dropdownId, listKey) {
     }
   });
   input.addEventListener("focus", () => {
+    syncQueryState();
     closeAllAutocompleteDropdowns(dropdownId);
     renderDropdown(input, dropdown, listKey, stateKey);
   });
+  syncQueryState();
 }
 
 function renderDropdown(input, dropdown, listKey, stateKey) {
@@ -4452,7 +4519,7 @@ function renderChips(stateKey, area, input, listKey) {
   const arr = state[meta.stateProp];
   area.innerHTML = arr.map(value => `
     <span class="tag-chip">${escapeHtml(value)}<button type="button" onclick="removeFormTag('${stateKey}',decodeURIComponent('${encodeURIComponent(value)}'),'${listKey}')">x</button></span>
-  `).join("") + `<input class="tag-text-input" id="${meta.inputId}" placeholder="${arr.length ? "" : meta.placeholder}">`;
+  `).join("") + `<input class="tag-text-input" id="${meta.inputId}" placeholder="${arr.length ? "" : meta.placeholder}"><button type="button" class="tag-clear-btn" aria-label="Limpar busca">x</button>`;
   const newInput = area.querySelector("input");
   setupAutocomplete(stateKey, meta.inputId, meta.areaId, meta.dropdownId, listKey);
   newInput.focus();
@@ -6848,8 +6915,8 @@ function renderTravelEvolutionChart() {
   const daySeries = yearlyStats.map(item => item.days);
   const maxTripValue = Math.max(...tripSeries, 0);
   const maxDayValue = Math.max(...daySeries, 0);
-  const tripPadding = Math.max(2, Math.ceil(maxTripValue * 0.28));
-  const dayPadding = Math.max(5, Math.ceil(maxDayValue * 0.28));
+  const tripPadding = Math.max(1, Math.ceil(maxTripValue * 0.12));
+  const dayPadding = Math.max(2, Math.ceil(maxDayValue * 0.12));
   const ctx = chartCanvas.getContext("2d");
   if (state.chartInstance) state.chartInstance.destroy();
   const barBaseLabelPlugin = {
@@ -6882,10 +6949,10 @@ function renderTravelEvolutionChart() {
           label: "Viagens",
           data: tripSeries,
           yAxisID: "yTrips",
-          backgroundColor: "rgba(38, 185, 221, 0.56)",
-          borderColor: "rgba(9, 117, 153, 0.78)",
+          backgroundColor: "rgba(38, 185, 221, 0.62)",
+          borderColor: "rgba(38, 185, 221, 0.62)",
           borderWidth: 1,
-          borderRadius: 9,
+          borderRadius: 0,
           borderSkipped: false,
           maxBarThickness: 34,
           clip: false,
@@ -6917,7 +6984,7 @@ function renderTravelEvolutionChart() {
       responsive: true,
       maintainAspectRatio: false,
       layout: {
-        padding: { top: 42, right: 30, bottom: 20, left: 18 }
+        padding: { top: 20, right: 26, bottom: 14, left: 18 }
       },
       scales: {
         yTrips: {
@@ -6955,14 +7022,14 @@ function renderTravelEvolutionChart() {
           anchor: "end",
           align: "top",
           offset: 8,
-          color: "rgba(212, 70, 28, 1)",
-          font: { weight: "900", size: 13 },
+          color: "rgba(255, 255, 255, 0.98)",
+          font: { weight: "900", size: 12 },
           textStrokeColor: "rgba(255, 255, 255, 0.92)",
-          textStrokeWidth: 3,
-          backgroundColor: "transparent",
+          textStrokeWidth: 0,
+          backgroundColor: "rgba(212, 70, 28, 1)",
           borderWidth: 0,
           borderRadius: 0,
-          padding: { top: 0, right: 0, bottom: 0, left: 0 },
+          padding: { top: 5, right: 9, bottom: 5, left: 9 },
           clamp: true,
           clip: false
         },
@@ -6988,8 +7055,7 @@ function renderDestinationChart() {
   const metricLabel = state.destinationMetricMode === "days" ? "Dias" : "Viagens";
   const metricSingular = state.destinationMetricMode === "days" ? "dia" : "viagem";
   const metricPlural = state.destinationMetricMode === "days" ? "dias" : "viagens";
-  const metricColor = state.destinationMetricMode === "days" ? "rgba(212, 70, 28, 0.82)" : "rgba(38, 185, 221, 0.58)";
-  const metricBorder = state.destinationMetricMode === "days" ? "rgba(212, 70, 28, 1)" : "rgba(9, 117, 153, 0.72)";
+  const metricColor = state.destinationMetricMode === "days" ? "rgba(212, 70, 28, 0.78)" : "rgba(38, 185, 221, 0.62)";
   if (!chartCanvas) return;
   if (!window.Chart) {
     renderDestinationFallback(stats);
@@ -7010,9 +7076,9 @@ function renderDestinationChart() {
         label: metricLabel,
         data: stats.map(item => item.value),
         backgroundColor: metricColor,
-        borderColor: metricBorder,
+        borderColor: metricColor,
         borderWidth: 1,
-        borderRadius: 8,
+        borderRadius: 0,
         borderSkipped: false,
         maxBarThickness: 30
       }]
@@ -7047,7 +7113,7 @@ function renderDestinationChart() {
           anchor: "end",
           align: "end",
           offset: 4,
-          color: state.destinationMetricMode === "days" ? "rgba(10, 47, 76, 0.86)" : "rgba(212, 70, 28, 1)",
+          color: state.destinationMetricMode === "days" ? "rgba(212, 70, 28, 1)" : "rgba(9, 117, 153, 1)",
           font: { weight: "900", size: 14 },
           clamp: true
         },
@@ -7198,25 +7264,26 @@ function renderPlanningSourceNote() {
 function renderPlanningMetrics() {
   const linkedIds = new Set(state.trips.map(trip => trip.planId).filter(Boolean));
   const metrics = [
-    { label: "Planos", value: state.planMetrics.total },
-    { label: "Em aberto", value: state.planMetrics.open },
-    { label: "Efetivados", value: state.planMetrics.converted || linkedIds.size }
+    { key: "total", label: "Planos", value: state.planMetrics.total },
+    { key: "open", label: "Em aberto", value: state.planMetrics.open },
+    { key: "converted", label: "Efetivados", value: state.planMetrics.converted || linkedIds.size }
   ];
   els["planning-mini-stats"].innerHTML = metrics.map(metric => `
-    <div class="planning-inline-stat">
+    <button type="button" class="planning-inline-stat" onclick="openPlansMetricModal('${metric.key}')">
       <strong>${metric.value}</strong>
       <span>${metric.label}</span>
-    </div>
+    </button>
   `).join("");
 }
 
 function renderPlanList() {
-  if (!state.filteredPlans.length) {
-    els["plan-list"].innerHTML = `<div class="empty-state">Nenhum plano cadastrado ainda. Preencha o formulário ao lado e salve para começar, ou conecte o CSV publicado do planejamento.</div>`;
+  const openPlans = state.filteredPlans.filter(plan => !["efetivado", "cancelado"].includes(plan.status));
+  if (!openPlans.length) {
+    els["plan-list"].innerHTML = `<div class="empty-state">Nenhum plano em aberto.</div>`;
     return;
   }
 
-  els["plan-list"].innerHTML = state.filteredPlans.map(plan => {
+  els["plan-list"].innerHTML = openPlans.map(plan => {
     const linkedTrips = getLinkedTripsForPlan(plan.id);
     return `
       <article class="plan-item ${state.selectedPlanId === plan.id ? "active" : ""}" onclick="selectPlan(decodeURIComponent('${encodeURIComponent(plan.id)}'))">
@@ -7241,6 +7308,42 @@ function renderPlanList() {
       </article>
     `;
   }).join("");
+  refreshIcons();
+}
+
+function openPlansMetricModal(metricKey = "total") {
+  const linkedIds = new Set(state.trips.map(trip => trip.planId).filter(Boolean));
+  const config = {
+    total: {
+      title: "Planos",
+      plans: state.plans
+    },
+    open: {
+      title: "Planos em aberto",
+      plans: state.plans.filter(plan => !["efetivado", "cancelado"].includes(plan.status))
+    },
+    converted: {
+      title: "Planos efetivados",
+      plans: state.plans.filter(plan => linkedIds.has(plan.id) || plan.status === "efetivado")
+    }
+  }[metricKey] || { title: "Planos", plans: state.plans };
+  openPlansListModal(config.title, config.plans);
+}
+
+function openPlansListModal(title, plans) {
+  if (!els["trip-modal"] || !els["modal-header"] || !els["modal-body"]) return;
+  els["modal-header"].textContent = title;
+  els["modal-body"].innerHTML = plans?.length ? `
+    <div class="modal-list">
+      ${plans.map(plan => `
+        <button type="button" class="modal-list-item planned" onclick="closeModal(); selectPlan(decodeURIComponent('${encodeURIComponent(plan.id)}')); switchView('planejar')">
+          <span class="modal-list-label">${escapeHtml(plan.destination)}<br><small>${escapeHtml(formatDateRange(plan.startDate, plan.endDate))}</small></span>
+          <span class="modal-list-badge">${escapeHtml(STATUS_META[normalizeStatus(plan.status)]?.label || "Planejado")}</span>
+        </button>
+      `).join("")}
+    </div>
+  ` : `<div class="empty-state compact-empty">Nenhum plano nesta lista.</div>`;
+  els["trip-modal"].classList.add("open");
   refreshIcons();
 }
 
@@ -7314,16 +7417,11 @@ function renderSelectedPlan() {
   const panel = els["plan-detail-panel"];
   const plan = state.plans.find(item => item.id === state.selectedPlanId);
   if (!plan) {
-    panel.innerHTML = `<div class="empty-state">Selecione um plano na coluna ao lado para ver o roteiro, o status e o fluxo de efetivação.</div>`;
+    panel.innerHTML = `<div class="empty-state">Selecione um plano.</div>`;
     return;
   }
 
   const linkedTrips = getLinkedTripsForPlan(plan.id);
-  const contextItems = [
-    ...plan.tags.map(tag => ({ icon: "hash", value: tag })),
-    ...plan.travelers.map(person => ({ icon: "users", value: person })),
-    ...plan.artists.map(artist => ({ icon: "music-2", value: artist }))
-  ];
 
   panel.innerHTML = `
     <div class="detail-header-top">
@@ -7357,23 +7455,10 @@ function renderSelectedPlan() {
 
     <div class="plan-detail-compact-meta">
       <span>${linkedTrips.length ? `${formatCountLabel(linkedTrips.length, "linha efetivada", "linhas efetivadas")}` : "Ainda não efetivado."}</span>
-      ${contextItems.length ? contextItems.slice(0, 6).map(item => `<span class="meta-pill"><i data-lucide="${item.icon}"></i>${escapeHtml(item.value)}</span>`).join("") : `<span>Sem contexto adicional.</span>`}
     </div>
 
     <div class="detail-section-title">Roteiro diário</div>
     ${renderItineraryTable(plan.itinerary, false, plan.startDate, plan.endDate)}
-
-    <div class="detail-section-title">Linhas efetivadas conectadas</div>
-    ${linkedTrips.length
-      ? `<div class="linked-trip-list">${linkedTrips.map(trip => `
-          <div class="summary-row" onclick="openTripModal(decodeURIComponent('${encodeURIComponent(trip.id)}'))">
-            <div>
-              <strong>${escapeHtml(trip.name)}</strong>
-            </div>
-            <span>${formatDateShort(trip.startDate)}</span>
-          </div>
-        `).join("")}</div>`
-      : `<div class="inline-note">Ainda não há nenhuma linha efetivada ligada a este plano.</div>`}
   `;
   refreshIcons();
 }
@@ -7588,8 +7673,7 @@ async function salvarPlanejamento() {
         ? "Plano salvo com sucesso e pronto para acompanhamento."
         : "Plano salvo com sucesso. Ele ficou sem roteiro detalhado, mas o status já pode ser acompanhado.";
     resetPlanEditor();
-    message.style.color = "var(--success)";
-    message.textContent = successMessage;
+    message.textContent = "";
     showToast(successMessage, "success", state.editingPlanId ? "Plano atualizado" : "Plano salvo");
     applyFilters();
   } catch (error) {
@@ -7974,7 +8058,7 @@ function resetTripForm(clearBanner) {
   els["city-blocks"].innerHTML = "";
   ["tags-area", "artists-area", "companions-area"].forEach(id => {
     const area = document.getElementById(id);
-    if (area) area.innerHTML = `<input class="tag-text-input" id="${id.replace("-area", "-input")}" placeholder="Digite para buscar...">`;
+    if (area) area.innerHTML = `<input class="tag-text-input" id="${id.replace("-area", "-input")}" placeholder="Digite para buscar..."><button type="button" class="tag-clear-btn" aria-label="Limpar busca">x</button>`;
   });
   setupAutocomplete("tags", "tags-input", "tags-area", "tags-dropdown", "tags");
   setupAutocomplete("artists", "artists-input", "artists-area", "artists-dropdown", "artists");
