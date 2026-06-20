@@ -2970,6 +2970,148 @@
     outline-offset: 2px;
   }
 
+  /* UX FIX: planos em linhas compactas e sem duplicidade visual */
+  .plan-list {
+    gap: 0;
+    margin-top: 10px;
+  }
+  .plan-item.compact-plan-row {
+    min-height: 54px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  .plan-item.compact-plan-row:hover,
+  .plan-item.compact-plan-row.active {
+    border-color: var(--line);
+    box-shadow: none;
+    transform: none;
+  }
+  .compact-plan-copy {
+    min-width: 0;
+    display: grid;
+    gap: 2px;
+  }
+  .compact-plan-copy strong {
+    overflow: hidden;
+    color: var(--blue-dark);
+    font-size: 14px;
+    font-weight: 900;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .compact-plan-copy span {
+    overflow: hidden;
+    color: var(--ink-2);
+    font-size: 12px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .compact-actions {
+    margin: 0;
+    display: inline-flex;
+    gap: 5px;
+  }
+  .compact-actions .icon-action-btn {
+    width: 32px;
+    height: 32px;
+  }
+  #plan-detail-panel {
+    display: none !important;
+  }
+  .draft-actions {
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .draft-actions .icon-action-btn {
+    width: 34px;
+    height: 34px;
+    font-weight: 900;
+  }
+
+  /* UX FIX: modal de plano e roteiro mais denso */
+  .plan-modal-header .trip-modal-title {
+    font-size: 26px;
+  }
+  .plan-modal-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    color: var(--ink-2);
+    font-size: 13px;
+    font-weight: 800;
+  }
+  .plan-modal-strip span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .plan-modal-strip svg {
+    width: 14px;
+    height: 14px;
+    color: var(--accent);
+  }
+  .plan-modal-cloud {
+    margin-top: 10px;
+  }
+  .plan-itinerary-modal .itinerary-container {
+    margin-top: 0;
+  }
+  .plan-itinerary-modal .itinerary-input,
+  .plan-itinerary-modal .itinerary-output {
+    min-height: 64px;
+  }
+  .selection-trip-item.planned strong::after {
+    content: none;
+    display: none;
+  }
+
+  /* UX FIX: dashboard mais compacto e carrossel sem scrollbar visual pesada */
+  .chart-panel {
+    padding-top: 14px;
+  }
+  .compact-chart-heading {
+    margin-bottom: 0;
+  }
+  .year-chart-container,
+  .destination-chart-container {
+    height: 246px;
+  }
+  .upcoming-track {
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+  .upcoming-track::-webkit-scrollbar {
+    display: none;
+  }
+  .upcoming-card {
+    flex-basis: min(214px, 74%);
+    min-height: 74px;
+    gap: 9px;
+  }
+  .upcoming-card strong {
+    font-size: 16px;
+  }
+  .upcoming-days {
+    min-width: 48px;
+    padding: 7px 8px;
+  }
+  .upcoming-days strong {
+    font-size: 20px;
+  }
+  .destination-chart-container {
+    margin-top: -6px;
+  }
+
   /* UX FIX: respeita usuários que preferem menos movimento */
   @media (prefers-reduced-motion: reduce) {
     *,
@@ -3572,8 +3714,9 @@
                 </div>
 
                 <div class="draft-actions">
-                  <div class="draft-summary" id="plan-draft-summary">Preencha destino e datas. O roteiro diário pode ser gerado depois.</div>
-                  <button type="button" class="btn-outline" id="generate-plan-grid-btn"><i data-lucide="layout-grid"></i> Gerar grade diária</button>
+                  <button type="button" class="btn-outline" id="generate-plan-grid-btn"><i data-lucide="layout-grid"></i> Roteiro diário</button>
+                  <button type="button" class="icon-action-btn" aria-label="Ajuda sobre roteiro diário" title="Ajuda sobre roteiro diário" onclick="showToast('Defina as datas e abra o roteiro diário quando quiser planejar manhã, tarde e noite.', 'info', 'Roteiro')">?</button>
+                  <div class="draft-summary" id="plan-draft-summary" style="display:none;"></div>
                 </div>
 
                 <div id="plan-grid-container" style="display:none;">
@@ -3587,10 +3730,6 @@
                 </div>
 
                 <div id="plan-message"></div>
-              </section>
-
-              <section class="panel plan-panel" id="plan-detail-panel">
-                <div class="empty-state">Selecione um plano.</div>
               </section>
             </div>
           </div>
@@ -3840,6 +3979,7 @@ const state = {
   formPlanArtists: [],
   formPlanCompanions: [],
   formPlanCities: [],
+  currentPlanDraftItinerary: null,
   editingTripId: null,
   editingTripSource: null,
   editingPlanId: null,
@@ -5842,7 +5982,7 @@ function openSelectedMapCollectionModal() {
         </button>
       `).join("")}
       ${plans.map(plan => `
-        <button type="button" class="modal-list-item planned" onclick="selectPlan(decodeURIComponent('${encodeURIComponent(plan.id)}')); closeModal(); switchView('planejar')">
+        <button type="button" class="modal-list-item planned" onclick="openPlanDetailModal(decodeURIComponent('${encodeURIComponent(plan.id)}'))">
           <span class="modal-list-label">${escapeHtml(plan.destination)}</span>
           <span class="modal-list-badge">Planejado · ${escapeHtml(formatDateShort(plan.startDate) || "Sem data")}</span>
         </button>
@@ -6470,7 +6610,7 @@ function renderCoverageSidebar(collections) {
               <span>${escapeHtml(formatDateShort(trip.startDate) || "Sem data")}</span>
             </button>
           `).join("") + previewPlans.map(plan => `
-            <button type="button" class="selection-trip-item planned" onclick="selectPlan(decodeURIComponent('${encodeURIComponent(plan.id)}')); switchView('planejar')">
+            <button type="button" class="selection-trip-item planned" onclick="openPlanDetailModal(decodeURIComponent('${encodeURIComponent(plan.id)}'))">
               <strong>${escapeHtml(plan.destination)}</strong>
               <span><em>Planejado</em>${escapeHtml(formatDateShort(plan.startDate) || "Sem data")}</span>
             </button>
@@ -6499,14 +6639,9 @@ function renderCoverageSidebar(collections) {
     ? renderSection("UFs", regions, "As UFs aparecem aqui quando houver viagens ou planos.", "region")
     : renderSection("Municípios", cities, "Os municípios aparecem aqui quando houver viagens ou planos.", "city");
 
-  const supportSection = state.mapDetail === "states"
-    ? renderSection("Municípios", cities, "Os municípios aparecem aqui quando houver viagens ou planos.", "city")
-    : renderSection("UFs", regions, "As UFs aparecem aqui quando houver viagens ou planos.", "region");
-
   els["map-rank"].innerHTML = `
     ${renderSection("Países", countries, "Nenhum país para destacar.", "country")}
     ${primarySection}
-    ${supportSection}
   `;
 }
 
@@ -6772,7 +6907,7 @@ function renderMapLayer(preserveViewport = false) {
       });
   }
 
-  if (showPlannedCoverage) {
+  if (showPlannedCoverage && cityMode) {
       state.plans
         .filter(plan => plan.status !== "cancelado" && !!getMapCoordinates(plan))
         .forEach(plan => {
@@ -6784,7 +6919,7 @@ function renderMapLayer(preserveViewport = false) {
             title: plan.destination,
             icon: createAtlasMarkerIcon("", "plan", getAtlasMarkerSize(1, 1, "plan"))
           }).bindTooltip(`<b>${escapeHtml(plan.destination)}</b><br><span>Planejado</span> · ${escapeHtml(getPlanLocationLabel(plan))}`)
-            .on("click", () => { selectPlan(plan.id); switchView("planejar"); })
+            .on("click", () => openPlanDetailModal(plan.id))
             .addTo(planLayer);
         });
   }
@@ -7199,7 +7334,7 @@ function renderUpcomingCarousel() {
       ${upcomingPlans.length > 1 ? `<button type="button" class="upcoming-nav" aria-label="Viagem anterior" onclick="scrollUpcomingCarousel(-1)"><i data-lucide="chevron-left"></i></button>` : ""}
       <div class="upcoming-track" id="upcoming-track">
         ${upcomingPlans.map(plan => `
-          <button type="button" class="upcoming-card" onclick="selectPlan(decodeURIComponent('${encodeURIComponent(plan.id)}')); switchView('planejar')">
+          <button type="button" class="upcoming-card" onclick="openPlanDetailModal(decodeURIComponent('${encodeURIComponent(plan.id)}'))">
             ${(() => {
               const countdown = getPlanCountdown(plan);
               const daysLabel = getUpcomingDaysBadge(countdown);
@@ -7243,7 +7378,6 @@ function renderPlanningExperience() {
   renderPlanningSourceNote();
   renderPlanningMetrics();
   renderPlanList();
-  renderSelectedPlan();
 }
 
 function renderPlanningSourceNote() {
@@ -7284,24 +7418,13 @@ function renderPlanList() {
   }
 
   els["plan-list"].innerHTML = openPlans.map(plan => {
-    const linkedTrips = getLinkedTripsForPlan(plan.id);
     return `
-      <article class="plan-item ${state.selectedPlanId === plan.id ? "active" : ""}" onclick="selectPlan(decodeURIComponent('${encodeURIComponent(plan.id)}'))">
-        <div class="plan-item-header">
-          ${renderStatusChip(plan.status)}
-          <span class="date-text">${plan.year || "Sem ano"}</span>
+      <article class="plan-item compact-plan-row ${state.selectedPlanId === plan.id ? "active" : ""}" onclick="openPlanDetailModal(decodeURIComponent('${encodeURIComponent(plan.id)}'))">
+        <div class="compact-plan-copy">
+          <strong>${escapeHtml(plan.destination)}</strong>
+          <span>${escapeHtml(getPlanLocationLabel(plan))}${plan.year ? ` · ${escapeHtml(plan.year)}` : ""}</span>
         </div>
-        <h3 class="plan-item-title">${escapeHtml(plan.destination)}</h3>
-        <div class="plan-item-copy">${escapeHtml(getPlanLocationLabel(plan))}</div>
-        <div class="meta-cloud">
-          ${plan.tags.slice(0, 2).map(tag => `<span class="meta-pill"><i data-lucide="hash"></i>${escapeHtml(tag)}</span>`).join("")}
-          ${plan.travelers.slice(0, 1).map(person => `<span class="meta-pill"><i data-lucide="users"></i>${escapeHtml(person)}</span>`).join("")}
-        </div>
-        <div class="plan-item-meta">
-          <span><i data-lucide="calendar-range"></i>${formatDateRange(plan.startDate, plan.endDate)}</span>
-          <span><i data-lucide="git-branch-plus"></i>${formatCountLabel(linkedTrips.length, "linha efetivada", "linhas efetivadas")}</span>
-        </div>
-        <div class="plan-item-actions">
+        <div class="plan-item-actions compact-actions">
           <button type="button" class="icon-action-btn edit-btn" aria-label="Editar plano" title="Editar plano" onclick="event.stopPropagation(); beginPlanEdit(decodeURIComponent('${encodeURIComponent(plan.id)}'))"><i data-lucide="pencil"></i></button>
           <button type="button" class="icon-action-btn delete-btn" aria-label="Excluir plano" title="Excluir plano" onclick="event.stopPropagation(); deletePlanById(decodeURIComponent('${encodeURIComponent(plan.id)}'))"><i data-lucide="trash-2"></i></button>
         </div>
@@ -7336,8 +7459,8 @@ function openPlansListModal(title, plans) {
   els["modal-body"].innerHTML = plans?.length ? `
     <div class="modal-list">
       ${plans.map(plan => `
-        <button type="button" class="modal-list-item planned" onclick="closeModal(); selectPlan(decodeURIComponent('${encodeURIComponent(plan.id)}')); switchView('planejar')">
-          <span class="modal-list-label">${escapeHtml(plan.destination)}<br><small>${escapeHtml(formatDateRange(plan.startDate, plan.endDate))}</small></span>
+        <button type="button" class="modal-list-item planned" onclick="openPlanDetailModal(decodeURIComponent('${encodeURIComponent(plan.id)}'))">
+          <span class="modal-list-label">${escapeHtml(plan.destination)}<br><small>${escapeHtml(getPlanLocationLabel(plan))} · ${escapeHtml(formatDateRange(plan.startDate, plan.endDate))}</small></span>
           <span class="modal-list-badge">${escapeHtml(STATUS_META[normalizeStatus(plan.status)]?.label || "Planejado")}</span>
         </button>
       `).join("")}
@@ -7350,7 +7473,7 @@ function openPlansListModal(title, plans) {
 function selectPlan(planId) {
   state.selectedPlanId = planId;
   renderPlanList();
-  renderSelectedPlan();
+  openPlanDetailModal(planId);
 }
 
 function updatePlanEditorUi() {
@@ -7374,6 +7497,7 @@ function resetPlanEditor() {
   state.formPlanTags = [];
   state.formPlanArtists = [];
   state.formPlanCompanions = [];
+  state.currentPlanDraftItinerary = null;
   els["plan-name"].value = "";
   setPlanLocationValues({});
   els["plan-start"].value = "";
@@ -7382,7 +7506,7 @@ function resetPlanEditor() {
   els["plan-grid-container"].style.display = "none";
   els["itinerary-table-wrapper"].innerHTML = "";
   els["plan-grid-title"].textContent = "Roteiro diário";
-  els["plan-draft-summary"].textContent = "Preencha destino e datas. O roteiro diário pode ser gerado depois.";
+  els["plan-draft-summary"].textContent = "";
   els["plan-message"].textContent = "";
   renderPlanTaxonomies();
   updatePlanEditorUi();
@@ -7398,13 +7522,14 @@ function beginPlanEdit(planId) {
   state.formPlanTags = [...plan.tags];
   state.formPlanCompanions = [...plan.travelers];
   state.formPlanArtists = [...plan.artists];
+  state.currentPlanDraftItinerary = plan.itinerary || null;
   els["plan-start"].value = plan.startDate || "";
   els["plan-end"].value = plan.endDate || "";
   els["plan-status"].value = plan.status || "planejado";
-  els["plan-grid-container"].style.display = "block";
+  els["plan-grid-container"].style.display = "none";
   els["plan-grid-title"].textContent = `Roteiro diário: ${plan.destination}`;
-  els["itinerary-table-wrapper"].innerHTML = renderItineraryTable(plan.itinerary, true, plan.startDate, plan.endDate);
-  els["plan-draft-summary"].textContent = "Edite o contexto do plano e salve para atualizar a linha oficial.";
+  els["itinerary-table-wrapper"].innerHTML = "";
+  els["plan-draft-summary"].textContent = itineraryHasEntries(plan.itinerary || { days: [], slots: {}, notes: "" }) ? "Roteiro pronto" : "";
   els["plan-message"].textContent = "";
   renderPlanTaxonomies();
   updatePlanEditorUi();
@@ -7413,53 +7538,47 @@ function beginPlanEdit(planId) {
   switchView("planejar");
 }
 
-function renderSelectedPlan() {
-  const panel = els["plan-detail-panel"];
-  const plan = state.plans.find(item => item.id === state.selectedPlanId);
-  if (!plan) {
-    panel.innerHTML = `<div class="empty-state">Selecione um plano.</div>`;
-    return;
-  }
+function renderSelectedPlan() {}
 
+function openPlanDetailModal(planId) {
+  const plan = state.plans.find(item => item.id === planId);
+  if (!plan || !els["trip-modal"] || !els["modal-header"] || !els["modal-body"]) return;
+  state.selectedPlanId = plan.id;
+  renderPlanList();
   const linkedTrips = getLinkedTripsForPlan(plan.id);
+  const chips = [
+    ...(plan.locations || []).map(location => ({ icon: "map-pin", value: formatLocationLabel(location) || location.city || location.country })),
+    ...plan.tags.map(tag => ({ icon: "hash", value: tag })),
+    ...plan.travelers.map(person => ({ icon: "users", value: person })),
+    ...plan.artists.map(artist => ({ icon: "music-2", value: artist }))
+  ].filter(item => item.value);
 
-  panel.innerHTML = `
-    <div class="detail-header-top">
-      <div>
-        <h2 class="panel-title compact-detail-title">${escapeHtml(plan.destination)}</h2>
-        <p class="detail-copy">${escapeHtml(getPlanLocationLabel(plan))} | ${escapeHtml(formatDateRange(plan.startDate, plan.endDate))}</p>
+  els["modal-header"].innerHTML = `
+    <div class="trip-modal-header-shell plan-modal-header">
+      <div class="trip-modal-header-main">
+        <div class="trip-modal-badges">${renderStatusChip(plan.status)}</div>
+        <h2 class="trip-modal-title">${escapeHtml(plan.destination)}</h2>
+        <div class="trip-modal-meta">
+          <i data-lucide="map-pin"></i>
+          <span>${escapeHtml(getPlanLocationLabel(plan))}</span>
+        </div>
       </div>
-      ${renderStatusChip(plan.status)}
-    </div>
-
-    <div class="meta-cloud">
-      ${(plan.locations || []).map(location => `<span class="meta-pill"><i data-lucide="map-pin"></i>${escapeHtml(formatLocationLabel(location) || location.city || location.country)}</span>`).join("")}
-      ${plan.tags.map(tag => `<span class="meta-pill"><i data-lucide="hash"></i>${escapeHtml(tag)}</span>`).join("")}
-      ${plan.travelers.map(person => `<span class="meta-pill"><i data-lucide="users"></i>${escapeHtml(person)}</span>`).join("")}
-      ${plan.artists.map(artist => `<span class="meta-pill"><i data-lucide="music-2"></i>${escapeHtml(artist)}</span>`).join("")}
-    </div>
-
-    <div class="detail-actions">
-      <div class="detail-status-wrap">
-        <select class="detail-status-select" id="detail-plan-status">
-          ${Object.entries(STATUS_META).map(([key, meta]) => `<option value="${key}" ${key === plan.status ? "selected" : ""}>${meta.label}</option>`).join("")}
-        </select>
-        <button type="button" class="secondary-action" onclick="updateSelectedPlanStatus()"><i data-lucide="save"></i> Atualizar status</button>
+      <div class="trip-modal-actions">
+        <button type="button" class="icon-action-btn edit-btn" aria-label="Editar plano" title="Editar plano" onclick="closeModal(); beginPlanEdit(decodeURIComponent('${encodeURIComponent(plan.id)}'))"><i data-lucide="pencil"></i></button>
+        <button type="button" class="icon-action-btn delete-btn" aria-label="Excluir plano" title="Excluir plano" onclick="deletePlanById(decodeURIComponent('${encodeURIComponent(plan.id)}'))"><i data-lucide="trash-2"></i></button>
       </div>
-      <button type="button" class="icon-action-btn edit-btn" aria-label="Editar plano" title="Editar plano" onclick="beginPlanEdit(decodeURIComponent('${encodeURIComponent(plan.id)}'))"><i data-lucide="pencil"></i></button>
-      <button type="button" class="icon-action-btn delete-btn" aria-label="Excluir plano" title="Excluir plano" onclick="deleteSelectedPlan()"><i data-lucide="trash-2"></i></button>
-      <button type="button" class="primary-action" onclick="startPlanConversion(decodeURIComponent('${encodeURIComponent(plan.id)}'))" ${plan.status === "cancelado" ? "disabled" : ""}><i data-lucide="git-branch-plus"></i> Efetivar este plano</button>
     </div>
-
-    <div id="detail-plan-message"></div>
-
-    <div class="plan-detail-compact-meta">
-      <span>${linkedTrips.length ? `${formatCountLabel(linkedTrips.length, "linha efetivada", "linhas efetivadas")}` : "Ainda não efetivado."}</span>
+  `;
+  els["modal-body"].innerHTML = `
+    <div class="plan-modal-strip">
+      <span><i data-lucide="calendar-range"></i>${escapeHtml(formatDateRange(plan.startDate, plan.endDate))}</span>
+      <span><i data-lucide="git-branch-plus"></i>${linkedTrips.length ? formatCountLabel(linkedTrips.length, "linha efetivada", "linhas efetivadas") : "Ainda não efetivado"}</span>
     </div>
-
+    ${chips.length ? `<div class="meta-cloud plan-modal-cloud">${chips.map(item => `<span class="meta-pill"><i data-lucide="${item.icon}"></i>${escapeHtml(item.value)}</span>`).join("")}</div>` : ""}
     <div class="detail-section-title">Roteiro diário</div>
     ${renderItineraryTable(plan.itinerary, false, plan.startDate, plan.endDate)}
   `;
+  els["trip-modal"].classList.add("open");
   refreshIcons();
 }
 
@@ -7543,13 +7662,47 @@ function gerarGradeRoteiro() {
   }
 
   const days = getDaysBetween(startDate, endDate);
-  const itinerary = { days, slots: createEmptySlots(days), notes: "" };
+  const itinerary = normalizeDraftItineraryForDates(state.currentPlanDraftItinerary, startDate, endDate);
   const planLabel = tripName || city;
   els["plan-grid-title"].textContent = planLabel ? `Roteiro diário: ${planLabel}` : "Roteiro diário";
-  els["itinerary-table-wrapper"].innerHTML = renderItineraryTable(itinerary, true, startDate, endDate);
-  els["plan-grid-container"].style.display = "block";
-  els["plan-draft-summary"].textContent = `${days.length} dia(s) preparados para o planejamento.`;
+  openPlanItineraryDraftModal(itinerary, startDate, endDate, planLabel);
   message.textContent = "";
+}
+
+function normalizeDraftItineraryForDates(source, startDate, endDate) {
+  const days = getDaysBetween(startDate, endDate);
+  const slots = createEmptySlots(days);
+  days.forEach(day => {
+    ITINERARY_SLOTS.forEach(slot => {
+      slots[day][slot.key] = source?.slots?.[day]?.[slot.key] || "";
+    });
+  });
+  return { days, slots, notes: source?.notes || "" };
+}
+
+function openPlanItineraryDraftModal(itinerary, startDate, endDate, planLabel = "") {
+  if (!els["trip-modal"] || !els["modal-header"] || !els["modal-body"]) return;
+  els["modal-header"].innerHTML = `
+    <div class="trip-modal-header-shell plan-modal-header">
+      <div class="trip-modal-header-main">
+        <h2 class="trip-modal-title">${escapeHtml(planLabel ? `Roteiro: ${planLabel}` : "Roteiro diário")}</h2>
+        <div class="trip-modal-meta"><i data-lucide="calendar-range"></i><span>${escapeHtml(formatDateRange(startDate, endDate))}</span></div>
+      </div>
+      <div class="trip-modal-actions">
+        <button type="button" class="primary-action" onclick="applyPlanItineraryDraft('${startDate}', '${endDate}')"><i data-lucide="check"></i> Aplicar roteiro</button>
+      </div>
+    </div>
+  `;
+  els["modal-body"].innerHTML = `<div class="plan-itinerary-modal">${renderItineraryTable(itinerary, true, startDate, endDate)}</div>`;
+  els["trip-modal"].classList.add("open");
+  refreshIcons();
+}
+
+function applyPlanItineraryDraft(startDate, endDate) {
+  state.currentPlanDraftItinerary = collectDraftItinerary(startDate, endDate);
+  els["plan-draft-summary"].textContent = `${state.currentPlanDraftItinerary.days.length} dias no roteiro`;
+  closeModal();
+  showToast("Roteiro aplicado ao plano.", "success", "Roteiro");
 }
 
 async function salvarPlanejamento() {
@@ -7592,7 +7745,7 @@ async function salvarPlanejamento() {
     return;
   }
 
-  const itinerary = collectDraftItinerary(startDate, endDate);
+  const itinerary = getCurrentPlanDraftItinerary(startDate, endDate);
   const payload = {
     id: state.editingPlanId || `plan-${Date.now()}`,
     viagem: tripName,
@@ -7670,8 +7823,8 @@ async function salvarPlanejamento() {
     const successMessage = state.editingPlanId
       ? "Plano atualizado com sucesso."
       : itineraryHasEntries(itinerary)
-        ? "Plano salvo com sucesso e pronto para acompanhamento."
-        : "Plano salvo com sucesso. Ele ficou sem roteiro detalhado, mas o status já pode ser acompanhado.";
+        ? "Plano salvo com roteiro."
+        : "Plano salvo.";
     resetPlanEditor();
     message.textContent = "";
     showToast(successMessage, "success", state.editingPlanId ? "Plano atualizado" : "Plano salvo");
@@ -7681,6 +7834,19 @@ async function salvarPlanejamento() {
     message.textContent = error.message || "Não foi possível salvar o plano no Apps Script.";
     showToast(message.textContent, "error", "Erro ao salvar");
   }
+}
+
+function hasVisibleDraftItineraryFields() {
+  return ITINERARY_SLOTS.some(slot => document.querySelector(`[id^="draft-${slot.key}-"]`));
+}
+
+function getCurrentPlanDraftItinerary(startDate, endDate) {
+  if (hasVisibleDraftItineraryFields()) {
+    state.currentPlanDraftItinerary = collectDraftItinerary(startDate, endDate);
+    return state.currentPlanDraftItinerary;
+  }
+  if (state.currentPlanDraftItinerary) return normalizeDraftItineraryForDates(state.currentPlanDraftItinerary, startDate, endDate);
+  return collectDraftItinerary(startDate, endDate);
 }
 
 async function deletePlanById(planId) {
