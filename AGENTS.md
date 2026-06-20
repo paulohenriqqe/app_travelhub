@@ -11,9 +11,11 @@ Use these preferences for future TravelHub edits.
 - Autocomplete should prefer selecting existing matches; only create when no match exists.
 - Provide a clear way to erase typed autocomplete searches.
 - Charts should use consistent metric colors: blue for trips, orange for days. Bar fill and border should match, with square bar corners.
+- Annual travel chart day labels should be orange rectangular labels centered on the line points, matching the reference visual.
 - Feedback such as save success should use fading toast alerts instead of persistent inline text when possible.
 - Planned items should appear as planned, but should not inflate effective trip counts.
 - Use modals for dense plan details and daily itinerary editing instead of expanding the desktop layout downward.
+- On mobile, daily itinerary editing should behave like a compact full-screen sheet, not a small centered popup.
 - Do not duplicate status labels such as "Planejado" in the same row/card/modal.
 - Do not mix ranking levels in the map sidebar: UF level shows UFs, city level shows cities/municipalities.
 - Plan lists should be compact rows with name, city/location, year, and edit/delete actions.

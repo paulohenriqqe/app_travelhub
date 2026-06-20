@@ -3214,9 +3214,32 @@
     .rank-panel { padding: 18px; }
     .modal-header { padding: 32px 72px 20px 24px; }
     .modal-body { padding: 24px; }
+    .modal-overlay {
+      align-items: stretch;
+      padding: 10px;
+    }
+    .modal-content {
+      max-width: none;
+      max-height: calc(100vh - 20px);
+      border-radius: 18px;
+    }
+    .modal-header {
+      padding: 18px 58px 12px 18px;
+      border-radius: 18px 18px 0 0;
+    }
+    .modal-body {
+      padding: 14px 16px 18px;
+      gap: 10px;
+    }
+    .modal-close {
+      top: 12px;
+      right: 12px;
+      width: 34px;
+      height: 34px;
+    }
     .trip-modal-grid { grid-template-columns: 1fr; }
     .trip-modal-actions { justify-content: flex-start; }
-    .trip-modal-title { font-size: 26px; }
+    .trip-modal-title { font-size: 23px; }
     .app-toast {
       left: 16px;
       right: 16px;
@@ -3258,19 +3281,55 @@
     .plan-layout {
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 10px;
     }
-    .plan-main { order: 1; gap: 14px; }
-    .plan-sidebar { order: 2; gap: 14px; }
-    .plan-panel { padding: 16px; border-radius: 14px; }
+    .plan-main { order: 1; gap: 10px; }
+    .plan-sidebar { order: 2; gap: 10px; }
+    .plan-panel { padding: 12px; border-radius: 12px; }
+    .planning-inline-stats {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+      margin-top: 8px !important;
+    }
+    .planning-inline-stat {
+      min-height: 44px;
+      padding: 7px 8px;
+      gap: 5px;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .planning-inline-stat strong {
+      font-size: 19px;
+    }
+    .planning-inline-stat span {
+      font-size: 9px;
+      line-height: 1.05;
+    }
+    .plan-list {
+      margin-top: 6px;
+    }
+    .plan-item.compact-plan-row {
+      min-height: 48px;
+      padding: 7px 0;
+    }
+    .compact-plan-copy strong {
+      font-size: 13px;
+    }
+    .compact-plan-copy span {
+      font-size: 11px;
+    }
+    .compact-actions .icon-action-btn {
+      width: 30px;
+      height: 30px;
+    }
     .plan-form-grid {
       grid-template-columns: 1fr;
-      gap: 13px;
-      margin-top: 16px;
+      gap: 10px;
+      margin-top: 10px;
     }
     .plan-form-grid .field,
     .plan-form-grid .field-full { grid-column: 1 / -1; }
-    .city-block { padding: 13px; border-radius: 10px; }
+    .city-block { padding: 0 0 9px; border-radius: 0; }
     .city-block-grid,
     .city-block-grid.compact-grid {
       grid-template-columns: 1fr;
@@ -3287,11 +3346,13 @@
     }
     .tag-input-area { min-height: 42px; }
     .draft-actions {
-      flex-direction: column;
-      align-items: stretch;
-      gap: 10px;
-      margin-top: 16px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 44px;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
     }
+    .draft-actions .icon-action-btn { width: 44px; height: 44px; }
     .draft-summary { font-size: 12px; line-height: 1.45; }
     #plan-grid-title {
       margin-top: 20px !important;
@@ -3303,16 +3364,46 @@
     .itinerary-mobile-list {
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      margin-top: 14px;
+      gap: 8px;
+      margin-top: 0;
+    }
+    .itinerary-day-card {
+      border-radius: 10px;
+      box-shadow: none;
+    }
+    .itinerary-day-card-header {
+      padding: 9px 10px;
     }
     .itinerary-day-card-header .itinerary-day-date { font-size: 17px; }
     .itinerary-day-card-header .itinerary-day-name { margin-bottom: 0; }
+    .itinerary-mobile-slot {
+      padding: 9px 10px 10px;
+    }
+    .itinerary-mobile-label {
+      margin-bottom: 6px;
+      font-size: 9px;
+    }
     .itinerary-mobile-list .itinerary-input,
     .itinerary-mobile-list .itinerary-output {
-      min-height: 78px;
+      min-height: 62px;
+      padding: 9px 10px;
       font-size: 12px;
-      line-height: 1.45;
+      line-height: 1.35;
+      border-radius: 8px;
+    }
+    .plan-itinerary-modal .itinerary-mobile-list .itinerary-input,
+    .plan-itinerary-modal .itinerary-mobile-list .itinerary-output {
+      min-height: 58px;
+    }
+    .plan-modal-header {
+      gap: 8px;
+    }
+    .plan-modal-header .trip-modal-actions {
+      width: 100%;
+    }
+    .plan-modal-header .primary-action {
+      width: 100%;
+      justify-content: center;
     }
     .form-actions-row {
       flex-direction: column;
@@ -3424,6 +3515,165 @@
     .conversion-banner { flex-direction: column; align-items: flex-start; }
     .detail-status-wrap, .draft-actions { grid-template-columns: 1fr; }
     .quick-grid { grid-template-columns: 1fr 1fr; }
+
+    /* UX FIX: Planejar mobile com proporção mais compacta e sem tela partida */
+    #view-planejar .dashboard-stack {
+      gap: 10px;
+    }
+    #view-planejar .plan-layout,
+    #view-planejar .plan-main,
+    #view-planejar .plan-sidebar {
+      gap: 8px;
+    }
+    #view-planejar .plan-panel {
+      padding: 10px 12px;
+      border-radius: 12px;
+    }
+    #view-planejar .panel-label {
+      margin-bottom: 0;
+      font-size: 11px;
+    }
+    #view-planejar .mini-stats {
+      margin-top: 8px !important;
+    }
+    #view-planejar .planning-inline-stats {
+      gap: 6px;
+    }
+    #view-planejar .planning-inline-stat {
+      min-height: 42px;
+      padding: 7px 8px;
+    }
+    #view-planejar .plan-list {
+      gap: 0;
+      margin-top: 6px;
+    }
+    #view-planejar .plan-item.compact-plan-row {
+      min-height: 46px;
+      padding: 7px 0;
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+    #view-planejar .compact-actions {
+      gap: 4px;
+    }
+    #view-planejar .compact-actions .icon-action-btn {
+      width: 30px;
+      height: 30px;
+      min-height: 30px;
+    }
+    #view-planejar .form-shell-header {
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    #view-planejar .panel-title {
+      font-size: 22px;
+      line-height: 1.05;
+    }
+    #view-planejar .plan-form-grid {
+      gap: 9px;
+      margin-top: 8px;
+    }
+    #view-planejar .field label {
+      margin-bottom: 5px;
+      font-size: 10px;
+    }
+    #view-planejar .form-input {
+      min-height: 40px;
+      padding: 9px 11px;
+    }
+    #view-planejar .tag-input-area {
+      min-height: 40px;
+    }
+    #view-planejar .city-block {
+      padding: 0 0 8px;
+    }
+    #view-planejar .city-block-header {
+      margin-bottom: 5px;
+    }
+    #view-planejar .add-city-btn {
+      min-height: 38px;
+      margin-top: 8px !important;
+    }
+    #view-planejar .draft-actions {
+      grid-template-columns: minmax(0, 1fr) 40px;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    #view-planejar .draft-actions .icon-action-btn {
+      width: 40px;
+      height: 40px;
+    }
+    #view-planejar .form-actions-row {
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    /* UX FIX: modal da grade diária vira folha mobile compacta */
+    .modal-overlay.plan-itinerary-open {
+      align-items: stretch;
+      padding: 0;
+    }
+    .modal-overlay.plan-itinerary-open .modal-content {
+      width: 100%;
+      max-width: none;
+      height: 100dvh;
+      max-height: 100dvh;
+      border-radius: 0;
+      overflow: hidden;
+    }
+    .modal-overlay.plan-itinerary-open .modal-header {
+      flex: 0 0 auto;
+      padding: 14px 52px 10px 16px;
+      border-radius: 0;
+    }
+    .modal-overlay.plan-itinerary-open .modal-body {
+      flex: 1 1 auto;
+      overflow: auto;
+      padding: 10px 12px 14px;
+    }
+    .modal-overlay.plan-itinerary-open .modal-close {
+      top: 10px;
+      right: 10px;
+      width: 34px;
+      height: 34px;
+    }
+    .modal-overlay.plan-itinerary-open .trip-modal-header-shell {
+      gap: 8px;
+    }
+    .modal-overlay.plan-itinerary-open .trip-modal-title {
+      font-size: 20px;
+      line-height: 1.05;
+    }
+    .modal-overlay.plan-itinerary-open .trip-modal-meta {
+      font-size: 11px;
+    }
+    .modal-overlay.plan-itinerary-open .trip-modal-actions {
+      width: 100%;
+    }
+    .modal-overlay.plan-itinerary-open .trip-modal-actions .primary-action {
+      width: 100%;
+      min-height: 40px;
+      justify-content: center;
+      padding: 9px 12px;
+    }
+    .modal-overlay.plan-itinerary-open .plan-itinerary-modal {
+      height: 100%;
+    }
+    .modal-overlay.plan-itinerary-open .itinerary-mobile-list {
+      gap: 7px;
+    }
+    .modal-overlay.plan-itinerary-open .itinerary-day-card-header {
+      padding: 8px 10px;
+    }
+    .modal-overlay.plan-itinerary-open .itinerary-day-card-header .itinerary-day-date {
+      font-size: 16px;
+    }
+    .modal-overlay.plan-itinerary-open .itinerary-mobile-slot {
+      padding: 8px 10px 9px;
+    }
+    .modal-overlay.plan-itinerary-open .itinerary-mobile-list .itinerary-input,
+    .modal-overlay.plan-itinerary-open .itinerary-mobile-list .itinerary-output {
+      min-height: 56px;
+    }
   }
 </style>
 </head>
@@ -7051,7 +7301,7 @@ function renderTravelEvolutionChart() {
   const maxTripValue = Math.max(...tripSeries, 0);
   const maxDayValue = Math.max(...daySeries, 0);
   const tripPadding = Math.max(1, Math.ceil(maxTripValue * 0.12));
-  const dayPadding = Math.max(2, Math.ceil(maxDayValue * 0.12));
+  const dayPadding = Math.max(8, Math.ceil(maxDayValue * 0.28));
   const ctx = chartCanvas.getContext("2d");
   if (state.chartInstance) state.chartInstance.destroy();
   const barBaseLabelPlugin = {
@@ -7069,6 +7319,35 @@ function renderTravelEvolutionChart() {
         const value = chart.data.datasets[0].data[index];
         if (!value) return;
         chartCtx.fillText(String(value), bar.x, chartArea.bottom - 13);
+      });
+      chartCtx.restore();
+    }
+  };
+  const lineCenterLabelPlugin = {
+    id: "travelhubLineCenterLabels",
+    afterDatasetsDraw(chart) {
+      const meta = chart.getDatasetMeta(1);
+      if (!meta || meta.hidden) return;
+      const { ctx: chartCtx, chartArea } = chart;
+      chartCtx.save();
+      chartCtx.font = "900 13px 'DM Sans', sans-serif";
+      chartCtx.textAlign = "center";
+      chartCtx.textBaseline = "middle";
+      meta.data.forEach((point, index) => {
+        const value = chart.data.datasets[1].data[index];
+        if (!value) return;
+        const label = String(value);
+        const width = Math.max(42, chartCtx.measureText(label).width + 22);
+        const height = 30;
+        const x = point.x - width / 2;
+        const y = Math.min(
+          chartArea.bottom - height - 4,
+          Math.max(chartArea.top + 4, point.y - height / 2)
+        );
+        chartCtx.fillStyle = "rgba(212, 70, 28, 1)";
+        chartCtx.fillRect(x, y, width, height);
+        chartCtx.fillStyle = "rgba(255, 255, 255, 0.98)";
+        chartCtx.fillText(label, point.x, y + height / 2 + 0.5);
       });
       chartCtx.restore();
     }
@@ -7114,7 +7393,7 @@ function renderTravelEvolutionChart() {
         }
       ]
     },
-    plugins: [barBaseLabelPlugin],
+    plugins: [barBaseLabelPlugin, lineCenterLabelPlugin],
     options: {
       responsive: true,
       maintainAspectRatio: false,
@@ -7152,7 +7431,7 @@ function renderTravelEvolutionChart() {
           display: false
         },
         datalabels: {
-          display: context => context.dataset.type === "line" && context.raw > 0,
+          display: false,
           formatter: value => value > 0 ? value : "",
           anchor: "end",
           align: "top",
@@ -7694,7 +7973,7 @@ function openPlanItineraryDraftModal(itinerary, startDate, endDate, planLabel = 
     </div>
   `;
   els["modal-body"].innerHTML = `<div class="plan-itinerary-modal">${renderItineraryTable(itinerary, true, startDate, endDate)}</div>`;
-  els["trip-modal"].classList.add("open");
+  els["trip-modal"].classList.add("open", "plan-itinerary-open");
   refreshIcons();
 }
 
@@ -8399,7 +8678,7 @@ function openListModal(title, listItems) {
 }
 
 function closeModal() {
-  els["trip-modal"].classList.remove("open");
+  els["trip-modal"].classList.remove("open", "plan-itinerary-open");
 }
 
 function updateSyncPill() {
