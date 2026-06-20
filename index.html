@@ -2264,10 +2264,44 @@
     grid-template-columns: minmax(0, 1.1fr) minmax(340px, 0.9fr);
   }
   .compact-chart-heading {
+    align-items: flex-start;
+    gap: 10px;
     margin-bottom: 6px;
   }
   .chart-container {
     height: 280px;
+  }
+  .year-chart-container {
+    height: 292px;
+    overflow: visible;
+  }
+  .chart-mini-legend {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 4px;
+    color: var(--ink-2);
+    font-size: 11px;
+    font-weight: 900;
+    white-space: nowrap;
+  }
+  .chart-mini-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .legend-swatch {
+    width: 10px;
+    height: 10px;
+    display: inline-block;
+    border-radius: 999px;
+  }
+  .legend-swatch.trips {
+    background: rgba(38, 185, 221, 0.68);
+    border: 1px solid rgba(9, 117, 153, 0.45);
+  }
+  .legend-swatch.days {
+    background: var(--accent);
   }
   .travel-chart-fallback {
     display: none;
@@ -2349,7 +2383,7 @@
     font-weight: 800;
   }
   .destination-chart-container {
-    height: 280px;
+    height: 292px;
   }
   .destination-chart-fallback {
     display: none;
@@ -2404,6 +2438,16 @@
     gap: 4px;
     justify-content: flex-end;
   }
+  .chart-toggle-stack {
+    display: grid;
+    justify-items: end;
+    gap: 5px;
+  }
+  .metric-toggle button.active {
+    border-color: rgba(212, 70, 28, 0.24);
+    background: rgba(246, 228, 221, 0.78);
+    color: var(--accent);
+  }
   .compact-toggle button {
     min-height: 28px;
     padding: 5px 8px;
@@ -2422,8 +2466,8 @@
     color: var(--blue-dark);
   }
   .dashboard-upcoming-panel {
-    min-height: 150px;
-    padding: 12px;
+    min-height: 132px;
+    padding: 12px 14px;
   }
   .upcoming-carousel {
     display: grid;
@@ -2449,18 +2493,19 @@
     padding: 0;
   }
   .upcoming-card {
-    flex: 0 0 min(230px, 88%);
-    min-height: 88px;
-    padding: 9px 0;
+    flex: 0 0 min(270px, 88%);
+    min-height: 82px;
+    padding: 10px 0;
     border: 0;
     border-bottom: 1px solid var(--line);
     border-radius: 0;
     background: transparent;
     text-align: left;
     scroll-snap-align: start;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
     transition: var(--transition);
   }
   .upcoming-carousel.single .upcoming-card {
@@ -2476,18 +2521,53 @@
     font-size: 18px;
     line-height: 1.05;
   }
-  .upcoming-card span:not(.spotlight-countdown) {
+  .upcoming-main {
+    min-width: 0;
+    display: grid;
+    gap: 5px;
+  }
+  .upcoming-main > span {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     color: var(--ink-2);
     font-size: 12px;
     font-weight: 700;
+    min-width: 0;
+  }
+  .upcoming-main span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .upcoming-card svg {
     width: 13px;
     height: 13px;
     color: var(--accent);
+  }
+  .upcoming-days {
+    min-width: 54px;
+    padding: 8px 9px;
+    border-radius: 14px;
+    background: rgba(246, 228, 221, 0.7);
+    color: var(--accent);
+    text-align: center;
+  }
+  .upcoming-days strong {
+    display: block;
+    color: var(--accent);
+    font-family: "DM Serif Display", serif;
+    font-size: 23px;
+    line-height: 0.95;
+  }
+  .upcoming-days span {
+    display: block !important;
+    color: var(--accent) !important;
+    font-size: 9px !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    text-transform: uppercase;
   }
   .upcoming-nav {
     width: 30px;
@@ -2865,7 +2945,16 @@
     .metric-card { padding: 12px 14px; min-height: 68px; }
     .metric-number { font-size: 30px; }
     .metric-label { font-size: 10px; }
-    .chart-container { height: 230px; }
+    .chart-container,
+    .year-chart-container,
+    .destination-chart-container { height: 244px; }
+    .compact-chart-heading {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .chart-toggle-stack {
+      justify-items: start;
+    }
     .upcoming-carousel { grid-template-columns: 28px minmax(0, 1fr) 28px; }
     .upcoming-card { flex-basis: 86%; }
     .filters-panel { flex-direction: column; align-items: stretch; }
@@ -3148,10 +3237,13 @@
               <div class="chart-title-row compact-chart-heading">
                 <div>
                   <h2 class="chart-title">Viagens por ano</h2>
-                  <p class="panel-copy">Barras mostram viagens; linha mostra dias.</p>
+                </div>
+                <div class="chart-mini-legend" aria-hidden="true">
+                  <span><i class="legend-swatch trips"></i>Viagens</span>
+                  <span><i class="legend-swatch days"></i>Dias</span>
                 </div>
               </div>
-              <div class="chart-container">
+              <div class="chart-container year-chart-container">
                 <canvas id="timeChart"></canvas>
                 <div class="travel-chart-fallback" id="timeChartFallback"></div>
               </div>
@@ -3160,12 +3252,17 @@
               <div class="chart-title-row compact-chart-heading">
                 <div>
                   <h2 class="chart-title">Top 5 destinos</h2>
-                  <p class="panel-copy">Veja municípios, UFs ou países mais visitados.</p>
                 </div>
-                <div class="compact-toggle" id="destination-chart-toggle">
-                  <button type="button" class="active" data-destination-chart="cities">Municípios</button>
-                  <button type="button" data-destination-chart="regions">UFs</button>
-                  <button type="button" data-destination-chart="countries">Países</button>
+                <div class="chart-toggle-stack">
+                  <div class="compact-toggle" id="destination-chart-toggle">
+                    <button type="button" class="active" data-destination-chart="cities">Municípios</button>
+                    <button type="button" data-destination-chart="regions">UFs</button>
+                    <button type="button" data-destination-chart="countries">Países</button>
+                  </div>
+                  <div class="compact-toggle metric-toggle" id="destination-metric-toggle">
+                    <button type="button" class="active" data-destination-metric="trips">Viagens</button>
+                    <button type="button" data-destination-metric="days">Dias</button>
+                  </div>
                 </div>
               </div>
               <div class="chart-container destination-chart-container">
@@ -3677,6 +3774,7 @@ const state = {
   showPlannedMap: false,
   selectedMapFeature: null,
   destinationChartMode: "cities",
+  destinationMetricMode: "trips",
   map: null,
   mapLayer: null,
   geoData: { world: null, brazil: null },
@@ -3973,6 +4071,11 @@ function bindEvents() {
   document.querySelectorAll("[data-destination-chart]").forEach(btn => btn.addEventListener("click", () => {
     state.destinationChartMode = btn.dataset.destinationChart;
     updateActiveButtons("[data-destination-chart]", state.destinationChartMode);
+    renderDestinationChart();
+  }));
+  document.querySelectorAll("[data-destination-metric]").forEach(btn => btn.addEventListener("click", () => {
+    state.destinationMetricMode = btn.dataset.destinationMetric;
+    updateActiveButtons("[data-destination-metric]", state.destinationMetricMode);
     renderDestinationChart();
   }));
   els["clear-filters"].addEventListener("click", clearFilters);
@@ -6626,7 +6729,7 @@ function renderMapLayer(preserveViewport = false) {
       : state.showPlannedMap
         ? "Planos aparecem em azul sobre a cobertura."
         : cityMode
-          ? "Veja municípios sobrepostos na mesma cobertura por UFs."
+          ? "Clique em uma cidade para ver as viagens."
           : "Clique em uma UF, país ou cidade para ver as viagens.";
   }
 
@@ -6671,13 +6774,14 @@ function renderStats() {
   renderUpcomingCarousel();
 }
 
-function buildDestinationStats(mode = state.destinationChartMode) {
+function buildDestinationStats(mode = state.destinationChartMode, metric = state.destinationMetricMode) {
   const stats = new Map();
   const addValue = (label, group) => {
     if (!label) return;
-    if (!stats.has(label)) stats.set(label, { label, value: 0, groups: [] });
+    if (!stats.has(label)) stats.set(label, { label, trips: 0, days: 0, value: 0, groups: [] });
     const item = stats.get(label);
-    item.value += 1;
+    item.trips += 1;
+    item.days += getTripTotalDays(group);
     item.groups.push(group);
   };
 
@@ -6700,6 +6804,7 @@ function buildDestinationStats(mode = state.destinationChartMode) {
   });
 
   return [...stats.values()]
+    .map(item => ({ ...item, value: metric === "days" ? item.days : item.trips }))
     .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label, "pt-BR"))
     .slice(0, 5);
 }
@@ -6743,6 +6848,8 @@ function renderTravelEvolutionChart() {
   const daySeries = yearlyStats.map(item => item.days);
   const maxTripValue = Math.max(...tripSeries, 0);
   const maxDayValue = Math.max(...daySeries, 0);
+  const tripPadding = Math.max(2, Math.ceil(maxTripValue * 0.28));
+  const dayPadding = Math.max(5, Math.ceil(maxDayValue * 0.28));
   const ctx = chartCanvas.getContext("2d");
   if (state.chartInstance) state.chartInstance.destroy();
   const barBaseLabelPlugin = {
@@ -6759,7 +6866,7 @@ function renderTravelEvolutionChart() {
       meta.data.forEach((bar, index) => {
         const value = chart.data.datasets[0].data[index];
         if (!value) return;
-        chartCtx.fillText(String(value), bar.x, chartArea.bottom - 8);
+        chartCtx.fillText(String(value), bar.x, chartArea.bottom - 13);
       });
       chartCtx.restore();
     }
@@ -6780,7 +6887,8 @@ function renderTravelEvolutionChart() {
           borderWidth: 1,
           borderRadius: 9,
           borderSkipped: false,
-          maxBarThickness: 42,
+          maxBarThickness: 34,
+          clip: false,
           order: 2
         },
         {
@@ -6795,8 +6903,8 @@ function renderTravelEvolutionChart() {
           pointBackgroundColor: "rgba(212, 70, 28, 1)",
           pointBorderColor: "rgba(255, 255, 255, 0.96)",
           pointBorderWidth: 2,
-          pointRadius: context => context.raw > 0 ? 4 : 3,
-          pointHoverRadius: context => context.raw > 0 ? 6 : 4,
+          pointRadius: context => context.raw > 0 ? 3.5 : 2.5,
+          pointHoverRadius: context => context.raw > 0 ? 5 : 3.5,
           fill: false,
           tension: 0.35,
           cubicInterpolationMode: "monotone",
@@ -6809,13 +6917,13 @@ function renderTravelEvolutionChart() {
       responsive: true,
       maintainAspectRatio: false,
       layout: {
-        padding: { top: 24, right: 14, bottom: 4, left: 14 }
+        padding: { top: 42, right: 30, bottom: 20, left: 18 }
       },
       scales: {
         yTrips: {
           display: false,
           beginAtZero: true,
-          suggestedMax: maxTripValue ? maxTripValue + Math.max(1, Math.ceil(maxTripValue * 0.18)) : 2,
+          suggestedMax: maxTripValue ? maxTripValue + tripPadding : 2,
           grid: { display: false },
           border: { display: false }
         },
@@ -6823,7 +6931,7 @@ function renderTravelEvolutionChart() {
           display: false,
           position: "right",
           beginAtZero: true,
-          suggestedMax: maxDayValue ? maxDayValue + Math.max(2, Math.ceil(maxDayValue * 0.18)) : 2,
+          suggestedMax: maxDayValue ? maxDayValue + dayPadding : 2,
           grid: { color: "rgba(10, 47, 76, 0.06)", drawBorder: false, drawTicks: false },
           border: { display: false }
         },
@@ -6839,24 +6947,14 @@ function renderTravelEvolutionChart() {
       },
       plugins: {
         legend: {
-          display: true,
-          position: "top",
-          align: "end",
-          labels: {
-            boxWidth: 10,
-            boxHeight: 10,
-            color: "rgba(71, 85, 105, 0.9)",
-            font: { size: 11, weight: "800" },
-            usePointStyle: true,
-            sort: (a, b) => a.datasetIndex - b.datasetIndex
-          }
+          display: false
         },
         datalabels: {
           display: context => context.dataset.type === "line" && context.raw > 0,
           formatter: value => value > 0 ? value : "",
           anchor: "end",
           align: "top",
-          offset: 6,
+          offset: 8,
           color: "rgba(212, 70, 28, 1)",
           font: { weight: "900", size: 13 },
           textStrokeColor: "rgba(255, 255, 255, 0.92)",
@@ -6883,9 +6981,15 @@ function renderTravelEvolutionChart() {
 
 function renderDestinationChart() {
   updateActiveButtons("[data-destination-chart]", state.destinationChartMode);
+  updateActiveButtons("[data-destination-metric]", state.destinationMetricMode);
   const chartCanvas = document.getElementById("destinationChart");
   const fallback = document.getElementById("destinationChartFallback");
   const stats = buildDestinationStats();
+  const metricLabel = state.destinationMetricMode === "days" ? "Dias" : "Viagens";
+  const metricSingular = state.destinationMetricMode === "days" ? "dia" : "viagem";
+  const metricPlural = state.destinationMetricMode === "days" ? "dias" : "viagens";
+  const metricColor = state.destinationMetricMode === "days" ? "rgba(212, 70, 28, 0.82)" : "rgba(38, 185, 221, 0.58)";
+  const metricBorder = state.destinationMetricMode === "days" ? "rgba(212, 70, 28, 1)" : "rgba(9, 117, 153, 0.72)";
   if (!chartCanvas) return;
   if (!window.Chart) {
     renderDestinationFallback(stats);
@@ -6903,10 +7007,10 @@ function renderDestinationChart() {
     data: {
       labels: stats.map(item => item.label),
       datasets: [{
-        label: "Viagens",
+        label: metricLabel,
         data: stats.map(item => item.value),
-        backgroundColor: "rgba(38, 185, 221, 0.58)",
-        borderColor: "rgba(9, 117, 153, 0.72)",
+        backgroundColor: metricColor,
+        borderColor: metricBorder,
         borderWidth: 1,
         borderRadius: 8,
         borderSkipped: false,
@@ -6943,14 +7047,14 @@ function renderDestinationChart() {
           anchor: "end",
           align: "end",
           offset: 4,
-          color: "rgba(212, 70, 28, 1)",
+          color: state.destinationMetricMode === "days" ? "rgba(10, 47, 76, 0.86)" : "rgba(212, 70, 28, 1)",
           font: { weight: "900", size: 14 },
           clamp: true
         },
         tooltip: {
           displayColors: false,
           callbacks: {
-            label: context => formatCountLabel(context.parsed.x, "viagem", "viagens")
+            label: context => formatCountLabel(context.parsed.x, metricSingular, metricPlural)
           }
         }
       }
@@ -6969,8 +7073,9 @@ function renderDestinationFallback(stats) {
     return;
   }
   const max = Math.max(...stats.map(item => item.value), 1);
+  const metricClass = state.destinationMetricMode === "days" ? "days" : "trips";
   fallback.innerHTML = `<div class="destination-rank-list">${stats.map(item => `
-    <button type="button" class="destination-rank-row" onclick="openDestinationStatsModal(decodeURIComponent('${encodeURIComponent(item.label)}'))">
+    <button type="button" class="destination-rank-row ${metricClass}" onclick="openDestinationStatsModal(decodeURIComponent('${encodeURIComponent(item.label)}'))">
       <span>${escapeHtml(item.label)}</span>
       <strong>${item.value}</strong>
       <em style="width:${Math.max(8, (item.value / max) * 100)}%"></em>
@@ -7031,17 +7136,33 @@ function renderUpcomingCarousel() {
           <button type="button" class="upcoming-card" onclick="selectPlan(decodeURIComponent('${encodeURIComponent(plan.id)}')); switchView('planejar')">
             ${(() => {
               const countdown = getPlanCountdown(plan);
-              return countdown ? `<span class="spotlight-countdown ${countdown.tone}">${escapeHtml(countdown.label)}</span>` : "";
+              const daysLabel = getUpcomingDaysBadge(countdown);
+              return `
+                <span class="upcoming-main">
+                  <strong>${escapeHtml(plan.destination)}</strong>
+                  <span><i data-lucide="calendar-range"></i>${escapeHtml(countdown?.detail || formatDateShort(plan.startDate) || "Sem data")}</span>
+                  <span><i data-lucide="map-pin"></i>${escapeHtml(getPlanLocationLabel(plan))}</span>
+                </span>
+                <span class="upcoming-days ${countdown?.tone || "neutral"}">
+                  <strong>${escapeHtml(daysLabel.value)}</strong>
+                  <span>${escapeHtml(daysLabel.label)}</span>
+                </span>
+              `;
             })()}
-            <strong>${escapeHtml(plan.destination)}</strong>
-            <span><i data-lucide="calendar-range"></i>${escapeHtml(getPlanCountdown(plan)?.detail || formatDateShort(plan.startDate) || "Sem data")}</span>
-            <span><i data-lucide="map-pin"></i>${escapeHtml(getPlanLocationLabel(plan))}</span>
           </button>
         `).join("")}
       </div>
       ${upcomingPlans.length > 1 ? `<button type="button" class="upcoming-nav" aria-label="Próxima viagem" onclick="scrollUpcomingCarousel(1)"><i data-lucide="chevron-right"></i></button>` : ""}
     </div>
   ` : `<div class="empty-state compact-empty">Nenhuma viagem futura.</div>`;
+}
+
+function getUpcomingDaysBadge(countdown) {
+  if (!countdown?.label) return { value: "-", label: "sem data" };
+  const number = countdown.label.match(/\d+/)?.[0];
+  if (countdown.label.includes("hoje")) return { value: "0", label: "hoje" };
+  if (!number) return { value: "-", label: "dias" };
+  return { value: number, label: Number(number) === 1 ? "dia" : "dias" };
 }
 
 function scrollUpcomingCarousel(direction) {
@@ -8218,7 +8339,8 @@ function updateActiveButtons(selector, activeValue) {
     button.classList.toggle("active",
       button.getAttribute("data-map-type") === activeValue ||
       button.getAttribute("data-mode") === activeValue ||
-      button.getAttribute("data-destination-chart") === activeValue
+      button.getAttribute("data-destination-chart") === activeValue ||
+      button.getAttribute("data-destination-metric") === activeValue
     );
   });
 }
