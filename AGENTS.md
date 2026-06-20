@@ -22,6 +22,9 @@ Use these preferences for future TravelHub edits.
 - Planned items should appear as planned, but should not inflate effective trip counts.
 - Use modals for dense plan details and daily itinerary editing instead of expanding the desktop layout downward.
 - On mobile, daily itinerary editing should behave like a compact full-screen sheet, not a small centered popup.
+- On iPhone/mobile, use high-density layouts: short gaps, low cards, compact buttons, and no persistent explanatory text blocks.
+- On iPhone/mobile, the Planning page should stay as compact radar/list view; create/edit planning uses a full-screen sheet with the real form DOM, not an inline long form.
+- When a mobile planning sheet opens itinerary editing, preserve the plan editor state and return to the sheet after applying or closing the itinerary.
 - Do not duplicate status labels such as "Planejado" in the same row/card/modal.
 - Do not mix ranking levels in the map sidebar: UF level shows UFs, city level shows cities/municipalities.
 - Keep map instructions inside the `?` helper, not as large persistent copy in the side panel.

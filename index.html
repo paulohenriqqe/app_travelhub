@@ -3863,6 +3863,456 @@
       min-height: 56px;
     }
   }
+
+  /* UX FIX: iPhone alta densidade e Planejar como folha modal */
+  @media (max-width: 768px) {
+    .topbar {
+      padding: 9px 12px;
+      gap: 8px;
+    }
+    .page-title {
+      font-size: 21px;
+      line-height: 1;
+    }
+    .top-actions .primary-action,
+    #topbar-primary-action {
+      min-height: 34px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      box-shadow: 0 6px 14px rgba(220, 65, 25, 0.18);
+    }
+    #topbar-primary-action svg {
+      width: 16px;
+      height: 16px;
+    }
+    .sync-pill {
+      min-height: 30px;
+      padding: 4px 8px;
+      font-size: 10px;
+      max-width: 82px;
+    }
+    .content {
+      padding: 12px 12px 82px;
+    }
+    .dashboard-stack,
+    .dashboard-hero-grid,
+    .stats-grid,
+    .chart-grid {
+      gap: 10px;
+    }
+    .panel,
+    .chart-panel,
+    .dashboard-upcoming-panel,
+    .rank-panel,
+    .filters-panel,
+    .form-panel,
+    .plan-panel {
+      border-radius: 12px;
+      box-shadow: 0 5px 14px rgba(8, 33, 55, 0.055);
+    }
+    .dashboard-upcoming-panel,
+    .chart-panel,
+    .rank-panel,
+    .filters-panel {
+      padding: 10px 11px;
+    }
+    .panel-label,
+    .chart-title,
+    .panel-title {
+      margin-bottom: 6px;
+    }
+    .kpi-grid {
+      gap: 8px;
+    }
+    .metric-card {
+      min-height: 56px;
+      padding: 8px 10px;
+      border-radius: 11px;
+    }
+    .metric-icon svg {
+      width: 16px;
+      height: 16px;
+    }
+    .metric-number {
+      font-size: 26px;
+      line-height: 0.95;
+    }
+    .metric-label {
+      font-size: 9px;
+      letter-spacing: 0.08em;
+    }
+    .chart-container,
+    .year-chart-container,
+    .destination-chart-container {
+      height: 214px;
+    }
+    .compact-chart-heading {
+      gap: 6px;
+    }
+    .chart-toggle-stack,
+    .destination-mode-toggle,
+    .destination-metric-toggle {
+      gap: 5px;
+    }
+    .destination-mode-toggle .filter-chip,
+    .destination-metric-toggle .filter-chip {
+      min-height: 30px;
+      padding: 5px 9px;
+      font-size: 10px;
+    }
+    .upcoming-shell {
+      min-height: 96px;
+    }
+    .upcoming-carousel {
+      grid-template-columns: 26px minmax(0, 1fr) 26px;
+      gap: 6px;
+    }
+    .upcoming-nav {
+      width: 26px;
+      height: 26px;
+    }
+    .upcoming-card {
+      min-height: 84px;
+      padding: 8px 10px;
+      border-radius: 10px;
+    }
+    #map {
+      height: 50vh;
+      min-height: 320px;
+    }
+    .map-stack,
+    .map-layout {
+      gap: 8px;
+    }
+    .map-toolbar {
+      gap: 6px;
+      padding-bottom: 2px;
+    }
+    .map-toggle,
+    .view-toggle,
+    .filter-chip,
+    .map-meta-card {
+      min-height: 32px;
+      padding: 6px 9px;
+      font-size: 10px;
+    }
+    .map-side-copy,
+    .map-selection-empty,
+    .source-note {
+      display: none;
+    }
+    .selection-card {
+      padding: 10px 0;
+    }
+    .selection-trip-item,
+    .rank-row {
+      padding: 6px 0;
+    }
+    .selection-clear-btn,
+    .selection-show-all {
+      min-height: 32px;
+      padding: 6px 10px;
+      border-radius: 9px;
+      font-size: 12px;
+    }
+    .form-panel {
+      padding: 12px;
+    }
+    .form-section {
+      margin-bottom: 8px;
+      padding: 0 0 9px;
+    }
+    .form-grid,
+    .plan-form-grid,
+    .city-block-grid,
+    .city-block-grid.compact-grid {
+      gap: 7px;
+    }
+    .field label {
+      margin-bottom: 4px;
+      font-size: 9px;
+    }
+    .form-input {
+      min-height: 36px;
+      padding: 7px 9px;
+      border-radius: 9px;
+      font-size: 13px;
+    }
+    .tag-input-area {
+      min-height: 36px;
+      padding: 4px 5px;
+      border-radius: 9px;
+    }
+    .tag-chip,
+    .meta-pill {
+      padding: 4px 7px;
+      font-size: 10px;
+    }
+    .tag-text-input {
+      min-width: 92px;
+      font-size: 13px;
+    }
+    .city-block {
+      padding: 0 0 7px;
+    }
+    .add-city-btn {
+      min-height: 34px;
+      padding: 6px 9px;
+    }
+    #view-planejar .plan-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    #view-planejar .plan-main {
+      display: none;
+    }
+    #view-planejar .plan-sidebar {
+      order: 1;
+      gap: 8px;
+    }
+    #view-planejar .plan-panel {
+      padding: 9px 10px;
+    }
+    #view-planejar .planning-inline-stats {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 5px;
+      margin-top: 6px !important;
+    }
+    #view-planejar .planning-inline-stat {
+      min-height: 38px;
+      padding: 6px 7px;
+      border-radius: 9px;
+    }
+    #view-planejar .planning-inline-stat strong {
+      font-size: 17px;
+    }
+    #view-planejar .planning-inline-stat span {
+      font-size: 8px;
+    }
+    #view-planejar .plan-list {
+      gap: 0;
+      margin-top: 4px;
+    }
+    #view-planejar .plan-item.compact-plan-row {
+      min-height: 42px;
+      padding: 6px 0;
+    }
+    #view-planejar .compact-plan-copy strong {
+      font-size: 12px;
+    }
+    #view-planejar .compact-plan-copy span,
+    #view-planejar .compact-plan-year {
+      font-size: 10px;
+    }
+    #view-planejar .compact-actions .icon-action-btn {
+      width: 28px;
+      height: 28px;
+      min-height: 28px;
+      border-radius: 8px;
+    }
+    .modal-overlay.plan-edit-sheet-open {
+      align-items: stretch;
+      padding: 0;
+    }
+    .modal-overlay.plan-edit-sheet-open .modal-content {
+      width: 100%;
+      max-width: none;
+      height: 100dvh;
+      max-height: 100dvh;
+      border-radius: 0;
+      overflow: hidden;
+    }
+    .modal-overlay.plan-edit-sheet-open .modal-header {
+      flex: 0 0 auto;
+      padding: 11px 50px 8px 13px;
+      border-radius: 0;
+    }
+    .modal-overlay.plan-edit-sheet-open .modal-body {
+      flex: 1 1 auto;
+      overflow: auto;
+      padding: 0;
+    }
+    .modal-overlay.plan-edit-sheet-open .modal-close {
+      top: 8px;
+      right: 9px;
+      width: 34px;
+      height: 34px;
+    }
+    .modal-overlay.plan-edit-sheet-open .trip-modal-title {
+      font-size: 20px;
+      line-height: 1;
+    }
+    .modal-overlay.plan-edit-sheet-open .trip-modal-meta {
+      font-size: 11px;
+    }
+    .plan-edit-sheet {
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+    }
+    .plan-edit-sheet #plan-editor-panel {
+      display: block;
+      flex: 1 1 auto;
+      margin: 0;
+      padding: 10px 12px 0;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+    }
+    .modal-overlay.plan-edit-sheet-open #plan-editor-panel .form-shell-header {
+      display: none;
+    }
+    .modal-overlay.plan-edit-sheet-open #plan-editor-panel .plan-form-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 7px;
+      margin-top: 0;
+    }
+    .modal-overlay.plan-edit-sheet-open #plan-editor-panel .field-full {
+      grid-column: 1 / -1;
+    }
+    .modal-overlay.plan-edit-sheet-open #plan-editor-panel .city-block-grid,
+    .modal-overlay.plan-edit-sheet-open #plan-editor-panel .city-block-grid.compact-grid {
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+    .modal-overlay.plan-edit-sheet-open #plan-editor-panel .add-city-btn {
+      margin-top: 7px !important;
+      min-height: 34px;
+    }
+    .modal-overlay.plan-edit-sheet-open #plan-editor-panel .draft-actions {
+      grid-template-columns: minmax(0, 1fr) 36px;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .modal-overlay.plan-edit-sheet-open #generate-plan-grid-btn {
+      min-height: 36px;
+      padding: 7px 10px;
+      font-size: 12px;
+    }
+    .modal-overlay.plan-edit-sheet-open #plan-editor-panel .draft-actions .icon-action-btn {
+      width: 36px;
+      height: 36px;
+      min-height: 36px;
+    }
+    .modal-overlay.plan-edit-sheet-open #plan-grid-container {
+      display: none !important;
+    }
+    .modal-overlay.plan-edit-sheet-open #plan-editor-panel .form-actions-row {
+      position: sticky;
+      bottom: 0;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 7px;
+      margin: 9px -12px 0;
+      padding: 8px 12px 12px;
+      border-top: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,0.92), #fff 30%);
+      backdrop-filter: blur(10px);
+    }
+    .modal-overlay.plan-edit-sheet-open #plan-editor-panel .form-actions-row .primary-action,
+    .modal-overlay.plan-edit-sheet-open #plan-editor-panel .form-actions-row .secondary-action {
+      width: 100%;
+      min-height: 38px;
+      justify-content: center;
+      padding: 8px 10px;
+      font-size: 12px;
+    }
+    .modal-overlay.plan-edit-sheet-open #plan-message {
+      min-height: 0;
+      margin-top: 6px;
+      font-size: 12px;
+    }
+    .modal-overlay.plan-itinerary-open .modal-header {
+      padding: 10px 50px 8px 12px;
+    }
+    .modal-overlay.plan-itinerary-open .modal-body {
+      padding: 8px 9px 10px;
+    }
+    .modal-overlay.plan-itinerary-open .trip-modal-title {
+      font-size: 18px;
+    }
+    .modal-overlay.plan-itinerary-open .trip-modal-actions .primary-action {
+      min-height: 36px;
+      padding: 7px 10px;
+      font-size: 12px;
+    }
+    .modal-overlay.plan-itinerary-open .itinerary-mobile-list {
+      gap: 6px;
+    }
+    .modal-overlay.plan-itinerary-open .itinerary-day-card-header,
+    .modal-overlay.plan-itinerary-open .itinerary-mobile-slot {
+      padding: 7px 9px;
+    }
+    .modal-overlay.plan-itinerary-open .itinerary-mobile-list .itinerary-input,
+    .modal-overlay.plan-itinerary-open .itinerary-mobile-list .itinerary-output {
+      min-height: 50px;
+      border-radius: 8px;
+      font-size: 12px;
+    }
+    .mobile-nav {
+      left: 10px;
+      right: 10px;
+      bottom: 10px;
+      padding: 6px;
+      border-radius: 14px;
+    }
+    .mobile-nav .nav-item {
+      min-height: 44px;
+      padding: 5px 2px;
+      font-size: 9px;
+    }
+    .mobile-nav .nav-item svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  /* UX FIX: iPhones estreitos com ainda menos respiro vertical */
+  @media (max-width: 430px) {
+    .content {
+      padding-inline: 10px;
+    }
+    .topbar {
+      padding-inline: 10px;
+    }
+    .page-title {
+      font-size: 20px;
+    }
+    .top-actions {
+      gap: 5px;
+    }
+    #topbar-primary-action {
+      min-height: 32px;
+      padding: 6px 9px;
+      font-size: 10px;
+    }
+    .sync-pill {
+      max-width: 72px;
+      font-size: 9px;
+    }
+    .chart-container,
+    .year-chart-container,
+    .destination-chart-container {
+      height: 198px;
+    }
+    #map {
+      min-height: 300px;
+    }
+    .modal-overlay.plan-edit-sheet-open #plan-editor-panel {
+      padding: 9px 10px 0;
+    }
+    .modal-overlay.plan-edit-sheet-open #plan-editor-panel .plan-form-grid {
+      gap: 6px;
+    }
+    .modal-overlay.plan-edit-sheet-open #plan-editor-panel .form-actions-row {
+      margin-inline: -10px;
+      padding-inline: 10px;
+    }
+  }
 </style>
 </head>
 <body>
@@ -4099,7 +4549,8 @@
             </aside>
 
             <div class="plan-main">
-              <section class="panel plan-panel">
+              <div id="plan-editor-anchor"></div>
+              <section class="panel plan-panel" id="plan-editor-panel">
                 <div class="form-shell-header">
                   <div>
                     <h2 class="panel-title" id="plan-editor-title">Criar novo plano</h2>
@@ -4425,6 +4876,7 @@ const state = {
   ibgeCitiesCache: {},
   globalGeo: { countries: [], subdivisions: {} },
   selectedPlanId: null,
+  returnToPlanEditSheetAfterItinerary: false,
   planMetrics: { total: 0, open: 0, inProgress: 0, converted: 0, conversionRate: 0, canceled: 0 },
   pendingConversion: null,
   currentJourneyGroups: [],
@@ -4650,7 +5102,7 @@ function cacheElements() {
       "filter-search", "filter-year", "filter-uf", "filter-tag", "clear-filters", "result-count", "dashboard-results", "map-rank", "map-meta-strip", "map-note", "map-side-copy", "map-selection-summary", "stat-ufs", "stat-cities",
     "stat-tags", "stat-companions", "stat-artists", "stat-upcoming-plans", "destinationChart", "destinationChartFallback", "destination-chart-toggle", "trip-modal", "modal-header", "modal-body", "city-blocks", "add-city-btn", "name-suggestions", "lista-grid",
     "form-message", "plan-conversion-banner", "conversion-banner-title", "conversion-banner-copy", "planning-source-note", "planning-mini-stats",
-    "plan-list", "plan-detail-panel", "plan-draft-summary", "plan-grid-container", "plan-grid-title", "itinerary-table-wrapper", "plan-message",
+    "plan-list", "plan-detail-panel", "plan-editor-panel", "plan-editor-anchor", "plan-draft-summary", "plan-grid-container", "plan-grid-title", "itinerary-table-wrapper", "plan-message",
     "detail-plan-message", "plan-name", "plan-start", "plan-end", "plan-status", "save-plan-btn", "plan-city-blocks", "plan-add-city-btn",
     "trip-form-title", "trip-submit-btn", "cancel-trip-edit-btn", "plan-editor-title", "cancel-plan-edit-btn", "app-toast",
     "trip-lookup-btn", "trip-lookup-input", "trip-lookup-results", "trip-help-btn", "plan-help-btn", "map-help-btn"
@@ -6820,8 +7272,9 @@ function updateTopbarPrimaryAction() {
 
 function handleTopbarPrimaryAction() {
   if (state.activeView === "planejar") {
-    resetPlanEditor();
+    resetPlanEditor({ closeSheet: false });
     switchView("planejar");
+    if (isMobileViewport()) openPlanEditSheet();
     return;
   }
   openFreshTripEditor();
@@ -8040,6 +8493,46 @@ function selectPlan(planId) {
   openPlanDetailModal(planId);
 }
 
+function isMobileViewport() {
+  return window.matchMedia("(max-width: 768px)").matches;
+}
+
+function restorePlanEditorPanel() {
+  const panel = els["plan-editor-panel"];
+  const anchor = els["plan-editor-anchor"];
+  if (!panel || !anchor || panel.parentElement === anchor.parentElement) return;
+  anchor.after(panel);
+}
+
+function openPlanEditSheet(plan = null) {
+  if (!isMobileViewport() || !els["trip-modal"] || !els["modal-header"] || !els["modal-body"] || !els["plan-editor-panel"]) return;
+  const locationLabel = plan ? getPlanLocationLabel(plan) : "Novo roteiro";
+  els["modal-header"].innerHTML = `
+    <div class="trip-modal-header-shell plan-modal-header compact-sheet-header">
+      <div class="trip-modal-header-main">
+        <h2 class="trip-modal-title">${state.editingPlanId ? "Editar plano" : "Novo roteiro"}</h2>
+        <div class="trip-modal-meta"><i data-lucide="map-pin"></i><span>${escapeHtml(locationLabel)}</span></div>
+      </div>
+    </div>
+  `;
+  els["modal-body"].innerHTML = `<div class="plan-edit-sheet" id="plan-edit-sheet"></div>`;
+  document.getElementById("plan-edit-sheet").appendChild(els["plan-editor-panel"]);
+  els["trip-modal"].classList.remove("plan-itinerary-open");
+  els["trip-modal"].classList.add("open", "plan-edit-sheet-open");
+  state.returnToPlanEditSheetAfterItinerary = false;
+  refreshIcons();
+}
+
+function closePlanEditSheet({ reset = true } = {}) {
+  if (!els["trip-modal"] || !els["trip-modal"].classList.contains("plan-edit-sheet-open")) return;
+  restorePlanEditorPanel();
+  els["trip-modal"].classList.remove("open", "plan-edit-sheet-open");
+  els["modal-header"].innerHTML = "";
+  els["modal-body"].innerHTML = "";
+  state.returnToPlanEditSheetAfterItinerary = false;
+  if (reset) resetPlanEditor({ closeSheet: false });
+}
+
 function updatePlanEditorUi() {
   const editing = !!state.editingPlanId;
   if (els["plan-editor-title"]) {
@@ -8056,7 +8549,11 @@ function updatePlanEditorUi() {
   refreshIcons();
 }
 
-function resetPlanEditor() {
+function resetPlanEditor(options = {}) {
+  if (options.closeSheet !== false && els["trip-modal"]?.classList.contains("plan-edit-sheet-open")) {
+    closePlanEditSheet({ reset: false });
+  }
+  restorePlanEditorPanel();
   state.editingPlanId = null;
   state.formPlanTags = [];
   state.formPlanArtists = [];
@@ -8098,8 +8595,12 @@ function beginPlanEdit(planId) {
   renderPlanTaxonomies();
   updatePlanEditorUi();
   refreshIcons();
-  showToast(`Editando o plano ${plan.destination}.`, "info", "Plano");
   switchView("planejar");
+  if (isMobileViewport()) {
+    openPlanEditSheet(plan);
+  } else {
+    showToast(`Editando o plano ${plan.destination}.`, "info", "Plano");
+  }
 }
 
 function renderSelectedPlan() {}
@@ -8246,6 +8747,12 @@ function normalizeDraftItineraryForDates(source, startDate, endDate) {
 
 function openPlanItineraryDraftModal(itinerary, startDate, endDate, planLabel = "") {
   if (!els["trip-modal"] || !els["modal-header"] || !els["modal-body"]) return;
+  const shouldReturnToPlanEdit = els["trip-modal"].classList.contains("plan-edit-sheet-open") && isMobileViewport();
+  if (shouldReturnToPlanEdit) {
+    restorePlanEditorPanel();
+    els["trip-modal"].classList.remove("plan-edit-sheet-open");
+  }
+  state.returnToPlanEditSheetAfterItinerary = shouldReturnToPlanEdit;
   els["modal-header"].innerHTML = `
     <div class="trip-modal-header-shell plan-modal-header">
       <div class="trip-modal-header-main">
@@ -8378,6 +8885,7 @@ async function salvarPlanejamento() {
       localPlan.locations[0].lng = resolvedLng;
       localPlan.locations[0].hasConfirmedCoords = true;
     }
+    const wasEditingPlan = !!state.editingPlanId;
     if (state.editingPlanId) {
       state.plans = state.plans.map(plan => plan.id === state.editingPlanId ? localPlan : plan);
     } else {
@@ -8391,7 +8899,7 @@ async function salvarPlanejamento() {
         : "Plano salvo.";
     resetPlanEditor();
     message.textContent = "";
-    showToast(successMessage, "success", state.editingPlanId ? "Plano atualizado" : "Plano salvo");
+    showToast(successMessage, "success", wasEditingPlan ? "Plano atualizado" : "Plano salvo");
     applyFilters();
   } catch (error) {
     message.style.color = "var(--danger)";
@@ -8963,7 +9471,22 @@ function openListModal(title, listItems) {
 }
 
 function closeModal() {
-  els["trip-modal"].classList.remove("open", "plan-itinerary-open");
+  if (!els["trip-modal"]) return;
+  if (els["trip-modal"].classList.contains("plan-edit-sheet-open")) {
+    closePlanEditSheet({ reset: true });
+    return;
+  }
+  const shouldReopenPlanEdit = els["trip-modal"].classList.contains("plan-itinerary-open")
+    && state.returnToPlanEditSheetAfterItinerary
+    && isMobileViewport();
+  els["trip-modal"].classList.remove("open", "plan-itinerary-open", "plan-edit-sheet-open");
+  if (shouldReopenPlanEdit) {
+    state.returnToPlanEditSheetAfterItinerary = false;
+    const plan = state.plans.find(item => item.id === state.editingPlanId) || null;
+    setTimeout(() => openPlanEditSheet(plan), 0);
+    return;
+  }
+  state.returnToPlanEditSheetAfterItinerary = false;
 }
 
 function updateSyncPill() {
