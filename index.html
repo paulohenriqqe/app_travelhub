@@ -4313,6 +4313,63 @@
       padding-inline: 10px;
     }
   }
+
+  /* UX FIX: Planejar no iPhone ocupa a largura toda, sem coluna encolhida */
+  @media (max-width: 768px) {
+    #view-planejar,
+    #view-planejar .dashboard-stack,
+    #view-planejar .plan-layout,
+    #view-planejar .plan-sidebar,
+    #view-planejar .plan-panel,
+    #view-planejar .plan-list,
+    #view-planejar .plan-item.compact-plan-row {
+      width: 100%;
+      max-width: none;
+      box-sizing: border-box;
+    }
+    #view-planejar .plan-layout {
+      align-items: stretch;
+    }
+    #view-planejar .plan-sidebar {
+      align-self: stretch;
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+    #view-planejar #planning-mini-stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+      margin-top: 7px !important;
+    }
+    #view-planejar .planning-inline-stat {
+      min-height: 42px;
+      padding: 6px 7px;
+      align-content: center;
+    }
+    #view-planejar .planning-inline-stat strong {
+      font-size: 18px;
+      line-height: 1;
+    }
+    #view-planejar .planning-inline-stat span {
+      font-size: 8px;
+      line-height: 1.05;
+      white-space: normal;
+    }
+    #view-planejar .plan-item.compact-plan-row {
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+    }
+  }
+
+  @media (max-width: 430px) {
+    #view-planejar #planning-mini-stats {
+      gap: 5px;
+    }
+    #view-planejar .planning-inline-stat {
+      min-height: 40px;
+      padding: 6px;
+    }
+  }
 </style>
 </head>
 <body>
