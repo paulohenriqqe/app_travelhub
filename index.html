@@ -40,6 +40,14 @@
     --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
     --shadow-md: 0 10px 25px -5px rgba(10, 47, 76, 0.08), 0 8px 10px -6px rgba(10, 47, 76, 0.04);
     --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-7: 32px;
+    --space-8: 40px;
   }
   * { box-sizing: border-box; }
   body {
@@ -645,7 +653,6 @@
   .origin-chip.plan { background: rgba(212, 70, 28, 0.12); color: var(--accent); }
   .status-chip { border: 1px solid transparent; }
   .status-chip.planejado { background: var(--warning-bg); color: var(--warning); border-color: #fcd34d; }
-  .status-chip.em-andamento { background: var(--blue-pale); color: var(--blue-dark); border-color: rgba(38, 185, 221, 0.45); }
   .status-chip.efetivado { background: var(--success-bg); color: var(--success); border-color: rgba(15, 118, 110, 0.26); }
   .status-chip.cancelado { background: var(--paper-2); color: var(--ink-2); border-color: var(--line); }
 
@@ -2290,6 +2297,135 @@
     font-size: 13px;
   }
 
+  /* UX FIX: KPIs com rótulo sempre visível e leitura mais clara */
+  .metric-card {
+    min-height: 88px;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 8px;
+  }
+  .metric-main {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .metric-label {
+    display: block;
+    color: var(--ink-2);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+  .metric-value,
+  .metric-sub {
+    display: none;
+  }
+
+  /* UX FIX: ranking de tempo por cidade compacto e clicável */
+  .city-days-list {
+    display: grid;
+    gap: 10px;
+  }
+  .city-days-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(90px, 0.9fr) auto;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 52px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--white);
+    color: inherit;
+    text-align: left;
+    transition: var(--transition);
+  }
+  .city-days-row:hover {
+    border-color: var(--blue-light);
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-1px);
+  }
+  .city-days-main {
+    min-width: 0;
+  }
+  .city-days-main strong {
+    display: block;
+    overflow: hidden;
+    color: var(--blue-dark);
+    font-size: 14px;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .city-days-main span,
+  .city-days-meta {
+    color: var(--ink-3);
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .city-days-bar {
+    height: 8px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--paper-2);
+  }
+  .city-days-bar span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--blue-light), var(--accent-soft));
+  }
+  .city-days-meta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    white-space: nowrap;
+  }
+  .city-days-meta strong {
+    color: var(--blue-dark);
+    font-size: 13px;
+  }
+
+  /* UX FIX: chip temporário de viagem acontecendo agora */
+  .status-chip.happening-now {
+    background: var(--blue-pale);
+    color: var(--blue-dark);
+    border-color: rgba(38, 185, 221, 0.32);
+  }
+
+  /* UX FIX: foco visível consistente para navegação por teclado */
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  .nav-item:focus-visible,
+  .metric-card:focus-visible {
+    outline: 3px solid rgba(38, 185, 221, 0.36);
+    outline-offset: 2px;
+  }
+
+  /* UX FIX: respeita usuários que preferem menos movimento */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+      transition-duration: 0.01ms !important;
+    }
+    .metric-card:hover,
+    .trip-card:hover,
+    .plan-item:hover,
+    .city-days-row:hover {
+      transform: none !important;
+    }
+  }
+
   @media (max-width: 1200px) {
     .dashboard-hero-grid, .journey-grid, .plan-layout, .detail-grid { grid-template-columns: 1fr; }
     .kpi-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
@@ -2340,6 +2476,16 @@
     .metric-card { padding: 12px 14px; min-height: 68px; }
     .metric-number { font-size: 30px; }
     .metric-word { font-size: 18px; }
+    .metric-label { font-size: 10px; }
+    .city-days-row {
+      grid-template-columns: 1fr;
+      gap: 8px;
+      min-height: 72px;
+    }
+    .city-days-meta {
+      justify-content: space-between;
+      width: 100%;
+    }
     .filters-panel { flex-direction: column; align-items: stretch; }
     #map { height: 52vh; min-height: 360px; }
     .map-toolbar {
@@ -2588,8 +2734,8 @@
     </nav>
     <nav class="nav-block">
       <div class="nav-label">Operação</div>
-      <button class="nav-item" data-view="editor"><i data-lucide="plus-circle"></i> Editor</button>
-      <button class="nav-item" data-view="planejar"><i data-lucide="calendar-clock"></i> Plano</button>
+      <button class="nav-item" data-view="editor"><i data-lucide="plus-circle"></i> Nova viagem</button>
+      <button class="nav-item" data-view="planejar"><i data-lucide="calendar-clock"></i> Planejar</button>
     </nav>
   </aside>
 
@@ -2619,6 +2765,15 @@
             <div class="panel chart-panel" style="grid-column:1/-1;">
               <h2 class="chart-title">Evolução das viagens no tempo</h2>
               <div class="chart-container"><canvas id="timeChart"></canvas></div>
+            </div>
+            <div class="panel chart-panel" style="grid-column:1/-1;">
+              <div class="chart-title-row">
+                <div>
+                  <h2 class="chart-title">Tempo por cidade</h2>
+                  <p class="panel-copy">Estimativa de quantos dias você já viveu em cada destino.</p>
+                </div>
+              </div>
+              <div class="city-days-list" id="stat-city-days"></div>
             </div>
           </div>
 
@@ -2668,7 +2823,7 @@
             </div>
             <aside class="panel rank-panel">
               <div class="panel-label" style="margin-bottom:10px;">Leitura da cobertura</div>
-              <p class="atlas-panel-copy" id="map-side-copy">Clique no mapa para abrir as viagens deste recorte.</p>
+              <p class="atlas-panel-copy" id="map-side-copy">Clique em uma UF, país ou cidade para ver as viagens.</p>
               <div id="map-selection-summary"></div>
               <div class="rank-list" id="map-rank"></div>
             </aside>
@@ -2713,7 +2868,7 @@
                   <strong>Como preencher</strong>
                   <div class="hero-help-list">
                     <span>Escolha um nome curto e fácil de achar depois.</span>
-                    <span>Adicione uma ou mais localizações visitadas.</span>
+                    <span>Adicione uma ou mais cidades visitadas.</span>
                     <span>Use tags, artistas e acompanhantes para dar contexto.</span>
                     <span>Use a lupa para reaproveitar uma viagem antiga.</span>
                   </div>
@@ -2740,10 +2895,10 @@
             </div>
 
             <div class="form-section">
-              <div class="form-section-title"><i data-lucide="map-pin"></i> Localizações visitadas <span style="font-size:11px;color:var(--ink-3);font-weight:400;margin-left:8px;text-transform:none;letter-spacing:0;">Adicione quantas quiser</span></div>
+              <div class="form-section-title"><i data-lucide="map-pin"></i> Cidades visitadas <span style="font-size:11px;color:var(--ink-3);font-weight:400;margin-left:8px;text-transform:none;letter-spacing:0;">Adicione uma cidade por parada da viagem.</span></div>
               <div class="city-blocks" id="city-blocks"></div>
               <button type="button" class="add-city-btn" id="add-city-btn" style="margin-top:12px;">
-                <i data-lucide="plus"></i> Adicionar outra localização
+                <i data-lucide="plus"></i> Adicionar outra cidade
               </button>
             </div>
 
@@ -2834,10 +2989,10 @@
                     <input type="text" class="form-input" id="plan-name" placeholder="Ex: Fim de semana em Ouro Preto">
                   </div>
                   <div class="field field-full">
-                    <label>Localizações planejadas</label>
+                    <label>Cidades planejadas</label>
                     <div class="city-blocks" id="plan-city-blocks"></div>
                     <button type="button" class="add-city-btn" id="plan-add-city-btn" style="margin-top:12px;">
-                      <i data-lucide="plus"></i> Adicionar outra localização
+                    <i data-lucide="plus"></i> Adicionar outra cidade
                     </button>
                   </div>
                   <div class="field"><label>Data de início</label><input type="date" class="form-input" id="plan-start"></div>
@@ -2867,7 +3022,6 @@
                     <label>Status inicial</label>
                     <select class="form-input" id="plan-status">
                       <option value="planejado">Planejado</option>
-                      <option value="em-andamento">Em andamento</option>
                       <option value="efetivado">Efetivado</option>
                       <option value="cancelado">Cancelado</option>
                     </select>
@@ -2912,8 +3066,8 @@
 <nav class="mobile-nav">
   <button class="nav-item active" data-view="dashboard"><i data-lucide="layout-dashboard"></i> Home</button>
   <button class="nav-item" data-view="map"><i data-lucide="map"></i> Mapa</button>
-  <button class="nav-item" data-view="editor"><i data-lucide="plus-circle"></i> Editor</button>
-  <button class="nav-item" data-view="planejar"><i data-lucide="calendar-clock"></i> Plano</button>
+  <button class="nav-item" data-view="editor"><i data-lucide="plus-circle"></i> Nova viagem</button>
+  <button class="nav-item" data-view="planejar"><i data-lucide="calendar-clock"></i> Planejar</button>
 </nav>
 
 <div id="trip-modal" class="modal-overlay">
@@ -2929,7 +3083,7 @@
 <datalist id="plan-region-options"></datalist>
 
 <script>
-Chart.register(ChartDataLabels);
+if (window.Chart && window.ChartDataLabels) Chart.register(ChartDataLabels);
 
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRNecMUqxdEaBZw6QzMixrnF-o7n4Ldu5eaOVsLR8vWT0QhxalCbImnUNqJhPshjLyIW5a2Yf6F-Gvb/pub?output=csv";
 const PLANNING_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRNecMUqxdEaBZw6QzMixrnF-o7n4Ldu5eaOVsLR8vWT0QhxalCbImnUNqJhPshjLyIW5a2Yf6F-Gvb/pub?gid=1966843480&single=true&output=csv";
@@ -2943,7 +3097,6 @@ const ITINERARY_SLOTS = [
 
 const STATUS_META = {
   "planejado": { label: "Planejado", icon: "bookmark-plus" },
-  "em-andamento": { label: "Em andamento", icon: "timer-reset" },
   "efetivado": { label: "Efetivado", icon: "check-check" },
   "cancelado": { label: "Cancelado", icon: "circle-slash" }
 };
@@ -3374,7 +3527,7 @@ function cacheElements() {
   [
     "sync-pill", "sync-text", "kpi-grid", "stats-kpi-grid", "journey-mini-stats", "dashboard-status-list", "dashboard-plan-list", "dashboard-summary-list",
       "filter-search", "filter-year", "filter-uf", "filter-tag", "clear-filters", "result-count", "dashboard-results", "map-rank", "map-meta-strip", "map-note", "map-side-copy", "map-selection-summary", "stat-ufs", "stat-cities",
-    "stat-tags", "stat-companions", "stat-artists", "stat-upcoming-plans", "trip-modal", "modal-header", "modal-body", "city-blocks", "add-city-btn", "name-suggestions", "lista-grid",
+    "stat-tags", "stat-companions", "stat-artists", "stat-city-days", "stat-upcoming-plans", "trip-modal", "modal-header", "modal-body", "city-blocks", "add-city-btn", "name-suggestions", "lista-grid",
     "form-message", "plan-conversion-banner", "conversion-banner-title", "conversion-banner-copy", "planning-source-note", "planning-mini-stats",
     "plan-list", "plan-detail-panel", "plan-draft-summary", "plan-grid-container", "plan-grid-title", "itinerary-table-wrapper", "plan-message",
     "detail-plan-message", "plan-name", "plan-start", "plan-end", "plan-status", "save-plan-btn", "plan-city-blocks", "plan-add-city-btn",
@@ -3485,7 +3638,7 @@ function bindEvents() {
   document.getElementById("clear-conversion-btn").addEventListener("click", () => clearPendingConversion(true));
   document.getElementById("cancel-trip-edit-btn").addEventListener("click", () => {
     resetTripForm(true);
-    showToast("Editor limpo.", "info", "Editor");
+    showToast("Editor limpo.", "info", "Nova viagem");
   });
   document.getElementById("cancel-plan-edit-btn").addEventListener("click", resetPlanEditor);
 }
@@ -3847,7 +4000,7 @@ function renderCityBlock(id) {
   const globalSubdivisionOptions = getGlobalSubdivisionSuggestions(cityObj.country);
   block.innerHTML = `
     <div class="city-block-header">
-      <div class="city-block-label">Localização ${state.formCities.findIndex(city => city.id === id) + 1}</div>
+      <div class="city-block-label">Cidade ${state.formCities.findIndex(city => city.id === id) + 1}</div>
       ${state.formCities.length > 1 ? `<button type="button" class="remove-city-btn" onclick="removeCityBlock(${id})"><i data-lucide="x"></i></button>` : ""}
     </div>
     <div class="city-block-grid ${brazilMode ? "" : "compact-grid"}">
@@ -3876,9 +4029,7 @@ function renderCityBlock(id) {
         </div>
       `}
     </div>
-    <div class="inline-note" style="margin-top:12px;">${cityObj.hasConfirmedCoords || (Number.isFinite(cityObj.lat) && Number.isFinite(cityObj.lng))
-      ? "Coordenadas já confirmadas para esta localização."
-      : "Latitude e longitude serão confirmadas automaticamente ao salvar."}</div>
+    <div class="inline-note" style="margin-top:12px;">Usaremos essa cidade para posicionar a viagem no mapa.</div>
   `;
 
   const countrySelect = document.getElementById(`f-country-${id}`);
@@ -4054,11 +4205,11 @@ function renderTripLookupResults(query = "") {
   if (!container) return;
 
   if (!state.loaded.trips) {
-    container.innerHTML = `<div class="hero-search-empty">Sincronizando as viagens para a busca rapida...</div>`;
+    container.innerHTML = `<div class="hero-search-empty">Sincronizando as viagens para a busca rápida...</div>`;
     return;
   }
   if (state.errors.trips) {
-    container.innerHTML = `<div class="hero-search-empty">A base de viagens nao carregou. Confira a sincronizacao para buscar anteriores.</div>`;
+    container.innerHTML = `<div class="hero-search-empty">Não foi possível sincronizar os dados agora. Você ainda pode navegar pelo que já foi carregado.</div>`;
     return;
   }
 
@@ -4380,7 +4531,7 @@ function parsePlanLocations(rawValue, fallbackLocation = {}) {
 
 function normalizeStatus(value) {
   const cleaned = String(value || "").trim().toLowerCase();
-  if (cleaned.includes("andamento")) return "em-andamento";
+  if (cleaned.includes("andamento")) return "planejado";
   if (cleaned.includes("efet")) return "efetivado";
   if (cleaned.includes("cancel")) return "cancelado";
   return "planejado";
@@ -4847,8 +4998,8 @@ function getPlanCountdown(plan) {
   if (today < start) {
     const daysUntil = getDateDiffInDays(today, start);
     return {
-      label: daysUntil === 0 ? "Comeca hoje" : `Faltam ${formatCountLabel(daysUntil, "dia", "dias")}`,
-      detail: `Saida em ${formatDateShort(plan.startDate || plan.endDate)}`,
+      label: daysUntil === 0 ? "Começa hoje" : `Faltam ${formatCountLabel(daysUntil, "dia", "dias")}`,
+      detail: `Saída em ${formatDateShort(plan.startDate || plan.endDate)}`,
       tone: "future"
     };
   }
@@ -4867,7 +5018,7 @@ function getPlanCountdown(plan) {
   const remainingDays = getDateDiffInDays(today, end);
   return {
     label: totalDays <= 1 ? "Acontece hoje" : `Dia ${currentDay} de ${totalDays}`,
-    detail: remainingDays === 0 ? "Ultimo dia da viagem" : `Faltam ${formatCountLabel(remainingDays, "dia", "dias")} para encerrar`,
+    detail: remainingDays === 0 ? "Último dia da viagem" : `Faltam ${formatCountLabel(remainingDays, "dia", "dias")} para encerrar`,
     tone: "active"
   };
 }
@@ -5198,7 +5349,7 @@ function removePlanCityBlock(id) {
   if (block) block.remove();
   document.querySelectorAll("#plan-city-blocks .city-block").forEach((element, idx) => {
     const label = element.querySelector(".city-block-label");
-    if (label) label.textContent = `Localização ${idx + 1}`;
+    if (label) label.textContent = `Cidade ${idx + 1}`;
   });
 }
 
@@ -5211,7 +5362,7 @@ function renderPlanCityBlock(id) {
   const globalSubdivisionOptions = getGlobalSubdivisionSuggestions(cityObj.country);
   block.innerHTML = `
     <div class="city-block-header">
-      <div class="city-block-label">Localização ${state.formPlanCities.findIndex(city => city.id === id) + 1}</div>
+      <div class="city-block-label">Cidade ${state.formPlanCities.findIndex(city => city.id === id) + 1}</div>
       ${state.formPlanCities.length > 1 ? `<button type="button" class="remove-city-btn" onclick="removePlanCityBlock(${id})"><i data-lucide="x"></i></button>` : ""}
     </div>
     <div class="city-block-grid ${brazilMode ? "" : "compact-grid"}">
@@ -5240,9 +5391,7 @@ function renderPlanCityBlock(id) {
         </div>
       `}
     </div>
-    <div class="inline-note" style="margin-top:12px;">${cityObj.hasConfirmedCoords || (Number.isFinite(cityObj.lat) && Number.isFinite(cityObj.lng))
-      ? "Coordenadas já confirmadas para esta localização."
-      : "Latitude e longitude serão confirmadas automaticamente ao salvar."}</div>
+    <div class="inline-note" style="margin-top:12px;">Usaremos essa cidade para posicionar a viagem no mapa.</div>
   `;
 
   const countrySelect = document.getElementById(`plan-country-${id}`);
@@ -5387,13 +5536,12 @@ function computePlanMetrics() {
   const linkedIds = new Set(state.trips.map(trip => trip.planId).filter(Boolean));
   const converted = state.plans.filter(plan => linkedIds.has(plan.id) || plan.status === "efetivado").length;
   const open = state.plans.filter(plan => !["efetivado", "cancelado"].includes(plan.status)).length;
-  const inProgress = state.plans.filter(plan => plan.status === "em-andamento").length;
   const canceled = state.plans.filter(plan => plan.status === "cancelado").length;
   const total = state.plans.length;
   state.planMetrics = {
     total,
     open,
-    inProgress,
+    inProgress: 0,
     converted,
     canceled,
     conversionRate: total ? Math.round((converted / total) * 100) : 0
@@ -5423,7 +5571,7 @@ function switchView(view) {
   const titles = {
     dashboard: "Ciclo de <em>viagens</em>",
     map: "Cobertura das <em>viagens</em>",
-    editor: "Editor de <em>viagens</em>",
+    editor: "Nova <em>viagem</em>",
     planejar: "Planejar <em>roteiro</em>"
   };
   document.getElementById("page-title").innerHTML = titles[view] || "";
@@ -5488,11 +5636,14 @@ function renderKpis() {
   const uniqueTags = [...new Set(state.filtered.flatMap(trip => trip.tags))];
   const uniqueCompanions = [...new Set(state.filtered.flatMap(trip => trip.travelers))];
   const uniqueArtists = [...new Set(state.filtered.flatMap(trip => trip.artists))];
+  const cityDaysStats = buildCityDaysStats(state.filtered);
+  const travelDays = state.filtered.reduce((sum, trip) => sum + getTripTotalDays(trip), 0);
   state.currentJourneyGroups = journeyGroups;
   state.currentYearsList = years;
   state.currentCitiesList = cities;
   state.currentCountriesList = countries;
   state.currentUfsList = regions;
+  state.currentCityDaysStats = cityDaysStats;
   state.currentTagsList = uniqueTags.sort((a, b) => a.localeCompare(b, "pt-BR"));
   state.currentCompanionsList = uniqueCompanions.sort((a, b) => a.localeCompare(b, "pt-BR"));
   state.currentArtistsList = uniqueArtists.sort((a, b) => a.localeCompare(b, "pt-BR"));
@@ -5500,27 +5651,19 @@ function renderKpis() {
   const homeHtml = `
     <article class="metric-card" onclick="openJourneyGroupsModal('Viagens registradas', state.currentJourneyGroups)">
       <div class="metric-main"><i data-lucide="plane"></i><span class="metric-value-text">${formatMetricCountLabel(journeyCount, "viagem", "viagens")}</span></div>
-    </article>
-    <article class="metric-card" onclick="openListModal('Anos registrados', state.currentYearsList)">
-      <div class="metric-main"><i data-lucide="calendar-range"></i><span class="metric-value-text">${formatMetricCountLabel(years.length, "ano", "anos")}</span></div>
+      <span class="metric-label">Total de viagens</span>
     </article>
     <article class="metric-card" onclick="openListModal('Cidades visitadas', state.currentCitiesList)">
       <div class="metric-main"><i data-lucide="map-pin"></i><span class="metric-value-text">${formatMetricCountLabel(cities.length, "cidade", "cidades")}</span></div>
+      <span class="metric-label">Cidades visitadas</span>
     </article>
     <article class="metric-card" onclick="openListModal('Países visitados', state.currentCountriesList)">
-      <div class="metric-main"><i data-lucide="globe-2"></i><span class="metric-value-text">${formatMetricCountLabel(countries.length, "país", "países")}</span></div>
+      <div class="metric-main"><i data-lucide="globe-2"></i><span class="metric-value-text">${countries.length}/${regions.length}</span></div>
+      <span class="metric-label">Países / UFs</span>
     </article>
-    <article class="metric-card" onclick="openListModal('Regiões visitadas', state.currentUfsList)">
-      <div class="metric-main"><i data-lucide="map"></i><span class="metric-value-text">${formatMetricCountLabel(regions.length, "região", "regiões")}</span></div>
-    </article>
-    <article class="metric-card" onclick="openListModal('Motivos registrados', state.currentTagsList)">
-      <div class="metric-main"><i data-lucide="hash"></i><span class="metric-value-text">${formatMetricCountLabel(uniqueTags.length, "motivo", "motivos")}</span></div>
-    </article>
-    <article class="metric-card" onclick="openListModal('Companhias recorrentes', state.currentCompanionsList)">
-      <div class="metric-main"><i data-lucide="users"></i><span class="metric-value-text">${formatMetricCountLabel(uniqueCompanions.length, "pessoa", "pessoas")}</span></div>
-    </article>
-    <article class="metric-card" onclick="openListModal('Artistas presentes', state.currentArtistsList)">
-      <div class="metric-main"><i data-lucide="music-2"></i><span class="metric-value-text">${formatMetricCountLabel(uniqueArtists.length, "artista", "artistas")}</span></div>
+    <article class="metric-card" onclick="openCityDaysModal()">
+      <div class="metric-main"><i data-lucide="calendar-days"></i><span class="metric-value-text">${formatMetricCountLabel(travelDays, "dia", "dias")}</span></div>
+      <span class="metric-label">Dias viajando</span>
     </article>
   `;
 
@@ -5591,7 +5734,7 @@ function renderDashboardCycle() {
 function renderDashboardResults() {
   els["result-count"].textContent = formatCountLabel(state.filtered.length, "registro real encontrado", "registros reais encontrados");
   if (!state.filtered.length) {
-    els["dashboard-results"].innerHTML = `<div class="empty-state">Sem resultados para a busca atual.</div>`;
+    els["dashboard-results"].innerHTML = `<div class="empty-state">Nenhuma viagem encontrada nesse filtro.</div>`;
     return;
   }
   els["dashboard-results"].innerHTML = `<div class="gallery-grid">${state.filtered.map(renderTripCard).join("")}</div>`;
@@ -5607,12 +5750,12 @@ function renderTripCard(trip) {
       <div class="trip-topline">
         <div class="trip-badges">
           <span class="uf-badge">${escapeHtml(badge || "TR")}</span>
+          ${renderTripContextChips(trip, linkedPlan)}
         </div>
-        <span class="date-text">${trip.year || "-"}</span>
+        <span class="date-text">${escapeHtml(formatTripDurationLabel(trip))}</span>
       </div>
       <h2 class="trip-title">${escapeHtml(trip.name)}</h2>
       <div class="trip-city"><i data-lucide="map-pin"></i>${escapeHtml(formatTripLocation(trip) || trip.city || trip.country)}</div>
-      ${linkedPlan ? `<div class="trip-links">Ligada ao plano ${escapeHtml(linkedPlan.destination)}</div>` : ""}
       ${trip.tags.length ? `<div class="tag-row">${trip.tags.slice(0, 2).map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}</div>` : ""}
       <div class="trip-details">
         <span><i data-lucide="users"></i>${formatPeopleCount(trip.travelers.length)}</span>
@@ -5620,13 +5763,18 @@ function renderTripCard(trip) {
           <div class="trip-detail-stack">
             <span class="trip-detail-main"><i data-lucide="music-2"></i>${artistSummary ? `<span class="trip-detail-plus">${escapeHtml(artistSummary)}</span>` : ""}${escapeHtml(trip.artists[0])}</span>
           </div>
-        ` : `<span><i data-lucide="calendar"></i>${formatDateShort(trip.startDate)}</span>`}
+        ` : `<span><i data-lucide="calendar"></i>${formatDateShort(trip.startDate) || "Sem data"}</span>`}
       </div>
     </article>
   `;
 }
 
 function initMap() {
+  if (!window.L || !document.getElementById("map")) {
+    state.errors.geo = "Mapa parcial: a biblioteca do mapa não carregou agora.";
+    updateSyncStatus();
+    return;
+  }
   if (state.map) {
     state.map.invalidateSize();
     renderMapLayer();
@@ -5665,11 +5813,14 @@ function renderCoverageSidebar(collections) {
     .slice()
     .sort((a, b) => (b.startDate || "").localeCompare(a.startDate || ""))
     .slice(0, 5);
+  const selectedTotalDays = selected
+    ? selected.trips.reduce((sum, trip) => sum + getTripTotalDays(trip), 0)
+    : 0;
 
   if (els["map-side-copy"]) {
     els["map-side-copy"].textContent = selected
       ? "As viagens deste recorte aparecem aqui."
-      : "Clique no mapa para abrir as viagens deste recorte.";
+      : "Clique em uma UF, país ou cidade para ver as viagens.";
   }
 
   if (els["map-selection-summary"]) {
@@ -5680,6 +5831,7 @@ function renderCoverageSidebar(collections) {
             <div class="panel-kicker">Recorte selecionado</div>
             <h3 class="selection-card-title">${escapeHtml(selected.title)}</h3>
             <p class="selection-card-subtitle">${escapeHtml(selected.subtitle)}</p>
+            <p class="selection-card-subtitle">${formatCountLabel(selected.trips.length, "viagem", "viagens")} | ${formatCountLabel(selectedTotalDays, "dia viajando", "dias viajando")}</p>
           </div>
           <button type="button" class="small-action" onclick="clearMapSelection()"><i data-lucide="x"></i> Limpar</button>
         </div>
@@ -6003,10 +6155,10 @@ function renderMapLayer(preserveViewport = false) {
     els["map-side-copy"].textContent = state.errors.geo
       ? "Cobertura parcial: algumas camadas territoriais não carregaram."
       : state.showPlannedMap
-        ? "Rotas e estreias planejadas aparecem em azul sobre a cobertura."
+        ? "Planos aparecem em azul sobre a cobertura."
         : cityMode
           ? "Veja municípios sobrepostos na mesma cobertura por UFs."
-          : "Clique no mapa para abrir as viagens deste recorte.";
+          : "Clique em uma UF, país ou cidade para ver as viagens.";
   }
 
   baseLayer.addTo(state.mapLayer);
@@ -6021,6 +6173,8 @@ function renderMapLayer(preserveViewport = false) {
 }
 
 function renderStats() {
+  renderCityDaysStats();
+
   const getTop = mapFn => Object.entries(state.filtered.reduce((acc, trip) => {
     const values = Array.isArray(mapFn(trip)) ? mapFn(trip) : [mapFn(trip)];
     values.forEach(value => { if (value) acc[value] = (acc[value] || 0) + 1; });
@@ -6058,7 +6212,9 @@ function renderStats() {
   const effectiveSeries = years.map(year => yearCounts[year] || 0);
   const maxSeriesValue = Math.max(...effectiveSeries, 0);
 
-  const ctx = document.getElementById("timeChart").getContext("2d");
+  const chartCanvas = document.getElementById("timeChart");
+  if (!chartCanvas || !window.Chart) return;
+  const ctx = chartCanvas.getContext("2d");
   if (state.chartInstance) state.chartInstance.destroy();
   const chartFill = ctx.createLinearGradient(0, 0, 0, 260);
   chartFill.addColorStop(0, "rgba(243, 115, 33, 0.22)");
@@ -6164,7 +6320,7 @@ function renderStats() {
         <span class="spotlight-pill"><i data-lucide="map-pin"></i>${escapeHtml(getPlanLocationLabel(plan))}</span>
       </div>
     </button>
-  `).join("") : `<div class="empty-state">A agenda futura aparece aqui quando os planos tiverem localização e datas definidas.</div>`;
+  `).join("") : `<div class="empty-state">A agenda futura aparece aqui quando os planos tiverem cidade e datas definidas.</div>`;
 }
 
 function renderPlanningExperience() {
@@ -6206,7 +6362,7 @@ function renderPlanningMetrics() {
 
 function renderPlanList() {
   if (!state.filteredPlans.length) {
-    els["plan-list"].innerHTML = `<div class="empty-state">Nenhum plano carregado. Preencha o formulário ao lado e salve para começar, ou conecte o CSV publicado do planejamento.</div>`;
+    els["plan-list"].innerHTML = `<div class="empty-state">Nenhum plano cadastrado ainda. Preencha o formulário ao lado e salve para começar, ou conecte o CSV publicado do planejamento.</div>`;
     return;
   }
 
@@ -6398,7 +6554,7 @@ function renderItineraryTable(itinerary, editable, startDate, endDate) {
     days.forEach((day, index) => {
       const value = itinerary.slots?.[day]?.[slot.key] || "";
       if (editable) {
-        html += `<td class="itinerary-td"><textarea class="itinerary-input" id="draft-${slot.key}-${index}" placeholder="O que acontece aqui?">${escapeHtml(value)}</textarea></td>`;
+        html += `<td class="itinerary-td"><textarea class="itinerary-input" id="draft-${slot.key}-${index}" placeholder="Ex: chegada, praia, jantar...">${escapeHtml(value)}</textarea></td>`;
       } else {
         html += `<td class="itinerary-td"><div class="itinerary-output ${value ? "" : "empty"}"><span class="itinerary-output-text">${value ? escapeHtml(value) : ""}</span></div></td>`;
       }
@@ -6408,6 +6564,50 @@ function renderItineraryTable(itinerary, editable, startDate, endDate) {
   html += `</tbody></table></div>`;
   if (itinerary.notes) html += `<div class="inline-note" style="margin-top:14px;">${escapeHtml(itinerary.notes)}</div>`;
   return html;
+}
+
+function renderCityDaysStats() {
+  const container = els["stat-city-days"];
+  if (!container) return;
+  const stats = (state.currentCityDaysStats || buildCityDaysStats(state.filtered)).slice(0, 12);
+  const maxDays = Math.max(...stats.map(item => item.totalDays), 1);
+  if (!stats.length) {
+    container.innerHTML = `<div class="empty-state">Nenhuma viagem encontrada nesse filtro.</div>`;
+    return;
+  }
+  container.innerHTML = stats.map(item => `
+    <button type="button" class="city-days-row" onclick="openCityDaysTrips(decodeURIComponent('${encodeURIComponent(item.label)}'))">
+      <div class="city-days-main">
+        <strong>${escapeHtml(item.label)}</strong>
+        <span>${formatCountLabel(item.tripCount, "viagem", "viagens")}${item.firstDate || item.lastDate ? ` | ${escapeHtml(formatDateRange(item.firstDate, item.lastDate))}` : ""}</span>
+      </div>
+      <div class="city-days-bar" aria-hidden="true"><span style="width:${Math.max(6, (item.totalDays / maxDays) * 100)}%"></span></div>
+      <div class="city-days-meta">
+        <strong>${formatCountLabel(item.totalDays, "dia", "dias")}</strong>
+        ${item.estimatedDays ? `<span class="tag">estimado</span>` : ""}
+      </div>
+    </button>
+  `).join("");
+}
+
+function openCityDaysTrips(label) {
+  const item = (state.currentCityDaysStats || []).find(entry => entry.label === label);
+  openTripsCollectionModal(
+    `Tempo em ${label}`,
+    item?.trips || [],
+    item ? `${formatCountLabel(item.totalDays, "dia", "dias")} em ${formatCountLabel(item.tripCount, "viagem", "viagens")}` : "Tempo por cidade"
+  );
+}
+
+function openCityDaysModal() {
+  const uniqueTrips = Array.from(
+    new Map((state.currentCityDaysStats || []).flatMap(item => item.trips).map(trip => [trip.id, trip])).values()
+  );
+  openTripsCollectionModal(
+    "Tempo por cidade",
+    uniqueTrips,
+    "Estimativa de dias viajando por destino"
+  );
 }
 
 function renderItineraryMobileCards(itinerary, editable, days) {
@@ -6424,7 +6624,7 @@ function renderItineraryMobileCards(itinerary, editable, days) {
       const value = itinerary.slots?.[day]?.[slot.key] || "";
       html += `<div class="itinerary-mobile-slot"><span class="itinerary-mobile-label">${escapeHtml(slot.label)}</span>`;
       if (editable) {
-        html += `<textarea class="itinerary-input" id="draft-${slot.key}-${index}" placeholder="O que acontece aqui?">${escapeHtml(value)}</textarea>`;
+        html += `<textarea class="itinerary-input" id="draft-${slot.key}-${index}" placeholder="Ex: chegada, praia, jantar...">${escapeHtml(value)}</textarea>`;
       } else {
         html += `<div class="itinerary-output ${value ? "" : "empty"}"><span class="itinerary-output-text">${value ? escapeHtml(value) : ""}</span></div>`;
       }
@@ -6489,12 +6689,12 @@ async function salvarPlanejamento() {
 
   if (!destination) {
     message.style.color = "var(--danger)";
-    message.textContent = "Informe ao menos o nome da viagem ou uma localização principal antes de salvar.";
+    message.textContent = "Informe ao menos o nome da viagem ou uma cidade principal antes de salvar.";
     return;
   }
   if (state.formPlanCities.length && !locations.length) {
     message.style.color = "var(--danger)";
-    message.textContent = "Complete pelo menos uma localização do plano. Para Brasil, informe país, UF e cidade; para outros países, país e cidade.";
+    message.textContent = "Complete pelo menos uma cidade do plano. Para Brasil, informe país, UF e cidade; para outros países, país e cidade.";
     return;
   }
   if (!startDate || !endDate) {
@@ -6587,7 +6787,7 @@ async function salvarPlanejamento() {
       ? "Plano atualizado com sucesso."
       : itineraryHasEntries(itinerary)
         ? "Plano salvo com sucesso e pronto para acompanhamento."
-        : "Plano salvo com sucesso. Ele ficou sem roteiro detalhado, mas o status ja pode ser acompanhado.";
+        : "Plano salvo com sucesso. Ele ficou sem roteiro detalhado, mas o status já pode ser acompanhado.";
     resetPlanEditor();
     message.style.color = "var(--success)";
     message.textContent = successMessage;
@@ -6624,9 +6824,9 @@ async function deletePlanById(planId) {
     applyFilters();
     if (message) {
       message.style.color = "var(--success)";
-      message.textContent = "Plano excluido com sucesso.";
+      message.textContent = "Plano excluído com sucesso.";
     }
-    showToast("Plano excluido com sucesso.", "success", "Plano removido");
+    showToast("Plano excluído com sucesso.", "success", "Plano removido");
   } catch (error) {
     if (message) {
       message.style.color = "var(--danger)";
@@ -6797,7 +6997,7 @@ async function handleFormSubmit(event) {
   }
   if (!cities.length) {
     message.style.color = "var(--danger)";
-    message.textContent = "Adicione pelo menos uma localização completa. Para Brasil, informe país, UF e cidade; para outros países, país e cidade.";
+    message.textContent = "Adicione pelo menos uma cidade completa. Para Brasil, informe país, UF e cidade; para outros países, país e cidade.";
     return;
   }
   if (end && end < start) {
@@ -6807,7 +7007,7 @@ async function handleFormSubmit(event) {
   }
   if (state.editingTripId && cities.length !== 1) {
     message.style.color = "var(--danger)";
-    message.textContent = "A edição ajusta uma localização por vez. Mantenha apenas uma cidade neste formulário.";
+    message.textContent = "A edição ajusta uma cidade por vez. Mantenha apenas uma cidade neste formulário.";
     return;
   }
 
@@ -7056,14 +7256,12 @@ function openTripModal(tripId) {
   if (!trip) return;
   const linkedPlan = trip.planId ? state.plans.find(plan => plan.id === trip.planId) : null;
   const badge = isBrazilCountry(trip.country) ? (trip.region || trip.uf || "BR") : (trip.country || "").slice(0, 2).toUpperCase();
-  const coordinateLabel = Number.isFinite(trip.lat) && Number.isFinite(trip.lng)
-    ? `${trip.lat.toFixed(4)}, ${trip.lng.toFixed(4)}`
-    : "Sem coordenada confirmada; o atlas usa um ponto aproximado.";
   els["modal-header"].innerHTML = `
     <div class="trip-modal-header-shell">
       <div class="trip-modal-header-main">
         <div class="trip-modal-badges">
           <span class="uf-badge">${escapeHtml(badge)}</span>
+          ${renderTripContextChips(trip, linkedPlan)}
         </div>
         <h2 class="trip-modal-title">${escapeHtml(trip.name)}</h2>
         <div class="trip-modal-meta">
@@ -7080,8 +7278,8 @@ function openTripModal(tripId) {
   els["modal-body"].innerHTML = `
     <div class="trip-modal-grid">
       ${infoBlock("calendar", "Datas", formatDateRange(trip.startDate, trip.endDate))}
+      ${infoBlock("calendar-days", "Duração", formatTripDurationLabel(trip))}
       ${infoBlock("globe-2", "País", trip.country || "Brasil")}
-      ${infoBlock("map", "Coordenadas", coordinateLabel)}
       ${trip.tags.length ? infoBlock("hash", "Tags", trip.tags.join(", ")) : ""}
       ${trip.artists.length ? infoBlock("music-2", "Artistas", trip.artists.join(", ")) : ""}
       ${infoBlock("users", "Acompanhantes", trip.travelers.length ? trip.travelers.join(", ") : "Solo")}
@@ -7103,7 +7301,7 @@ async function deleteTrip(tripId) {
     state.trips = state.trips.filter(item => item.id !== trip.id);
     closeModal();
     applyFilters();
-    showToast("Viagem excluida com sucesso.", "success", "Viagem removida");
+    showToast("Viagem excluída com sucesso.", "success", "Viagem removida");
   } catch (error) {
     els["modal-body"].insertAdjacentHTML("afterbegin", `<div class="empty-state" style="margin-bottom:16px;">${escapeHtml(error.message || "Não foi possível excluir a viagem.")}</div>`);
     showToast(error.message || "Não foi possível excluir a viagem.", "error", "Erro ao excluir");
@@ -7169,23 +7367,23 @@ function updateSyncPill() {
   }
 
   if (state.errors.trips) {
-    els["sync-text"].textContent = "Base com erro";
+    els["sync-text"].textContent = "Não sincronizado";
     return;
   }
 
   if (state.errors.geo) {
-    els["sync-text"].textContent = "Atlas parcial";
+    els["sync-text"].textContent = "Mapa parcial";
     return;
   }
 
   if (state.errors.plans) {
-    els["sync-text"].textContent = "Base online";
+    els["sync-text"].textContent = "Dados online";
     return;
   }
 
   els["sync-text"].textContent = isConfiguredUrl(GOOGLE_SCRIPT_URL, "SEU_ID_AQUI")
     ? "Online"
-    : "Base online";
+    : "Dados online";
 }
 
 function collectDraftItinerary(startDate, endDate) {
@@ -7211,6 +7409,103 @@ function getLinkedTripsForPlan(planId) {
   return state.trips.filter(trip => trip.planId === planId);
 }
 
+function getTripTotalDays(trip) {
+  const start = normalizeDateValue(trip?.startDate);
+  const end = normalizeDateValue(trip?.endDate);
+  if (start && end) return getDaysBetween(start, end).length;
+  if (start) return 1;
+  return 0;
+}
+
+function formatTripDurationLabel(trip) {
+  const days = getTripTotalDays(trip);
+  if (!days) return "Sem data";
+  return formatCountLabel(days, "dia", "dias");
+}
+
+function isTripHappeningNow(trip) {
+  const start = normalizeDateValue(trip?.startDate);
+  if (!start) return false;
+  const end = normalizeDateValue(trip?.endDate) || start;
+  const today = new Date().toISOString().slice(0, 10);
+  return start <= today && today <= end;
+}
+
+function renderTripContextChips(trip, linkedPlan) {
+  return `
+    ${linkedPlan ? `<span class="origin-chip plan">Planejada</span>` : ""}
+    ${isTripHappeningNow(trip) ? `<span class="status-chip happening-now"><i data-lucide="sparkles" style="width:12px;height:12px;margin-right:6px;"></i>Acontecendo agora</span>` : ""}
+  `;
+}
+
+function getTripLocationsForDuration(trip) {
+  const rawLocations = Array.isArray(trip?.locations) && trip.locations.length
+    ? trip.locations
+    : [trip];
+  const seen = new Set();
+  return rawLocations
+    .map(location => buildLocationDraft({
+      country: location.country || trip.country || "Brasil",
+      region: location.region || location.uf || trip.region || trip.uf || "",
+      uf: location.uf || location.region || trip.uf || trip.region || "",
+      city: location.city || trip.city || "",
+      lat: location.lat,
+      lng: location.lng
+    }))
+    .filter(location => {
+      if (!location.city) return false;
+      const key = `${normalizeLookupKey(location.country)}|${normalizeLookupKey(location.region || location.uf)}|${normalizeLookupKey(location.city)}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+}
+
+function buildCityDaysStats(trips) {
+  const stats = new Map();
+  (trips || []).forEach(trip => {
+    const totalDays = getTripTotalDays(trip);
+    if (!totalDays) return;
+    const locations = getTripLocationsForDuration(trip);
+    if (!locations.length) return;
+    const baseDays = Math.floor(totalDays / locations.length);
+    let remainder = totalDays % locations.length;
+    const estimated = locations.length > 1;
+
+    locations.forEach(location => {
+      const assignedDays = baseDays + (remainder > 0 ? 1 : 0);
+      if (remainder > 0) remainder -= 1;
+      const key = `${normalizeLookupKey(location.country)}|${normalizeLookupKey(location.region || location.uf)}|${normalizeLookupKey(location.city)}`;
+      if (!stats.has(key)) {
+        stats.set(key, {
+          city: location.city,
+          region: location.region || location.uf,
+          country: location.country || "Brasil",
+          label: formatLocationLabel(location) || location.city,
+          totalDays: 0,
+          tripCount: 0,
+          firstDate: "",
+          lastDate: "",
+          estimatedDays: 0,
+          trips: []
+        });
+      }
+      const item = stats.get(key);
+      item.totalDays += assignedDays;
+      item.tripCount += 1;
+      if (estimated) item.estimatedDays += assignedDays;
+      if (trip.startDate && (!item.firstDate || trip.startDate < item.firstDate)) item.firstDate = trip.startDate;
+      if (trip.endDate && (!item.lastDate || trip.endDate > item.lastDate)) item.lastDate = trip.endDate;
+      if (!item.trips.some(existing => existing.id === trip.id)) item.trips.push(trip);
+    });
+  });
+
+  return [...stats.values()].sort((a, b) => {
+    if (b.totalDays !== a.totalDays) return b.totalDays - a.totalDays;
+    return a.label.localeCompare(b.label, "pt-BR");
+  });
+}
+
 function itineraryHasEntries(itinerary) {
   return itinerary.days.some(day => ITINERARY_SLOTS.some(slot => itinerary.slots?.[day]?.[slot.key]));
 }
@@ -7221,8 +7516,9 @@ function getItineraryDayCount(plan) {
 }
 
 function renderStatusChip(status) {
-  const meta = STATUS_META[status] || STATUS_META["planejado"];
-  return `<span class="status-chip ${status}"><i data-lucide="${meta.icon}" style="width:12px;height:12px;margin-right:6px;"></i>${meta.label}</span>`;
+  const normalized = normalizeStatus(status);
+  const meta = STATUS_META[normalized] || STATUS_META["planejado"];
+  return `<span class="status-chip ${normalized}"><i data-lucide="${meta.icon}" style="width:12px;height:12px;margin-right:6px;"></i>${meta.label}</span>`;
 }
 
 function getDaysBetween(startDate, endDate) {
