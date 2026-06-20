@@ -3457,10 +3457,20 @@ function setupAutocomplete(stateKey, inputId, areaId, dropdownId, listKey) {
   area.addEventListener("click", () => input.focus());
   input.addEventListener("input", () => renderDropdown(input, dropdown, listKey, stateKey));
   input.addEventListener("keydown", event => {
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      if (!dropdown.classList.contains("open")) renderDropdown(input, dropdown, listKey, stateKey);
+      moveAutocompleteSelection(dropdown, event.key === "ArrowDown" ? 1 : -1);
+      return;
+    }
     if (event.key === "Enter" || event.key === ",") {
       event.preventDefault();
-      const value = input.value.trim().replace(/,$/, "");
-      if (value) commitTag(stateKey, value, listKey, input, area);
+      commitAutocompleteInput(stateKey, listKey, input, area, dropdown);
+      return;
+    }
+    if (event.key === "Escape") {
+      dropdown.classList.remove("open");
+      return;
     }
     if (event.key === "Backspace" && !input.value) {
       const arr = state[meta.stateProp];
@@ -3480,25 +3490,21 @@ function renderDropdown(input, dropdown, listKey, stateKey) {
   const meta = TAXONOMY_FIELD_META[stateKey];
   if (!meta) return;
   closeAllAutocompleteDropdowns(dropdown.id);
-  const query = input.value.trim().toLowerCase();
-  const selected = state[meta.stateProp];
-  let items = state.lists[listKey].filter(item => !selected.includes(item));
-  if (query) items = items.filter(item => item.toLowerCase().includes(query));
+  const { query, items, canCreate } = getAutocompleteOptions(stateKey, listKey, input.value);
 
   let html = "";
   if (items.length) {
-    html += items.slice(0, 8).map(item => `
-      <div class="ac-item" onmousedown="event.preventDefault(); selectAcItem('${stateKey}',decodeURIComponent('${encodeURIComponent(item)}'),'${listKey}')">
+    html += items.slice(0, 8).map((item, index) => `
+      <div class="ac-item ${index === 0 ? "selected" : ""}" role="option" aria-selected="${index === 0 ? "true" : "false"}" data-ac-action="select" data-ac-value="${encodeURIComponent(item)}">
         <i data-lucide="check-circle-2"></i> ${escapeHtml(item)}
       </div>
     `).join("");
   }
 
-  if (query && !state.lists[listKey].map(item => item.toLowerCase()).includes(query)) {
-    if (items.length) html += `<div class="ac-divider"></div>`;
+  if (canCreate) {
     html += `
-      <div class="ac-item new-item" onmousedown="event.preventDefault(); createAndSelectAcItem('${stateKey}',decodeURIComponent('${encodeURIComponent(input.value.trim())}'),'${listKey}')">
-        <i data-lucide="plus-circle"></i> Criar "${escapeHtml(input.value.trim())}"
+      <div class="ac-item new-item selected" role="option" aria-selected="true" data-ac-action="create" data-ac-value="${encodeURIComponent(query)}">
+        <i data-lucide="plus-circle"></i> Criar "${escapeHtml(query)}"
       </div>
     `;
   }
@@ -3508,8 +3514,76 @@ function renderDropdown(input, dropdown, listKey, stateKey) {
     return;
   }
   dropdown.innerHTML = html;
+  dropdown.dataset.activeIndex = "0";
+  const area = document.getElementById(meta.areaId);
+  dropdown.querySelectorAll(".ac-item").forEach((item, index) => {
+    item.addEventListener("mouseenter", () => setAutocompleteActiveOption(dropdown, index));
+    item.addEventListener("mousedown", event => {
+      event.preventDefault();
+      commitAutocompleteOption(item, stateKey, listKey, input, area);
+    });
+  });
   dropdown.classList.add("open");
   refreshIcons();
+}
+
+function getAutocompleteOptions(stateKey, listKey, rawValue) {
+  const meta = TAXONOMY_FIELD_META[stateKey];
+  const query = rawValue.trim().replace(/,$/, "");
+  const lookup = normalizeLookupKey(query);
+  const selectedLookups = new Set((state[meta.stateProp] || []).map(normalizeLookupKey));
+  const allItems = state.lists[listKey] || [];
+  let items = allItems.filter(item => !selectedLookups.has(normalizeLookupKey(item)));
+  if (lookup) items = items.filter(item => normalizeLookupKey(item).includes(lookup));
+  const existsInList = lookup && allItems.some(item => normalizeLookupKey(item) === lookup);
+  return {
+    query,
+    items,
+    canCreate: !!query && !items.length && !existsInList
+  };
+}
+
+function setAutocompleteActiveOption(dropdown, index) {
+  const items = [...dropdown.querySelectorAll(".ac-item")];
+  if (!items.length) return;
+  const nextIndex = (index + items.length) % items.length;
+  dropdown.dataset.activeIndex = String(nextIndex);
+  items.forEach((item, itemIndex) => {
+    const active = itemIndex === nextIndex;
+    item.classList.toggle("selected", active);
+    item.setAttribute("aria-selected", active ? "true" : "false");
+  });
+}
+
+function moveAutocompleteSelection(dropdown, direction) {
+  const items = dropdown.querySelectorAll(".ac-item");
+  if (!items.length) return;
+  const current = Number.parseInt(dropdown.dataset.activeIndex || "0", 10);
+  setAutocompleteActiveOption(dropdown, current + direction);
+}
+
+function commitAutocompleteInput(stateKey, listKey, input, area, dropdown) {
+  const activeItem = dropdown?.classList.contains("open") ? dropdown.querySelector(".ac-item.selected") : null;
+  if (activeItem) {
+    commitAutocompleteOption(activeItem, stateKey, listKey, input, area);
+    return;
+  }
+  const { query, items, canCreate } = getAutocompleteOptions(stateKey, listKey, input.value);
+  if (items.length) {
+    commitTag(stateKey, items[0], listKey, input, area);
+    return;
+  }
+  if (canCreate) createAndSelectAcItem(stateKey, query, listKey);
+}
+
+function commitAutocompleteOption(item, stateKey, listKey, input, area) {
+  const value = decodeURIComponent(item.dataset.acValue || "");
+  if (!value) return;
+  if (item.dataset.acAction === "create") {
+    createAndSelectAcItem(stateKey, value, listKey);
+    return;
+  }
+  commitTag(stateKey, value, listKey, input, area);
 }
 
 function selectAcItem(stateKey, value, listKey) {
@@ -3533,9 +3607,11 @@ function commitTag(stateKey, value, listKey, input, area) {
   const meta = TAXONOMY_FIELD_META[stateKey];
   if (!meta) return;
   const arr = state[meta.stateProp];
-  if (!arr.includes(value)) {
+  const lookup = normalizeLookupKey(value);
+  if (!arr.some(item => normalizeLookupKey(item) === lookup)) {
     arr.push(value);
-    addToList(listKey, value);
+    const existsInList = (state.lists[listKey] || []).some(item => normalizeLookupKey(item) === lookup);
+    if (!existsInList) addToList(listKey, value);
   }
   input.value = "";
   renderChips(stateKey, area, input, listKey);
