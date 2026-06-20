@@ -17,6 +17,7 @@ Use these preferences for future TravelHub edits.
 - Dashboard charts should feel connected to the results list; clicking a chart item should apply the matching page filter when possible.
 - Chart-applied filters should be easy to undo: clicking the same item again or using a nearby compact clear action should remove the filter.
 - Keep annual chart day labels subtle and configurable through the local label style constants.
+- KPI detail modals should be useful rankings with real counts or durations; avoid zero badges and plain unscored lists.
 - Upcoming trips should show one focused carousel item at a time; avoid peeking cut-off second cards.
 - Feedback such as save success should use fading toast alerts instead of persistent inline text when possible.
 - Planned items should appear as planned, but should not inflate effective trip counts.

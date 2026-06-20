@@ -6543,6 +6543,10 @@ function isLocationCollectionTitle(title) {
   return /Cidade|Município|Localização/i.test(title || "");
 }
 
+function isRegionCollectionTitle(title) {
+  return /UF|UFs|Regi|Estado/i.test(title || "");
+}
+
 function buildListCounts(title) {
   const counts = {};
   state.filtered.forEach(trip => {
@@ -6554,7 +6558,7 @@ function buildListCounts(title) {
       if (trip.country) counts[trip.country] = (counts[trip.country] || 0) + 1;
       return;
     }
-    if ((title || "").includes("Regi") || (title || "").includes("Estado")) {
+    if (isRegionCollectionTitle(title)) {
       const region = trip.region || trip.uf;
       if (region) counts[region] = (counts[region] || 0) + 1;
       return;
@@ -6582,7 +6586,7 @@ function buildListCounts(title) {
 function getTripsForListTitle(title, value) {
   if (title.includes("Ano")) return getTripsForYear(value);
   if (title.includes("País")) return getTripsForCountry(value);
-  if (title.includes("Regi") || title.includes("Estado")) return getTripsForRegionScope(value);
+  if (isRegionCollectionTitle(title)) return getTripsForRegionScope(value);
   if (isLocationCollectionTitle(title)) return getTripsForLocationLabel(value);
   if (title.includes("Motivo") || title.includes("Tag")) return getTripsForTag(value);
   if (title.includes("Companhia") || title.includes("Acompanhante")) return getTripsForCompanion(value);
@@ -6593,7 +6597,7 @@ function getTripsForListTitle(title, value) {
 function getListSubtitle(title) {
   if (title.includes("Ano")) return "Distribuição anual das viagens registradas";
   if (title.includes("País")) return "Escala internacional atual";
-  if (title.includes("Regi") || title.includes("Estado")) return "Camadas territoriais brasileiras e futuras";
+  if (isRegionCollectionTitle(title)) return "Estados com mais viagens";
   if (isLocationCollectionTitle(title)) return "Recortes locais da base";
   if (title.includes("Motivo") || title.includes("Tag")) return "Motivos e contextos recorrentes";
   if (title.includes("Companhia") || title.includes("Acompanhante")) return "Pessoas que aparecem nas viagens";
@@ -7325,7 +7329,7 @@ function renderKpis() {
       <div class="metric-main"><i data-lucide="map"></i><span class="metric-value-text"><span class="metric-number">${brazilRegions.length}</span></span></div>
       <span class="metric-label">UFs</span>
     </article>
-    <article class="metric-card" onclick="openJourneyGroupsModal('Dias viajando', state.currentJourneyGroups)">
+    <article class="metric-card" onclick="openTravelDaysModal()">
       <div class="metric-main"><i data-lucide="calendar-days"></i><span class="metric-value-text"><span class="metric-number">${travelDays}</span></span></div>
       <span class="metric-label">Dias viajando</span>
     </article>
@@ -9368,6 +9372,38 @@ function openJourneyGroupsModal(title, journeyGroups) {
       `).join("")}
     </div>
   `;
+  els["trip-modal"].classList.add("open");
+  refreshIcons();
+}
+
+function openTravelDaysModal() {
+  const items = (state.currentJourneyGroups || getJourneyGroups(state.filtered))
+    .map(group => ({ ...group, days: getTripTotalDays(group) }))
+    .sort((a, b) => {
+      if (b.days !== a.days) return b.days - a.days;
+      return (b.startDate || "").localeCompare(a.startDate || "");
+    });
+  const totalDays = items.reduce((sum, group) => sum + group.days, 0);
+  const maxDays = Math.max(...items.map(group => group.days), 1);
+  els["modal-header"].innerHTML = `
+    <h2 style="font-family:'DM Serif Display',serif;font-size:32px;margin:0;color:var(--blue-dark);">Dias viajando</h2>
+    <p style="margin:8px 0 0;color:var(--ink-3);font-size:15px;font-weight:500;">Maiores viagens por duração</p>
+    <p style="margin:8px 0 0;color:var(--ink-3);font-size:15px;font-weight:500;">Total: ${formatCountLabel(totalDays, "dia", "dias")}</p>
+  `;
+  els["modal-body"].innerHTML = items.length ? `
+    <div style="display:flex;flex-direction:column;">
+      ${items.map(group => {
+        const location = [group.city || group.cities?.[0], group.region].filter(Boolean).join(", ") || group.country || "";
+        return `
+          <button type="button" class="modal-list-item" style="--bar-width:${Math.max(8, (group.days / maxDays) * 100)}%;" onclick="openTripsCollectionModal('Viagem: ${escapeHtml(group.name)}', getTripsForJourneyKey(decodeURIComponent('${encodeURIComponent(group.key)}')), '${escapeHtml(formatDateRange(group.startDate, group.endDate))}')">
+            <span class="modal-list-bar"></span>
+            <span class="modal-list-label">${escapeHtml(group.name)}<br><small>${escapeHtml([location, formatDateRange(group.startDate, group.endDate)].filter(Boolean).join(" · "))}</small></span>
+            <span class="modal-list-badge">${escapeHtml(formatCountLabel(group.days, "dia", "dias"))}</span>
+          </button>
+        `;
+      }).join("")}
+    </div>
+  ` : `<div class="empty-state compact-empty">Nenhuma viagem com data válida.</div>`;
   els["trip-modal"].classList.add("open");
   refreshIcons();
 }
