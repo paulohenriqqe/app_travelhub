@@ -2005,7 +2005,25 @@
   .modal-list-item:last-child { border-bottom: none; }
 
   .mobile-nav { display: none; }
-  .result-count { color: var(--ink-3); font-size: 14px; font-weight: 500; }
+  .result-count {
+    color: var(--ink-3);
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+  .filter-return {
+    min-height: 26px;
+    padding: 4px 9px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--white);
+    color: var(--blue-dark);
+    font-size: 11px;
+    font-weight: 900;
+  }
   .panel-label {
     color: var(--ink-2);
     font-size: 12px;
@@ -3962,8 +3980,8 @@
               <div class="hero-popover-card" id="map-help-card">
                 <strong>Como ler o mapa</strong>
                 <div class="hero-help-list">
-                  <span>Passe o mouse para destacar o recorte.</span>
-                  <span>Clique em um país, UF ou cidade para abrir as viagens.</span>
+                  <span>Clique em país, UF ou cidade para ver viagens.</span>
+                  <span>Planos aparecem em azul.</span>
                 </div>
               </div>
             </div>
@@ -3974,7 +3992,7 @@
             </div>
             <aside class="panel rank-panel">
               <div class="panel-label" style="margin-bottom:10px;">Leitura da cobertura</div>
-              <p class="atlas-panel-copy" id="map-side-copy">Clique em uma UF, país ou cidade para ver as viagens.</p>
+              <p class="atlas-panel-copy" id="map-side-copy"></p>
               <div id="map-selection-summary"></div>
               <div class="rank-list" id="map-rank"></div>
             </aside>
@@ -4635,7 +4653,7 @@ function cacheElements() {
     "plan-list", "plan-detail-panel", "plan-draft-summary", "plan-grid-container", "plan-grid-title", "itinerary-table-wrapper", "plan-message",
     "detail-plan-message", "plan-name", "plan-start", "plan-end", "plan-status", "save-plan-btn", "plan-city-blocks", "plan-add-city-btn",
     "trip-form-title", "trip-submit-btn", "cancel-trip-edit-btn", "plan-editor-title", "cancel-plan-edit-btn", "app-toast",
-    "trip-lookup-btn", "trip-lookup-input", "trip-lookup-results", "trip-help-btn", "plan-help-btn"
+    "trip-lookup-btn", "trip-lookup-input", "trip-lookup-results", "trip-help-btn", "plan-help-btn", "map-help-btn"
   ].forEach(id => { els[id] = document.getElementById(id); });
 }
 
@@ -6925,12 +6943,25 @@ function renderDashboardCycle() {
 }
 
 function renderDashboardResults() {
-  els["result-count"].textContent = formatCountLabel(getJourneyCount(state.filtered), "viagem encontrada", "viagens encontradas");
+  const activeFilter = getActiveFilterSummary();
+  els["result-count"].innerHTML = `
+    <span>${escapeHtml(formatCountLabel(getJourneyCount(state.filtered), "viagem encontrada", "viagens encontradas"))}</span>
+    ${activeFilter ? `<button type="button" class="filter-return" onclick="clearFilters()">Limpar filtro · ${escapeHtml(activeFilter)}</button>` : ""}
+  `;
   if (!state.filtered.length) {
     els["dashboard-results"].innerHTML = `<div class="empty-state">Nenhuma viagem encontrada nesse filtro.</div>`;
     return;
   }
   els["dashboard-results"].innerHTML = `<div class="gallery-grid">${state.filtered.map(renderTripCard).join("")}</div>`;
+}
+
+function getActiveFilterSummary() {
+  const { search, year, uf, tag } = state.filters;
+  if (year) return year;
+  if (uf) return uf;
+  if (tag) return tag;
+  if (search) return search;
+  return "";
 }
 
 function renderTripCard(trip) {
@@ -7031,8 +7062,8 @@ function renderCoverageSidebar(collections) {
   const shouldShowAllButton = totalSelectionCount > visibleSelectionCount;
 
   if (els["map-side-copy"]) {
-    els["map-side-copy"].style.display = selected ? "none" : "";
-    els["map-side-copy"].textContent = selected ? "" : "Clique em uma UF, país ou cidade.";
+    els["map-side-copy"].style.display = "none";
+    els["map-side-copy"].textContent = "";
   }
 
   if (els["map-selection-summary"]) {
@@ -7062,7 +7093,7 @@ function renderCoverageSidebar(collections) {
           <button type="button" class="secondary-action" onclick="openSelectedMapCollectionModal()">Ver todas</button>
         </div>` : ""}
       </section>
-    ` : `<div class="inline-note">Nada selecionado ainda.</div>`;
+    ` : "";
   }
 
   const renderSection = (title, items, emptyText, kind) => `
@@ -7368,13 +7399,10 @@ function renderMapLayer(preserveViewport = false) {
 
   renderCoverageSidebar(collections);
   if (els["map-side-copy"] && !getSelectedMapFeatureData(collections)) {
+    els["map-side-copy"].style.display = state.errors.geo ? "" : "none";
     els["map-side-copy"].textContent = state.errors.geo
-      ? "Cobertura parcial: algumas camadas territoriais não carregaram."
-      : state.showPlannedMap
-        ? "Planos aparecem em azul sobre a cobertura."
-        : cityMode
-          ? "Clique em uma cidade para ver as viagens."
-          : "Clique em uma UF, país ou cidade para ver as viagens.";
+      ? "Cobertura parcial."
+      : "";
   }
 
   baseLayer.addTo(state.mapLayer);
@@ -7496,6 +7524,14 @@ function renderTravelEvolutionChart() {
   const dayPadding = Math.max(8, Math.ceil(maxDayValue * 0.28));
   const ctx = chartCanvas.getContext("2d");
   if (state.chartInstance) state.chartInstance.destroy();
+  // Ajuste aqui se quiser o rótulo laranja ainda mais sutil.
+  const lineLabelStyle = {
+    fontSize: 10,
+    minWidth: 26,
+    height: 18,
+    paddingX: 10,
+    opacity: 0.9
+  };
   const barBaseLabelPlugin = {
     id: "travelhubBarBaseLabels",
     afterDatasetsDraw(chart) {
@@ -7522,21 +7558,21 @@ function renderTravelEvolutionChart() {
       if (!meta || meta.hidden) return;
       const { ctx: chartCtx, chartArea } = chart;
       chartCtx.save();
-      chartCtx.font = "900 12px 'DM Sans', sans-serif";
+      chartCtx.font = `900 ${lineLabelStyle.fontSize}px 'DM Sans', sans-serif`;
       chartCtx.textAlign = "center";
       chartCtx.textBaseline = "middle";
       meta.data.forEach((point, index) => {
         const value = chart.data.datasets[1].data[index];
         if (!value) return;
         const label = String(value);
-        const width = Math.max(34, chartCtx.measureText(label).width + 16);
-        const height = 24;
+        const width = Math.max(lineLabelStyle.minWidth, chartCtx.measureText(label).width + lineLabelStyle.paddingX);
+        const height = lineLabelStyle.height;
         const x = point.x - width / 2;
         const y = Math.min(
           chartArea.bottom - height - 4,
           Math.max(chartArea.top + 4, point.y - height / 2)
         );
-        chartCtx.fillStyle = "rgba(212, 70, 28, 1)";
+        chartCtx.fillStyle = `rgba(212, 70, 28, ${lineLabelStyle.opacity})`;
         chartCtx.fillRect(x, y, width, height);
         chartCtx.fillStyle = "rgba(255, 255, 255, 0.98)";
         chartCtx.fillText(label, point.x, y + height / 2 + 0.5);
@@ -7772,6 +7808,12 @@ function renderDestinationFallback(stats) {
 }
 
 function applyDashboardChartFilter(type, value) {
+  const sameYearFilter = type === "year" && state.filters.year === value && !state.filters.search && !state.filters.uf && !state.filters.tag;
+  if (sameYearFilter) {
+    clearFilters();
+    showToast("Filtro removido.", "info", "Dashboard");
+    return;
+  }
   state.filters = { search: "", year: "", uf: "", tag: "" };
   if (type === "year") state.filters.year = value;
   syncFilterControls();
@@ -7780,11 +7822,19 @@ function applyDashboardChartFilter(type, value) {
 }
 
 function applyDestinationChartFilter(label) {
+  const nextSearch = state.destinationChartMode === "regions" ? "" : label.toLowerCase();
+  const nextUf = state.destinationChartMode === "regions" ? label : "";
+  const sameDestinationFilter = state.filters.search === nextSearch && state.filters.uf === nextUf && !state.filters.year && !state.filters.tag;
+  if (sameDestinationFilter) {
+    clearFilters();
+    showToast("Filtro removido.", "info", "Top 5");
+    return;
+  }
   state.filters = { search: "", year: "", uf: "", tag: "" };
   if (state.destinationChartMode === "regions") {
-    state.filters.uf = label;
+    state.filters.uf = nextUf;
   } else {
-    state.filters.search = label.toLowerCase();
+    state.filters.search = nextSearch;
   }
   syncFilterControls(state.destinationChartMode === "regions" ? "" : label);
   applyFilters();
