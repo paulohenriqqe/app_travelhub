@@ -308,15 +308,10 @@
     font-size: 32px;
     line-height: 0.92;
   }
-  .metric-word {
-    font-size: 20px;
-    line-height: 1;
-  }
   .metric-label,
   .metric-value,
   .metric-sub { display: none; }
   .dashboard-upcoming-panel { padding: 14px; }
-  .dashboard-upcoming-panel .spotlight-grid { grid-template-columns: 1fr; }
 
   .journey-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 24px; }
   .journey-panel, .journey-side-panel { padding: 24px; }
@@ -690,27 +685,6 @@
     justify-content: flex-start;
   }
   .map-meta-card:hover { border-color: var(--blue-light); box-shadow: var(--shadow-sm); transform: translateY(-2px); }
-  .map-meta-card .metric-value-text.map-metric-text {
-    display: inline-flex !important;
-    align-items: baseline;
-    gap: 5px;
-    white-space: nowrap;
-    font-family: "DM Serif Display", serif;
-    color: var(--blue-dark);
-  }
-  .map-meta-card .metric-number {
-    display: inline;
-    font-size: 24px;
-    line-height: 0.92;
-    letter-spacing: 0;
-  }
-  .map-meta-card .metric-word {
-    display: inline;
-    font-size: 15px;
-    line-height: 1;
-    letter-spacing: 0;
-    text-transform: none;
-  }
   .leaflet-tooltip.uf-label {
     background: transparent;
     border: none;
@@ -1555,60 +1529,6 @@
   }
   .soft-support-item strong { display: block; color: var(--blue-dark); font-size: 14px; margin-bottom: 4px; }
   .soft-support-item span { color: var(--ink-3); font-size: 12px; font-weight: 700; }
-  .spotlight-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 10px;
-  }
-  .spotlight-card {
-    position: relative;
-    width: 100%;
-    padding: 12px;
-    border-radius: 16px;
-    border: 1px solid rgba(212, 70, 28, 0.18);
-    background: var(--white);
-    text-align: left;
-    transition: var(--transition);
-  }
-  .spotlight-topline {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-  }
-  .spotlight-card:hover {
-    transform: translateY(-2px);
-    border-color: rgba(212, 70, 28, 0.32);
-    box-shadow: var(--shadow-md);
-  }
-  .spotlight-card strong {
-    display: block;
-    margin-top: 0;
-    padding-right: 116px;
-    color: var(--blue-dark);
-    font-family: "DM Serif Display", serif;
-    font-size: 18px;
-    line-height: 1.1;
-  }
-  .spotlight-card span {
-    display: block;
-    margin-top: 4px;
-    color: var(--ink-2);
-    font-size: 12px;
-    line-height: 1.4;
-    font-weight: 600;
-  }
-  .spotlight-support {
-    min-height: 17px;
-    color: var(--ink-3);
-    font-size: 11px;
-    font-weight: 700;
-  }
-  .spotlight-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    margin-top: 8px;
-  }
   .spotlight-countdown {
     display: inline-flex;
     align-items: center;
@@ -2297,13 +2217,391 @@
     font-size: 13px;
   }
 
-  /* UX FIX: KPIs com rótulo sempre visível e leitura mais clara */
+  /* UX FIX: compactação final de dashboard, mapas e formulários */
+  .topbar {
+    min-height: 64px;
+    padding: 0 28px;
+  }
+  .content {
+    padding: 20px 28px 72px;
+  }
+  .dashboard-stack {
+    gap: 14px;
+  }
+  .kpi-grid {
+    gap: 10px;
+  }
   .metric-card {
-    min-height: 88px;
+    min-height: 66px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    box-shadow: none;
+  }
+  .metric-card:hover {
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-1px);
+  }
+  .metric-main svg {
+    width: 16px;
+    height: 16px;
+    color: var(--blue-med);
+  }
+  .metric-number {
+    font-size: 32px;
+  }
+  .metric-label {
+    font-size: 11px;
+    letter-spacing: 0.03em;
+  }
+  .chart-panel {
+    padding: 16px 18px;
+  }
+  .compact-chart-heading {
+    margin-bottom: 6px;
+  }
+  .chart-container {
+    height: 280px;
+  }
+  .travel-chart-fallback {
+    display: none;
+    position: relative;
+    height: 100%;
+    align-items: end;
+    gap: 12px;
+    padding: 22px 10px 28px;
+  }
+  .fallback-line {
+    position: absolute;
+    inset: 22px 10px 28px;
+    width: calc(100% - 20px);
+    height: calc(100% - 50px);
+    overflow: visible;
+    pointer-events: none;
+  }
+  .fallback-line polyline {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .fallback-year {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 42px;
+    height: 100%;
+    display: flex;
+    align-items: end;
+    justify-content: center;
+  }
+  .fallback-bar {
+    position: relative;
+    width: min(42px, 72%);
+    min-height: 6px;
+    border-radius: 9px 9px 3px 3px;
+    background: rgba(38, 185, 221, 0.58);
+    border: 1px solid rgba(9, 117, 153, 0.28);
+  }
+  .fallback-bar-label {
+    position: absolute;
+    left: 50%;
+    bottom: 5px;
+    transform: translateX(-50%);
+    color: var(--blue-dark);
+    font-size: 11px;
+    font-weight: 900;
+  }
+  .fallback-day-label {
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 900;
+    text-shadow: 0 1px 0 var(--white), 0 0 6px var(--white);
+  }
+  .fallback-day-label::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: -1;
+    width: 8px;
+    height: 8px;
+    transform: translate(-50%, -50%);
+    border-radius: 999px;
+    background: var(--accent);
+  }
+  .fallback-year-label {
+    position: absolute;
+    left: 50%;
+    bottom: -22px;
+    transform: translateX(-50%);
+    color: var(--ink-2);
+    font-size: 11px;
+    font-weight: 800;
+  }
+  .dashboard-upcoming-panel {
+    min-height: 176px;
+    padding: 12px;
+  }
+  .upcoming-carousel {
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr) 30px;
+    align-items: center;
+    gap: 8px;
+    min-height: 126px;
+  }
+  .upcoming-track {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+    padding: 2px 0 8px;
+  }
+  .upcoming-card {
+    flex: 0 0 min(230px, 88%);
+    min-height: 108px;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--white);
+    text-align: left;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    transition: var(--transition);
+  }
+  .upcoming-card:hover {
+    border-color: var(--blue-light);
+    transform: translateY(-1px);
+  }
+  .upcoming-card strong {
+    color: var(--blue-dark);
+    font-family: "DM Serif Display", serif;
+    font-size: 18px;
+    line-height: 1.05;
+  }
+  .upcoming-card span:not(.spotlight-countdown) {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--ink-2);
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .upcoming-card svg {
+    width: 13px;
+    height: 13px;
+    color: var(--accent);
+  }
+  .upcoming-nav {
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--white);
+    color: var(--blue-dark);
+  }
+  .upcoming-nav svg {
+    width: 15px;
+    height: 15px;
+  }
+  .compact-empty {
+    min-height: 116px;
+    display: grid;
+    place-items: center;
+    padding: 12px;
+  }
+  .map-layout {
+    gap: 12px;
+  }
+  .map-stack {
+    gap: 10px;
+  }
+  .map-toolbar {
+    gap: 8px;
+  }
+  .map-meta-strip {
+    gap: 6px;
+  }
+  .map-meta-card {
+    min-width: 82px;
+    min-height: 38px;
+    padding: 6px 9px;
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
+    gap: 1px;
+    box-shadow: none;
+  }
+  .map-meta-card:hover {
+    box-shadow: none;
+    transform: none;
+  }
+  .map-meta-label {
+    color: var(--ink-3);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .map-meta-value {
+    color: var(--blue-dark);
+    font-family: "DM Serif Display", serif;
+    font-size: 22px;
+    line-height: 1;
+  }
+  .rank-panel {
+    padding: 12px;
+  }
+  .selection-card {
+    margin-top: 8px;
+    padding: 10px 0 0;
+    border: 0;
+    border-top: 1px solid var(--line);
+    border-radius: 0;
+    background: transparent;
+  }
+  .selection-card-title {
+    margin: 0 0 2px;
+    font-size: 24px;
+  }
+  .selection-card-subtitle {
+    font-size: 12px;
+    line-height: 1.3;
+  }
+  .selection-trip-list {
+    gap: 0;
+    margin-top: 8px;
+  }
+  .selection-trip-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 7px 0;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    border-radius: 0;
+    background: transparent;
+  }
+  .selection-trip-item:hover {
+    box-shadow: none;
+    transform: none;
+  }
+  .selection-trip-item strong {
+    margin: 0;
+    font-size: 13px;
+  }
+  .selection-trip-item span {
+    font-size: 11px;
+    white-space: nowrap;
+  }
+  .selection-card-actions {
+    margin-top: 10px;
+  }
+  .form-panel {
+    padding: 24px;
+  }
+  .form-shell-header {
+    margin-bottom: 14px;
+  }
+  .form-shell-title {
+    font-size: 22px;
+  }
+  .form-section {
+    padding: 14px;
+    margin-bottom: 14px;
+  }
+  .form-section-title {
+    margin-bottom: 10px;
+  }
+  .form-grid,
+  .plan-form-grid {
+    gap: 10px 12px;
+  }
+  .control,
+  .form-input,
+  .detail-status-select {
+    min-height: 42px;
+    padding: 8px 12px;
+  }
+  .tag-input-area {
+    min-height: 42px;
+    padding: 6px 8px;
+  }
+  .city-blocks {
     gap: 8px;
+  }
+  .city-block {
+    padding: 10px;
+  }
+  .city-block-header {
+    margin-bottom: 8px;
+  }
+  .add-city-btn {
+    min-height: 36px;
+    padding: 8px 10px;
+  }
+  .plan-layout {
+    gap: 14px;
+  }
+  .plan-panel {
+    padding: 16px;
+  }
+  .planning-inline-stats {
+    gap: 8px;
+  }
+  .planning-inline-stat {
+    padding: 9px 10px;
+    min-height: 54px;
+  }
+  .planning-inline-stat strong {
+    font-size: 22px;
+  }
+  .compact-detail-title {
+    margin-top: 0 !important;
+  }
+  .plan-detail-compact-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 7px;
+    margin-top: 10px;
+    color: var(--ink-3);
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .detail-actions {
+    margin-top: 12px;
+    gap: 8px;
+  }
+  .detail-section-title {
+    margin: 18px 0 10px;
+  }
+  .itinerary-th {
+    padding: 10px 8px;
+  }
+  .itinerary-row-label {
+    padding: 12px 8px;
+  }
+  .itinerary-input,
+  .itinerary-output {
+    min-height: 78px;
+    padding: 10px 12px;
+  }
+
+  /* UX FIX: KPIs com rótulo sempre visível e leitura mais clara */
+  .metric-card {
+    min-height: 66px;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 5px;
   }
   .metric-main {
     width: 100%;
@@ -2321,73 +2619,6 @@
   .metric-value,
   .metric-sub {
     display: none;
-  }
-
-  /* UX FIX: ranking de tempo por cidade compacto e clicável */
-  .city-days-list {
-    display: grid;
-    gap: 10px;
-  }
-  .city-days-row {
-    display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(90px, 0.9fr) auto;
-    align-items: center;
-    gap: 12px;
-    width: 100%;
-    min-height: 52px;
-    padding: 10px 12px;
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    background: var(--white);
-    color: inherit;
-    text-align: left;
-    transition: var(--transition);
-  }
-  .city-days-row:hover {
-    border-color: var(--blue-light);
-    box-shadow: var(--shadow-sm);
-    transform: translateY(-1px);
-  }
-  .city-days-main {
-    min-width: 0;
-  }
-  .city-days-main strong {
-    display: block;
-    overflow: hidden;
-    color: var(--blue-dark);
-    font-size: 14px;
-    line-height: 1.2;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  .city-days-main span,
-  .city-days-meta {
-    color: var(--ink-3);
-    font-size: 11px;
-    font-weight: 700;
-  }
-  .city-days-bar {
-    height: 8px;
-    overflow: hidden;
-    border-radius: 999px;
-    background: var(--paper-2);
-  }
-  .city-days-bar span {
-    display: block;
-    height: 100%;
-    border-radius: inherit;
-    background: linear-gradient(90deg, var(--blue-light), var(--accent-soft));
-  }
-  .city-days-meta {
-    display: inline-flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 6px;
-    white-space: nowrap;
-  }
-  .city-days-meta strong {
-    color: var(--blue-dark);
-    font-size: 13px;
   }
 
   /* UX FIX: chip temporário de viagem acontecendo agora */
@@ -2421,7 +2652,7 @@
     .metric-card:hover,
     .trip-card:hover,
     .plan-item:hover,
-    .city-days-row:hover {
+    .upcoming-card:hover {
       transform: none !important;
     }
   }
@@ -2475,17 +2706,10 @@
     .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .metric-card { padding: 12px 14px; min-height: 68px; }
     .metric-number { font-size: 30px; }
-    .metric-word { font-size: 18px; }
     .metric-label { font-size: 10px; }
-    .city-days-row {
-      grid-template-columns: 1fr;
-      gap: 8px;
-      min-height: 72px;
-    }
-    .city-days-meta {
-      justify-content: space-between;
-      width: 100%;
-    }
+    .chart-container { height: 230px; }
+    .upcoming-carousel { grid-template-columns: 28px minmax(0, 1fr) 28px; }
+    .upcoming-card { flex-basis: 86%; }
     .filters-panel { flex-direction: column; align-items: stretch; }
     #map { height: 52vh; min-height: 360px; }
     .map-toolbar {
@@ -2757,23 +2981,22 @@
             <div class="kpi-grid" id="kpi-grid"></div>
             <section class="panel dashboard-upcoming-panel">
               <div class="panel-label" style="margin-bottom:8px;">Próximas viagens</div>
-              <div class="spotlight-grid" id="stat-upcoming-plans"></div>
+              <div class="upcoming-shell" id="stat-upcoming-plans"></div>
             </section>
           </div>
 
           <div class="stats-grid">
             <div class="panel chart-panel" style="grid-column:1/-1;">
-              <h2 class="chart-title">Evolução das viagens no tempo</h2>
-              <div class="chart-container"><canvas id="timeChart"></canvas></div>
-            </div>
-            <div class="panel chart-panel" style="grid-column:1/-1;">
-              <div class="chart-title-row">
+              <div class="chart-title-row compact-chart-heading">
                 <div>
-                  <h2 class="chart-title">Tempo por cidade</h2>
-                  <p class="panel-copy">Estimativa de quantos dias você já viveu em cada destino.</p>
+                  <h2 class="chart-title">Viagens e dias por ano</h2>
+                  <p class="panel-copy">Colunas mostram viagens; linha mostra dias viajando.</p>
                 </div>
               </div>
-              <div class="city-days-list" id="stat-city-days"></div>
+              <div class="chart-container">
+                <canvas id="timeChart"></canvas>
+                <div class="travel-chart-fallback" id="timeChartFallback"></div>
+              </div>
             </div>
           </div>
 
@@ -2843,7 +3066,7 @@
 
           <div class="form-shell-header">
             <div>
-              <h2 class="chart-title form-shell-title" id="trip-form-title">Nova viagem</h2>
+              <h2 class="chart-title form-shell-title" id="trip-form-title">Dados principais</h2>
             </div>
             <div class="form-shell-actions">
               <div class="hero-assist hero-search-assist" id="trip-lookup-assist">
@@ -3419,10 +3642,6 @@ function formatCountLabel(count, singular, plural) {
   return `${count} ${pluralizePt(count, singular, plural)}`;
 }
 
-function formatMetricCountLabel(count, singular, plural) {
-  return `<span class="metric-number">${count}</span><span class="metric-word">${pluralizePt(count, singular, plural)}</span>`;
-}
-
 function formatPeopleCount(count) {
   if (!count) return "Solo";
   return formatCountLabel(count, "pessoa", "pessoas");
@@ -3527,7 +3746,7 @@ function cacheElements() {
   [
     "sync-pill", "sync-text", "kpi-grid", "stats-kpi-grid", "journey-mini-stats", "dashboard-status-list", "dashboard-plan-list", "dashboard-summary-list",
       "filter-search", "filter-year", "filter-uf", "filter-tag", "clear-filters", "result-count", "dashboard-results", "map-rank", "map-meta-strip", "map-note", "map-side-copy", "map-selection-summary", "stat-ufs", "stat-cities",
-    "stat-tags", "stat-companions", "stat-artists", "stat-city-days", "stat-upcoming-plans", "trip-modal", "modal-header", "modal-body", "city-blocks", "add-city-btn", "name-suggestions", "lista-grid",
+    "stat-tags", "stat-companions", "stat-artists", "stat-upcoming-plans", "trip-modal", "modal-header", "modal-body", "city-blocks", "add-city-btn", "name-suggestions", "lista-grid",
     "form-message", "plan-conversion-banner", "conversion-banner-title", "conversion-banner-copy", "planning-source-note", "planning-mini-stats",
     "plan-list", "plan-detail-panel", "plan-draft-summary", "plan-grid-container", "plan-grid-title", "itinerary-table-wrapper", "plan-message",
     "detail-plan-message", "plan-name", "plan-start", "plan-end", "plan-status", "save-plan-btn", "plan-city-blocks", "plan-add-city-btn",
@@ -4029,7 +4248,6 @@ function renderCityBlock(id) {
         </div>
       `}
     </div>
-    <div class="inline-note" style="margin-top:12px;">Usaremos essa cidade para posicionar a viagem no mapa.</div>
   `;
 
   const countrySelect = document.getElementById(`f-country-${id}`);
@@ -5127,32 +5345,27 @@ function renderMapMetaStrip() {
   const mappablePlanCount = getMappablePlanCount();
   const items = [
     {
-      singular: "viagem",
-      plural: "viagens",
+      label: "Viagens",
       value: collections.journeys.length,
       action: `openJourneyGroupsModal('Viagens registradas', state.currentJourneyGroups)`
     },
     {
-      singular: "estado",
-      plural: "estados",
+      label: "UFs",
       value: state.currentUfsList.length,
-      action: `openListModal('Estados visitados', state.currentUfsList)`
+      action: `openListModal('UFs visitadas', state.currentUfsList)`
     },
     {
-      singular: "município",
-      plural: "municípios",
+      label: "Cidades",
       value: state.currentCitiesList.length,
-      action: `openListModal('Municípios visitados', state.currentCitiesList)`
+      action: `openListModal('Cidades visitadas', state.currentCitiesList)`
     },
     {
-      singular: "país",
-      plural: "países",
+      label: "Países",
       value: state.currentCountriesList.length,
       action: `openListModal('Países visitados', state.currentCountriesList)`
     },
     {
-      singular: "plano",
-      plural: "planos",
+      label: "Planos",
       value: mappablePlanCount,
       action: `switchView('planejar')`
     }
@@ -5160,7 +5373,8 @@ function renderMapMetaStrip() {
 
   els["map-meta-strip"].innerHTML = items.map(item => `
     <button type="button" class="map-meta-card" onclick="${item.action}">
-      <span class="metric-value-text map-metric-text">${formatMetricCountLabel(item.value, item.singular, item.plural)}</span>
+      <span class="map-meta-label">${item.label}</span>
+      <span class="map-meta-value">${item.value}</span>
     </button>
   `).join("");
 }
@@ -5196,7 +5410,7 @@ function getSelectedMapFeatureData(collections) {
       kind,
       key,
       title: label,
-      subtitle: `${formatCountLabel(trips.length, "registro real", "registros reais")} nesse território`,
+      subtitle: "Território",
       modalTitle: `Viagens em ${label}`,
       modalSubtitle: "País visitado",
       trips
@@ -5209,7 +5423,7 @@ function getSelectedMapFeatureData(collections) {
       kind,
       key,
       title: item.label,
-      subtitle: `${formatCountLabel(item.trips.length, "registro real", "registros reais")} nessa UF`,
+      subtitle: "UF",
       modalTitle: `Viagens em ${item.label}`,
       modalSubtitle: "UF brasileira visitada",
       trips: item.trips
@@ -5222,7 +5436,7 @@ function getSelectedMapFeatureData(collections) {
       kind,
       key,
       title: item.label,
-      subtitle: `${formatCountLabel(item.trips.length, "registro real", "registros reais")} nessa cidade`,
+      subtitle: "Cidade",
       modalTitle: `Viagens em ${item.label}`,
       modalSubtitle: "Cidade visitada",
       trips: item.trips
@@ -5391,7 +5605,6 @@ function renderPlanCityBlock(id) {
         </div>
       `}
     </div>
-    <div class="inline-note" style="margin-top:12px;">Usaremos essa cidade para posicionar a viagem no mapa.</div>
   `;
 
   const countrySelect = document.getElementById(`plan-country-${id}`);
@@ -5599,6 +5812,7 @@ function openFreshTripEditor() {
 function updateTopbarPrimaryAction() {
   const button = document.getElementById("topbar-primary-action");
   if (!button) return;
+  button.style.display = state.activeView === "editor" ? "none" : "inline-flex";
   button.innerHTML = state.activeView === "planejar"
     ? `<i data-lucide="plus"></i> Novo roteiro`
     : `<i data-lucide="plus"></i> Nova viagem`;
@@ -5631,38 +5845,36 @@ function renderKpis() {
   const years = [...new Set(state.filtered.map(trip => trip.year).filter(Boolean))].sort((a, b) => Number(a) - Number(b));
   const cities = [...new Set(state.filtered.map(getTripLocationLabel).filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR"));
   const countries = [...new Set(state.filtered.map(trip => trip.country).filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR"));
-  const regions = [...new Set(state.filtered.map(trip => trip.region || trip.uf).filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR"));
-  const brazilRegions = [...new Set(state.filtered.filter(trip => isBrazilCountry(trip.country)).map(trip => trip.region || trip.uf).filter(Boolean))];
+  const brazilRegions = [...new Set(state.filtered.filter(trip => isBrazilCountry(trip.country)).map(trip => trip.region || trip.uf).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b, "pt-BR"));
   const uniqueTags = [...new Set(state.filtered.flatMap(trip => trip.tags))];
   const uniqueCompanions = [...new Set(state.filtered.flatMap(trip => trip.travelers))];
   const uniqueArtists = [...new Set(state.filtered.flatMap(trip => trip.artists))];
-  const cityDaysStats = buildCityDaysStats(state.filtered);
-  const travelDays = state.filtered.reduce((sum, trip) => sum + getTripTotalDays(trip), 0);
+  const travelDays = journeyGroups.reduce((sum, trip) => sum + getTripTotalDays(trip), 0);
   state.currentJourneyGroups = journeyGroups;
   state.currentYearsList = years;
   state.currentCitiesList = cities;
   state.currentCountriesList = countries;
-  state.currentUfsList = regions;
-  state.currentCityDaysStats = cityDaysStats;
+  state.currentUfsList = brazilRegions;
   state.currentTagsList = uniqueTags.sort((a, b) => a.localeCompare(b, "pt-BR"));
   state.currentCompanionsList = uniqueCompanions.sort((a, b) => a.localeCompare(b, "pt-BR"));
   state.currentArtistsList = uniqueArtists.sort((a, b) => a.localeCompare(b, "pt-BR"));
 
   const homeHtml = `
     <article class="metric-card" onclick="openJourneyGroupsModal('Viagens registradas', state.currentJourneyGroups)">
-      <div class="metric-main"><i data-lucide="plane"></i><span class="metric-value-text">${formatMetricCountLabel(journeyCount, "viagem", "viagens")}</span></div>
-      <span class="metric-label">Total de viagens</span>
+      <div class="metric-main"><i data-lucide="plane"></i><span class="metric-value-text"><span class="metric-number">${journeyCount}</span></span></div>
+      <span class="metric-label">Viagens</span>
     </article>
     <article class="metric-card" onclick="openListModal('Cidades visitadas', state.currentCitiesList)">
-      <div class="metric-main"><i data-lucide="map-pin"></i><span class="metric-value-text">${formatMetricCountLabel(cities.length, "cidade", "cidades")}</span></div>
-      <span class="metric-label">Cidades visitadas</span>
+      <div class="metric-main"><i data-lucide="map-pin"></i><span class="metric-value-text"><span class="metric-number">${cities.length}</span></span></div>
+      <span class="metric-label">Cidades</span>
     </article>
-    <article class="metric-card" onclick="openListModal('Países visitados', state.currentCountriesList)">
-      <div class="metric-main"><i data-lucide="globe-2"></i><span class="metric-value-text">${countries.length}/${regions.length}</span></div>
-      <span class="metric-label">Países / UFs</span>
+    <article class="metric-card" onclick="openListModal('UFs visitadas', state.currentUfsList)">
+      <div class="metric-main"><i data-lucide="map"></i><span class="metric-value-text"><span class="metric-number">${brazilRegions.length}</span></span></div>
+      <span class="metric-label">UFs</span>
     </article>
-    <article class="metric-card" onclick="openCityDaysModal()">
-      <div class="metric-main"><i data-lucide="calendar-days"></i><span class="metric-value-text">${formatMetricCountLabel(travelDays, "dia", "dias")}</span></div>
+    <article class="metric-card" onclick="openJourneyGroupsModal('Dias viajando', state.currentJourneyGroups)">
+      <div class="metric-main"><i data-lucide="calendar-days"></i><span class="metric-value-text"><span class="metric-number">${travelDays}</span></span></div>
       <span class="metric-label">Dias viajando</span>
     </article>
   `;
@@ -5732,7 +5944,7 @@ function renderDashboardCycle() {
 }
 
 function renderDashboardResults() {
-  els["result-count"].textContent = formatCountLabel(state.filtered.length, "registro real encontrado", "registros reais encontrados");
+  els["result-count"].textContent = formatCountLabel(getJourneyCount(state.filtered), "viagem encontrada", "viagens encontradas");
   if (!state.filtered.length) {
     els["dashboard-results"].innerHTML = `<div class="empty-state">Nenhuma viagem encontrada nesse filtro.</div>`;
     return;
@@ -5809,18 +6021,18 @@ function renderCoverageSidebar(collections) {
     .sort((a, b) => b.trips.length - a.trips.length)
     .slice(0, 5);
   const selected = getSelectedMapFeatureData(collections);
-  const previewTrips = (selected?.trips || [])
+  const selectedJourneyGroups = getJourneyGroups(selected?.trips || []);
+  const previewTrips = selectedJourneyGroups
     .slice()
     .sort((a, b) => (b.startDate || "").localeCompare(a.startDate || ""))
     .slice(0, 5);
   const selectedTotalDays = selected
-    ? selected.trips.reduce((sum, trip) => sum + getTripTotalDays(trip), 0)
+    ? selectedJourneyGroups.reduce((sum, trip) => sum + getTripTotalDays(trip), 0)
     : 0;
 
   if (els["map-side-copy"]) {
-    els["map-side-copy"].textContent = selected
-      ? "As viagens deste recorte aparecem aqui."
-      : "Clique em uma UF, país ou cidade para ver as viagens.";
+    els["map-side-copy"].style.display = selected ? "none" : "";
+    els["map-side-copy"].textContent = selected ? "" : "Clique em uma UF, país ou cidade.";
   }
 
   if (els["map-selection-summary"]) {
@@ -5828,10 +6040,8 @@ function renderCoverageSidebar(collections) {
       <section class="selection-card">
         <div class="selection-card-header">
           <div>
-            <div class="panel-kicker">Recorte selecionado</div>
             <h3 class="selection-card-title">${escapeHtml(selected.title)}</h3>
-            <p class="selection-card-subtitle">${escapeHtml(selected.subtitle)}</p>
-            <p class="selection-card-subtitle">${formatCountLabel(selected.trips.length, "viagem", "viagens")} | ${formatCountLabel(selectedTotalDays, "dia viajando", "dias viajando")}</p>
+            <p class="selection-card-subtitle">${selectedJourneyGroups.length} viagens · ${selectedTotalDays} dias</p>
           </div>
           <button type="button" class="small-action" onclick="clearMapSelection()"><i data-lucide="x"></i> Limpar</button>
         </div>
@@ -5839,11 +6049,12 @@ function renderCoverageSidebar(collections) {
           ${previewTrips.length ? previewTrips.map(trip => `
             <button type="button" class="selection-trip-item" onclick="openTripModal(decodeURIComponent('${encodeURIComponent(trip.id)}'))">
               <strong>${escapeHtml(trip.name)}</strong>
+              <span>${escapeHtml(formatDateShort(trip.startDate) || "Sem data")}</span>
             </button>
           `).join("") : `<div class="inline-note">Ainda não há viagens registradas nesse recorte.</div>`}
         </div>
         ${previewTrips.length ? `<div class="selection-card-actions">
-          <button type="button" class="secondary-action" onclick="openSelectedMapCollectionModal()">Ver galeria completa</button>
+          <button type="button" class="secondary-action" onclick="openSelectedMapCollectionModal()">Ver todas</button>
         </div>` : ""}
       </section>
     ` : `<div class="inline-note">Nada selecionado ainda.</div>`;
@@ -5982,7 +6193,7 @@ function renderMapLayer(preserveViewport = false) {
           const bounds = layer.getBounds?.();
           layer.bindTooltip(
             visited
-              ? `<b>${escapeHtml(label)}</b><br>${formatCountLabel(tripsCount, "registro real", "registros reais")}`
+              ? `<b>${escapeHtml(label)}</b><br>${formatCountLabel(getJourneyCount(item?.trips || []), "viagem", "viagens")}`
               : `<b>${escapeHtml(label)}</b>`,
             { sticky: true }
           );
@@ -6071,7 +6282,7 @@ function renderMapLayer(preserveViewport = false) {
           const regionLabel = item?.label || feature.properties?.name || feature.properties?.sigla || "UF";
           layer.bindTooltip(
             tripsCount
-              ? `<b>${escapeHtml(regionLabel)}</b><br>${formatCountLabel(tripsCount, "registro real", "registros reais")}`
+              ? `<b>${escapeHtml(regionLabel)}</b><br>${formatCountLabel(getJourneyCount(item?.trips || []), "viagem", "viagens")}`
               : `<b>${escapeHtml(regionLabel)}</b>`,
             { sticky: true }
           );
@@ -6173,8 +6384,6 @@ function renderMapLayer(preserveViewport = false) {
 }
 
 function renderStats() {
-  renderCityDaysStats();
-
   const getTop = mapFn => Object.entries(state.filtered.reduce((acc, trip) => {
     const values = Array.isArray(mapFn(trip)) ? mapFn(trip) : [mapFn(trip)];
     values.forEach(value => { if (value) acc[value] = (acc[value] || 0) + 1; });
@@ -6199,35 +6408,96 @@ function renderStats() {
   draw("stat-companions", getTop(trip => trip.travelers), "getTripsForCompanion", "Companhia recorrente");
   draw("stat-artists", getTop(trip => trip.artists), "getTripsForArtist", "Artista recorrente");
 
-  const yearCounts = state.filtered.reduce((acc, trip) => {
-    const numericYear = Number.parseInt(trip.year, 10);
-    if (!Number.isInteger(numericYear)) return acc;
-    acc[numericYear] = (acc[numericYear] || 0) + 1;
-    return acc;
-  }, {});
-  const yearKeys = Object.keys(yearCounts).map(Number).sort((a, b) => a - b);
-  const years = yearKeys.length
-    ? Array.from({ length: yearKeys[yearKeys.length - 1] - yearKeys[0] + 1 }, (_, index) => yearKeys[0] + index)
-    : [];
-  const effectiveSeries = years.map(year => yearCounts[year] || 0);
-  const maxSeriesValue = Math.max(...effectiveSeries, 0);
+  renderTravelEvolutionChart();
+  renderUpcomingCarousel();
+}
 
+function buildYearlyTravelStats(trips) {
+  const stats = new Map();
+  getJourneyGroups(trips || []).forEach(group => {
+    const start = normalizeDateValue(group.startDate);
+    const numericYear = Number.parseInt(start ? start.slice(0, 4) : group.year, 10);
+    if (!Number.isInteger(numericYear)) return;
+    if (!stats.has(numericYear)) stats.set(numericYear, { year: numericYear, trips: 0, days: 0 });
+    const item = stats.get(numericYear);
+    item.trips += 1;
+    item.days += getTripTotalDays(group);
+  });
+
+  const years = [...stats.keys()].sort((a, b) => a - b);
+  if (!years.length) return [];
+  for (let year = years[0]; year <= years[years.length - 1]; year += 1) {
+    if (!stats.has(year)) stats.set(year, { year, trips: 0, days: 0 });
+  }
+  return [...stats.values()].sort((a, b) => a.year - b.year);
+}
+
+function renderTravelEvolutionChart() {
   const chartCanvas = document.getElementById("timeChart");
-  if (!chartCanvas || !window.Chart) return;
+  const yearlyStats = buildYearlyTravelStats(state.filtered);
+  if (!chartCanvas) return;
+  if (!window.Chart) {
+    renderTravelEvolutionFallback(yearlyStats);
+    return;
+  }
+  const fallback = document.getElementById("timeChartFallback");
+  chartCanvas.style.display = "";
+  if (fallback) {
+    fallback.style.display = "none";
+    fallback.innerHTML = "";
+  }
+  const years = yearlyStats.map(item => item.year);
+  const tripSeries = yearlyStats.map(item => item.trips);
+  const daySeries = yearlyStats.map(item => item.days);
+  const maxTripValue = Math.max(...tripSeries, 0);
+  const maxDayValue = Math.max(...daySeries, 0);
   const ctx = chartCanvas.getContext("2d");
   if (state.chartInstance) state.chartInstance.destroy();
-  const chartFill = ctx.createLinearGradient(0, 0, 0, 260);
-  chartFill.addColorStop(0, "rgba(243, 115, 33, 0.22)");
-  chartFill.addColorStop(1, "rgba(243, 115, 33, 0.04)");
+  const barBaseLabelPlugin = {
+    id: "travelhubBarBaseLabels",
+    afterDatasetsDraw(chart) {
+      const meta = chart.getDatasetMeta(0);
+      if (!meta || meta.hidden) return;
+      const { ctx: chartCtx, chartArea } = chart;
+      chartCtx.save();
+      chartCtx.fillStyle = "rgba(10, 47, 76, 0.82)";
+      chartCtx.font = "800 11px 'DM Sans', sans-serif";
+      chartCtx.textAlign = "center";
+      chartCtx.textBaseline = "middle";
+      meta.data.forEach((bar, index) => {
+        const value = chart.data.datasets[0].data[index];
+        if (!value) return;
+        chartCtx.fillText(String(value), bar.x, chartArea.bottom - 8);
+      });
+      chartCtx.restore();
+    }
+  };
+
   state.chartInstance = new Chart(ctx, {
-    type: "line",
+    type: "bar",
     data: {
       labels: years,
       datasets: [
         {
-          data: effectiveSeries,
+          type: "bar",
+          label: "Viagens",
+          data: tripSeries,
+          yAxisID: "yTrips",
+          backgroundColor: "rgba(38, 185, 221, 0.56)",
+          borderColor: "rgba(9, 117, 153, 0.78)",
+          borderWidth: 1,
+          borderRadius: 9,
+          borderSkipped: false,
+          maxBarThickness: 42,
+          order: 2
+        },
+        {
+          type: "line",
+          label: "Dias",
+          data: daySeries,
+          yAxisID: "yDays",
           borderColor: "rgba(212, 70, 28, 1)",
-          backgroundColor: chartFill,
+          backgroundColor: "rgba(212, 70, 28, 0.12)",
           borderWidth: 3,
           clip: false,
           pointBackgroundColor: "rgba(212, 70, 28, 1)",
@@ -6235,32 +6505,34 @@ function renderStats() {
           pointBorderWidth: 2,
           pointRadius: context => context.raw > 0 ? 4 : 3,
           pointHoverRadius: context => context.raw > 0 ? 6 : 4,
-          fill: true,
+          fill: false,
           tension: 0.35,
-          cubicInterpolationMode: "monotone"
+          cubicInterpolationMode: "monotone",
+          order: 1
         }
       ]
     },
+    plugins: [barBaseLabelPlugin],
     options: {
       responsive: true,
       maintainAspectRatio: false,
       layout: {
-        padding: { top: 28, right: 18, bottom: 0, left: 18 }
+        padding: { top: 24, right: 14, bottom: 4, left: 14 }
       },
       scales: {
-        y: {
-          display: true,
+        yTrips: {
+          display: false,
           beginAtZero: true,
-          suggestedMax: maxSeriesValue ? maxSeriesValue + Math.max(1, Math.round(maxSeriesValue * 0.2)) : 2,
-          ticks: {
-            display: false,
-            precision: 0
-          },
-          grid: {
-            color: "rgba(10, 47, 76, 0.08)",
-            drawBorder: false,
-            drawTicks: false
-          },
+          suggestedMax: maxTripValue ? maxTripValue + Math.max(1, Math.ceil(maxTripValue * 0.18)) : 2,
+          grid: { display: false },
+          border: { display: false }
+        },
+        yDays: {
+          display: false,
+          position: "right",
+          beginAtZero: true,
+          suggestedMax: maxDayValue ? maxDayValue + Math.max(2, Math.ceil(maxDayValue * 0.18)) : 2,
+          grid: { color: "rgba(10, 47, 76, 0.06)", drawBorder: false, drawTicks: false },
           border: { display: false }
         },
         x: {
@@ -6274,15 +6546,26 @@ function renderStats() {
         }
       },
       plugins: {
-        legend: { display: false },
-        datalabels: {
+        legend: {
           display: true,
+          position: "top",
+          align: "end",
+          labels: {
+            boxWidth: 10,
+            boxHeight: 10,
+            color: "rgba(71, 85, 105, 0.9)",
+            font: { size: 11, weight: "800" },
+            usePointStyle: true
+          }
+        },
+        datalabels: {
+          display: context => context.dataset.type === "line" && context.raw > 0,
           formatter: value => value > 0 ? value : "",
           anchor: "end",
           align: "top",
-          offset: 10,
+          offset: 6,
           color: "rgba(212, 70, 28, 1)",
-          font: { weight: "900", size: 14 },
+          font: { weight: "900", size: 13 },
           textStrokeColor: "rgba(255, 255, 255, 0.92)",
           textStrokeWidth: 3,
           backgroundColor: "transparent",
@@ -6293,34 +6576,81 @@ function renderStats() {
           clip: false
         },
         tooltip: {
-          displayColors: false,
+          displayColors: true,
           callbacks: {
-            label: context => `${context.parsed.y} ${context.parsed.y === 1 ? "viagem" : "viagens"}`
+            label: context => context.dataset.type === "line"
+              ? `Dias: ${context.parsed.y}`
+              : `Viagens: ${context.parsed.y}`
           }
         }
       }
     }
   });
+}
 
-  const upcomingPlans = getUpcomingPlans(3);
-  els["stat-upcoming-plans"].innerHTML = upcomingPlans.length ? upcomingPlans.map(plan => `
-    <button type="button" class="spotlight-card" onclick="selectPlan(decodeURIComponent('${encodeURIComponent(plan.id)}')); switchView('planejar')">
-      ${(() => {
-        const countdown = getPlanCountdown(plan);
-        return `
-          <div class="spotlight-topline">
-            ${countdown ? `<span class="spotlight-countdown ${countdown.tone}">${escapeHtml(countdown.label)}</span>` : ""}
-          </div>
-        `;
-      })()}
-      <strong>${escapeHtml(plan.destination)}</strong>
-      <span class="spotlight-support">${escapeHtml(getPlanCountdown(plan)?.detail || "Datas e local prontos para acompanhar daqui.")}</span>
-      <div class="spotlight-meta">
-        <span class="spotlight-pill"><i data-lucide="calendar-range"></i>${formatDateShort(plan.startDate) || "Sem data"}</span>
-        <span class="spotlight-pill"><i data-lucide="map-pin"></i>${escapeHtml(getPlanLocationLabel(plan))}</span>
+function renderTravelEvolutionFallback(yearlyStats) {
+  const chartCanvas = document.getElementById("timeChart");
+  const fallback = document.getElementById("timeChartFallback");
+  if (!fallback) return;
+  if (chartCanvas) chartCanvas.style.display = "none";
+  fallback.style.display = "flex";
+  if (!yearlyStats.length) {
+    fallback.innerHTML = `<div class="empty-state compact-empty">Sem dados suficientes para o gráfico.</div>`;
+    return;
+  }
+  const maxTrips = Math.max(...yearlyStats.map(item => item.trips), 1);
+  const maxDays = Math.max(...yearlyStats.map(item => item.days), 1);
+  const pointCount = Math.max(yearlyStats.length - 1, 1);
+  const linePoints = yearlyStats
+    .map((item, index) => {
+      const x = yearlyStats.length === 1 ? 50 : (index / pointCount) * 100;
+      const y = 8 + (1 - (item.days / maxDays)) * 76;
+      return `${x},${y}`;
+    })
+    .join(" ");
+  fallback.innerHTML = `<svg class="fallback-line" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polyline points="${linePoints}"></polyline></svg>` + yearlyStats.map(item => {
+    const barHeight = Math.max(8, (item.trips / maxTrips) * 82);
+    const dayTop = 88 - ((item.days / maxDays) * 76);
+    return `
+      <div class="fallback-year">
+        <div class="fallback-day-label" style="top:${dayTop}%">${item.days || ""}</div>
+        <div class="fallback-bar" style="height:${barHeight}%"><span class="fallback-bar-label">${item.trips || ""}</span></div>
+        <span class="fallback-year-label">${item.year}</span>
       </div>
-    </button>
-  `).join("") : `<div class="empty-state">A agenda futura aparece aqui quando os planos tiverem cidade e datas definidas.</div>`;
+    `;
+  }).join("");
+}
+
+function renderUpcomingCarousel() {
+  const upcomingPlans = getUpcomingPlans(6);
+  if (!els["stat-upcoming-plans"]) return;
+  els["stat-upcoming-plans"].innerHTML = upcomingPlans.length ? `
+    <div class="upcoming-carousel">
+      <button type="button" class="upcoming-nav" aria-label="Viagem anterior" onclick="scrollUpcomingCarousel(-1)"><i data-lucide="chevron-left"></i></button>
+      <div class="upcoming-track" id="upcoming-track">
+        ${upcomingPlans.map(plan => `
+          <button type="button" class="upcoming-card" onclick="selectPlan(decodeURIComponent('${encodeURIComponent(plan.id)}')); switchView('planejar')">
+            ${(() => {
+              const countdown = getPlanCountdown(plan);
+              return countdown ? `<span class="spotlight-countdown ${countdown.tone}">${escapeHtml(countdown.label)}</span>` : "";
+            })()}
+            <strong>${escapeHtml(plan.destination)}</strong>
+            <span><i data-lucide="calendar-range"></i>${escapeHtml(getPlanCountdown(plan)?.detail || formatDateShort(plan.startDate) || "Sem data")}</span>
+            <span><i data-lucide="map-pin"></i>${escapeHtml(getPlanLocationLabel(plan))}</span>
+          </button>
+        `).join("")}
+      </div>
+      <button type="button" class="upcoming-nav" aria-label="Próxima viagem" onclick="scrollUpcomingCarousel(1)"><i data-lucide="chevron-right"></i></button>
+    </div>
+  ` : `<div class="empty-state compact-empty">Nenhuma viagem futura.</div>`;
+}
+
+function scrollUpcomingCarousel(direction) {
+  const track = document.getElementById("upcoming-track");
+  if (!track) return;
+  const card = track.querySelector(".upcoming-card");
+  const distance = card ? card.getBoundingClientRect().width + 10 : 220;
+  track.scrollBy({ left: direction * distance, behavior: "smooth" });
 }
 
 function renderPlanningExperience() {
@@ -6348,9 +6678,9 @@ function renderPlanningSourceNote() {
 function renderPlanningMetrics() {
   const linkedIds = new Set(state.trips.map(trip => trip.planId).filter(Boolean));
   const metrics = [
-    { label: "Planos totais", value: state.planMetrics.total },
+    { label: "Planos", value: state.planMetrics.total },
     { label: "Em aberto", value: state.planMetrics.open },
-    { label: "Já conectados", value: linkedIds.size }
+    { label: "Efetivados", value: state.planMetrics.converted || linkedIds.size }
   ];
   els["planning-mini-stats"].innerHTML = metrics.map(metric => `
     <div class="planning-inline-stat">
@@ -6469,13 +6799,16 @@ function renderSelectedPlan() {
   }
 
   const linkedTrips = getLinkedTripsForPlan(plan.id);
-  const itineraryDays = plan.itinerary.days.length ? plan.itinerary.days : getDaysBetween(plan.startDate, plan.endDate);
+  const contextItems = [
+    ...plan.tags.map(tag => ({ icon: "hash", value: tag })),
+    ...plan.travelers.map(person => ({ icon: "users", value: person })),
+    ...plan.artists.map(artist => ({ icon: "music-2", value: artist }))
+  ];
 
   panel.innerHTML = `
     <div class="detail-header-top">
       <div>
-        <div class="panel-label">Viagem futura</div>
-        <h2 class="panel-title" style="margin-top:10px;">${escapeHtml(plan.destination)}</h2>
+        <h2 class="panel-title compact-detail-title">${escapeHtml(plan.destination)}</h2>
         <p class="detail-copy">${escapeHtml(getPlanLocationLabel(plan))} | ${escapeHtml(formatDateRange(plan.startDate, plan.endDate))}</p>
       </div>
       ${renderStatusChip(plan.status)}
@@ -6502,19 +6835,9 @@ function renderSelectedPlan() {
 
     <div id="detail-plan-message"></div>
 
-    <div class="detail-grid">
-      <div class="detail-stat-box">
-        <strong>Vínculo com a base efetivada</strong>
-        <span>${linkedTrips.length}</span>
-      </div>
-      <div class="detail-note-box">
-        <strong>Contexto da viagem</strong>
-        <p>${plan.artists.length || plan.tags.length || plan.travelers.length ? escapeHtml([
-          plan.tags.length ? `Tags: ${plan.tags.join(", ")}` : "",
-          plan.travelers.length ? `Acompanhantes: ${plan.travelers.join(", ")}` : "",
-          plan.artists.length ? `Artistas: ${plan.artists.join(", ")}` : ""
-        ].filter(Boolean).join(" | ")) : itineraryDays.length ? "O plano já tem estrutura de datas e pode receber mais contexto antes da efetivação." : "Plano sem contexto adicional por enquanto."}</p>
-      </div>
+    <div class="plan-detail-compact-meta">
+      <span>${linkedTrips.length ? `${formatCountLabel(linkedTrips.length, "linha efetivada", "linhas efetivadas")}` : "Ainda não efetivado."}</span>
+      ${contextItems.length ? contextItems.slice(0, 6).map(item => `<span class="meta-pill"><i data-lucide="${item.icon}"></i>${escapeHtml(item.value)}</span>`).join("") : `<span>Sem contexto adicional.</span>`}
     </div>
 
     <div class="detail-section-title">Roteiro diário</div>
@@ -6564,50 +6887,6 @@ function renderItineraryTable(itinerary, editable, startDate, endDate) {
   html += `</tbody></table></div>`;
   if (itinerary.notes) html += `<div class="inline-note" style="margin-top:14px;">${escapeHtml(itinerary.notes)}</div>`;
   return html;
-}
-
-function renderCityDaysStats() {
-  const container = els["stat-city-days"];
-  if (!container) return;
-  const stats = (state.currentCityDaysStats || buildCityDaysStats(state.filtered)).slice(0, 12);
-  const maxDays = Math.max(...stats.map(item => item.totalDays), 1);
-  if (!stats.length) {
-    container.innerHTML = `<div class="empty-state">Nenhuma viagem encontrada nesse filtro.</div>`;
-    return;
-  }
-  container.innerHTML = stats.map(item => `
-    <button type="button" class="city-days-row" onclick="openCityDaysTrips(decodeURIComponent('${encodeURIComponent(item.label)}'))">
-      <div class="city-days-main">
-        <strong>${escapeHtml(item.label)}</strong>
-        <span>${formatCountLabel(item.tripCount, "viagem", "viagens")}${item.firstDate || item.lastDate ? ` | ${escapeHtml(formatDateRange(item.firstDate, item.lastDate))}` : ""}</span>
-      </div>
-      <div class="city-days-bar" aria-hidden="true"><span style="width:${Math.max(6, (item.totalDays / maxDays) * 100)}%"></span></div>
-      <div class="city-days-meta">
-        <strong>${formatCountLabel(item.totalDays, "dia", "dias")}</strong>
-        ${item.estimatedDays ? `<span class="tag">estimado</span>` : ""}
-      </div>
-    </button>
-  `).join("");
-}
-
-function openCityDaysTrips(label) {
-  const item = (state.currentCityDaysStats || []).find(entry => entry.label === label);
-  openTripsCollectionModal(
-    `Tempo em ${label}`,
-    item?.trips || [],
-    item ? `${formatCountLabel(item.totalDays, "dia", "dias")} em ${formatCountLabel(item.tripCount, "viagem", "viagens")}` : "Tempo por cidade"
-  );
-}
-
-function openCityDaysModal() {
-  const uniqueTrips = Array.from(
-    new Map((state.currentCityDaysStats || []).flatMap(item => item.trips).map(trip => [trip.id, trip])).values()
-  );
-  openTripsCollectionModal(
-    "Tempo por cidade",
-    uniqueTrips,
-    "Estimativa de dias viajando por destino"
-  );
 }
 
 function renderItineraryMobileCards(itinerary, editable, days) {
@@ -6901,7 +7180,7 @@ function startPlanConversion(planId) {
 function updateTripFormUi() {
   const editing = !!state.editingTripId;
   if (els["trip-form-title"]) {
-    els["trip-form-title"].textContent = editing ? "Editar viagem" : "Nova viagem";
+    els["trip-form-title"].textContent = editing ? "Editar viagem" : "Dados principais";
   }
   if (els["trip-submit-btn"]) {
     els["trip-submit-btn"].innerHTML = editing
@@ -7436,74 +7715,6 @@ function renderTripContextChips(trip, linkedPlan) {
     ${linkedPlan ? `<span class="origin-chip plan">Planejada</span>` : ""}
     ${isTripHappeningNow(trip) ? `<span class="status-chip happening-now"><i data-lucide="sparkles" style="width:12px;height:12px;margin-right:6px;"></i>Acontecendo agora</span>` : ""}
   `;
-}
-
-function getTripLocationsForDuration(trip) {
-  const rawLocations = Array.isArray(trip?.locations) && trip.locations.length
-    ? trip.locations
-    : [trip];
-  const seen = new Set();
-  return rawLocations
-    .map(location => buildLocationDraft({
-      country: location.country || trip.country || "Brasil",
-      region: location.region || location.uf || trip.region || trip.uf || "",
-      uf: location.uf || location.region || trip.uf || trip.region || "",
-      city: location.city || trip.city || "",
-      lat: location.lat,
-      lng: location.lng
-    }))
-    .filter(location => {
-      if (!location.city) return false;
-      const key = `${normalizeLookupKey(location.country)}|${normalizeLookupKey(location.region || location.uf)}|${normalizeLookupKey(location.city)}`;
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
-}
-
-function buildCityDaysStats(trips) {
-  const stats = new Map();
-  (trips || []).forEach(trip => {
-    const totalDays = getTripTotalDays(trip);
-    if (!totalDays) return;
-    const locations = getTripLocationsForDuration(trip);
-    if (!locations.length) return;
-    const baseDays = Math.floor(totalDays / locations.length);
-    let remainder = totalDays % locations.length;
-    const estimated = locations.length > 1;
-
-    locations.forEach(location => {
-      const assignedDays = baseDays + (remainder > 0 ? 1 : 0);
-      if (remainder > 0) remainder -= 1;
-      const key = `${normalizeLookupKey(location.country)}|${normalizeLookupKey(location.region || location.uf)}|${normalizeLookupKey(location.city)}`;
-      if (!stats.has(key)) {
-        stats.set(key, {
-          city: location.city,
-          region: location.region || location.uf,
-          country: location.country || "Brasil",
-          label: formatLocationLabel(location) || location.city,
-          totalDays: 0,
-          tripCount: 0,
-          firstDate: "",
-          lastDate: "",
-          estimatedDays: 0,
-          trips: []
-        });
-      }
-      const item = stats.get(key);
-      item.totalDays += assignedDays;
-      item.tripCount += 1;
-      if (estimated) item.estimatedDays += assignedDays;
-      if (trip.startDate && (!item.firstDate || trip.startDate < item.firstDate)) item.firstDate = trip.startDate;
-      if (trip.endDate && (!item.lastDate || trip.endDate > item.lastDate)) item.lastDate = trip.endDate;
-      if (!item.trips.some(existing => existing.id === trip.id)) item.trips.push(trip);
-    });
-  });
-
-  return [...stats.values()].sort((a, b) => {
-    if (b.totalDays !== a.totalDays) return b.totalDays - a.totalDays;
-    return a.label.localeCompare(b.label, "pt-BR");
-  });
 }
 
 function itineraryHasEntries(itinerary) {
