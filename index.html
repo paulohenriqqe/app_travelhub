@@ -1214,7 +1214,7 @@
   }
   .remove-city-btn:hover { background: #fee2e2; color: #dc2626; }
   .remove-city-btn svg { width: 14px; height: 14px; }
-  .city-block-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .city-block-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
   .city-block-grid.compact-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .add-city-btn {
     display: inline-flex;
@@ -5764,12 +5764,22 @@ function renderCityBlock(id) {
           <input class="form-input" id="f-city-${id}" value="${escapeHtml(cityObj.city || "")}" placeholder="Ex: Lisboa">
         </div>
       `}
+      <div class="field">
+        <label>Dias na cidade</label>
+        <input type="number" min="1" step="1" class="form-input" id="f-days-${id}" value="${escapeHtml(cityObj.destinationDays || "")}" placeholder="auto">
+      </div>
     </div>
   `;
 
   const countrySelect = document.getElementById(`f-country-${id}`);
   if (countrySelect) {
     countrySelect.addEventListener("change", event => onCountryChange(id, event.target.value));
+  }
+  const daysInput = document.getElementById(`f-days-${id}`);
+  if (daysInput) {
+    daysInput.addEventListener("input", event => {
+      cityObj.destinationDays = normalizeDestinationDays(event.target.value);
+    });
   }
 
   if (brazilMode) {
@@ -7056,6 +7066,7 @@ async function fillCityBlockFromPlan(blockId, plan) {
   cityObj.region = plan.region || plan.uf || "";
   cityObj.uf = isBrazilCountry(cityObj.country) ? cityObj.region : "";
   cityObj.city = cleanTextValue(plan.city);
+  cityObj.destinationDays = normalizeDestinationDays(plan.destinationDays);
   cityObj.lat = Number.isFinite(plan.lat) ? plan.lat : null;
   cityObj.lng = Number.isFinite(plan.lng) ? plan.lng : null;
   renderCityBlock(blockId);
@@ -7084,15 +7095,22 @@ async function setTripLocationValues(locations = []) {
 function buildLocationDraft(location = {}) {
   const country = normalizeCountryValue(location.country || "Brasil");
   const region = normalizeRegionValue(location.region || location.uf || "", country);
+  const destinationDays = normalizeDestinationDays(location.destinationDays || location.diasNaCidade || location.daysInCity || location.days);
   return {
     country,
     region,
     uf: isBrazilCountry(country) ? region : "",
     city: cleanTextValue(location.city || ""),
+    destinationDays,
     lat: Number.isFinite(location.lat) ? location.lat : safeParseFloat(location.lat),
     lng: Number.isFinite(location.lng) ? location.lng : safeParseFloat(location.lng),
     hasConfirmedCoords: !!location.hasConfirmedCoords
   };
+}
+
+function normalizeDestinationDays(value) {
+  const parsed = safeParseFloat(value);
+  return Number.isFinite(parsed) && parsed > 0 ? Math.max(1, Math.round(parsed)) : null;
 }
 
 function hasLocationDraftValue(location = {}) {
@@ -7177,12 +7195,22 @@ function renderPlanCityBlock(id) {
           <input class="form-input" id="plan-city-${id}" value="${escapeHtml(cityObj.city || "")}" placeholder="Ex: Lisboa">
         </div>
       `}
+      <div class="field">
+        <label>Dias na cidade</label>
+        <input type="number" min="1" step="1" class="form-input" id="plan-days-${id}" value="${escapeHtml(cityObj.destinationDays || "")}" placeholder="auto">
+      </div>
     </div>
   `;
 
   const countrySelect = document.getElementById(`plan-country-${id}`);
   if (countrySelect) {
     countrySelect.addEventListener("change", event => onPlanCountryChange(id, event.target.value));
+  }
+  const daysInput = document.getElementById(`plan-days-${id}`);
+  if (daysInput) {
+    daysInput.addEventListener("input", event => {
+      cityObj.destinationDays = normalizeDestinationDays(event.target.value);
+    });
   }
 
   if (brazilMode) {
@@ -9259,6 +9287,7 @@ function beginTripEdit(tripId) {
     region: trip.region,
     uf: trip.uf,
     city: trip.city,
+    destinationDays: trip.destinationDays,
     lat: trip.lat,
     lng: trip.lng
   }]);
@@ -9298,7 +9327,8 @@ async function handleFormSubmit(event) {
         ...city,
         country,
         region,
-        uf: isBrazilCountry(country) ? region : ""
+        uf: isBrazilCountry(country) ? region : "",
+        destinationDays: normalizeDestinationDays(city.destinationDays)
       };
     })
     .filter(city => city.city && city.country && (!isBrazilCountry(city.country) || city.region));
@@ -9342,6 +9372,7 @@ async function handleFormSubmit(event) {
       region: city.region,
       uf: city.uf,
       city: city.city,
+      destinationDays: city.destinationDays,
       lat: city.lat,
       lng: city.lng
     })),
@@ -9360,6 +9391,7 @@ async function handleFormSubmit(event) {
     payload.city = cities[0]?.city || "";
     payload.lat = cities[0]?.lat ?? null;
     payload.lng = cities[0]?.lng ?? null;
+    payload.destinationDays = cities[0]?.destinationDays ?? null;
   }
 
   message.style.color = "var(--ink-3)";
@@ -9400,6 +9432,7 @@ async function handleFormSubmit(event) {
         tags: [...state.formTags],
         artists: [...state.formArtists],
         travelers: [...state.formCompanions],
+        destinationDays: normalizeDestinationDays(persistedRow.destinationDays || persistedRow.diasNaCidade || city.destinationDays),
         lat: resolvedLat,
         lng: resolvedLng,
         hasConfirmedCoords: Number.isFinite(persistedLat) && Number.isFinite(persistedLng),
@@ -9438,6 +9471,7 @@ async function handleFormSubmit(event) {
         tags: [...state.formTags],
         artists: [...state.formArtists],
         travelers: [...state.formCompanions],
+        destinationDays: normalizeDestinationDays(updatedRow.destinationDays || updatedRow.diasNaCidade || cities[0].destinationDays),
         lat: Number.isFinite(persistedLat) ? persistedLat : cities[0].lat,
         lng: Number.isFinite(persistedLng) ? persistedLng : cities[0].lng,
         hasConfirmedCoords: Number.isFinite(persistedLat) && Number.isFinite(persistedLng),
