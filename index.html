@@ -8021,30 +8021,30 @@ function renderStats() {
 
 function buildDestinationStats(mode = state.destinationChartMode, metric = state.destinationMetricMode) {
   const stats = new Map();
-  const addValue = (label, group) => {
+  const addValue = (label, group, daysValue = getTripTotalDays(group)) => {
     if (!label) return;
     if (!stats.has(label)) stats.set(label, { label, trips: 0, days: 0, value: 0, groups: [] });
     const item = stats.get(label);
     item.trips += 1;
-    item.days += getTripTotalDays(group);
+    item.days += daysValue;
     item.groups.push(group);
   };
 
   getJourneyGroups(state.filtered).forEach(group => {
     if (mode === "countries") {
-      addValue(group.country || "Brasil", group);
+      getDestinationRowsByLabel(group, "countries").forEach((rows, label) => {
+        addValue(label, group, getDestinationDaysForRows(group, rows, "countries"));
+      });
       return;
     }
     if (mode === "regions") {
-      addValue(group.region || group.country || "Sem UF", group);
+      getDestinationRowsByLabel(group, "regions").forEach((rows, label) => {
+        addValue(label, group, getDestinationDaysForRows(group, rows, "regions"));
+      });
       return;
     }
-    const seen = new Set();
-    (group.cities?.length ? group.cities : [group.city]).filter(Boolean).forEach(city => {
-      const label = formatLocationLabel({ city, region: group.region, country: group.country }) || city;
-      if (seen.has(label)) return;
-      seen.add(label);
-      addValue(label, group);
+    getDestinationRowsByLabel(group, "cities").forEach((rows, label) => {
+      addValue(label, group, getDestinationDaysForRows(group, rows, "cities"));
     });
   });
 
@@ -8052,6 +8052,45 @@ function buildDestinationStats(mode = state.destinationChartMode, metric = state
     .map(item => ({ ...item, value: metric === "days" ? item.days : item.trips }))
     .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label, "pt-BR"))
     .slice(0, 5);
+}
+
+function getDestinationRowsByLabel(group, mode) {
+  const rowsByLabel = new Map();
+  const rows = group.trips?.length ? group.trips : [group];
+  rows.forEach(row => {
+    let label = "";
+    if (mode === "countries") {
+      label = row.country || group.country || "Brasil";
+    } else if (mode === "regions") {
+      label = row.region || row.uf || group.region || group.country || "Sem UF";
+    } else {
+      label = getTripLocationLabel(row) || formatLocationLabel({ city: row.city || group.city, region: row.region || group.region, country: row.country || group.country });
+    }
+    if (!label) return;
+    if (!rowsByLabel.has(label)) rowsByLabel.set(label, []);
+    rowsByLabel.get(label).push(row);
+  });
+  return rowsByLabel;
+}
+
+function getDestinationDaysForRows(group, rows, mode) {
+  if (!rows?.length) return 0;
+  const groupDays = getTripTotalDays(group);
+  if (mode === "countries" && getDestinationRowsByLabel(group, "countries").size <= 1) return groupDays;
+
+  const rowDays = rows.reduce((sum, row) => sum + getTripTotalDays(row), 0);
+  const allRows = group.trips?.length ? group.trips : rows;
+  const dateRanges = new Set(allRows.map(row => `${normalizeDateValue(row.startDate) || ""}|${normalizeDateValue(row.endDate) || ""}`));
+  const repeatsFullJourneyDates = allRows.length > 1
+    && dateRanges.size <= 1
+    && groupDays > 1
+    && rows.every(row => getTripTotalDays(row) === groupDays);
+
+  if (repeatsFullJourneyDates && (mode === "cities" || mode === "regions")) {
+    return rows.length;
+  }
+
+  return rowDays;
 }
 
 function buildYearlyTravelStats(trips) {
