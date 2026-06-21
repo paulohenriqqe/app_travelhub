@@ -5179,6 +5179,12 @@ function closeAllAutocompleteDropdowns(exceptId = "") {
   });
 }
 
+function closeChipOverflowPopovers(exceptArea = null) {
+  document.querySelectorAll(".tag-input-area.show-overflow").forEach(area => {
+    if (area !== exceptArea) area.classList.remove("show-overflow");
+  });
+}
+
 function closeAssistPanels(exceptId = "") {
   ["trip-help-assist", "plan-help-assist", "trip-lookup-assist", "map-help-assist"].forEach(id => {
     const node = document.getElementById(id);
@@ -5348,6 +5354,8 @@ function bindEvents() {
   els["trip-modal"].addEventListener("click", e => { if (e.target === els["trip-modal"]) closeModal(); });
   document.addEventListener("keydown", e => {
     if (e.key !== "Escape") return;
+    closeAllAutocompleteDropdowns();
+    closeChipOverflowPopovers();
     closeAssistPanels();
     if (els["trip-modal"].classList.contains("open")) closeModal();
   });
@@ -5356,8 +5364,11 @@ function bindEvents() {
   document.getElementById("f-start").addEventListener("change", updateNameSuggestions);
   document.getElementById("f-end").addEventListener("change", updateNameSuggestions);
   document.addEventListener("click", e => {
-    if (!e.target.closest(".autocomplete-wrapper")) closeAllAutocompleteDropdowns();
-    if (!e.target.closest(".tag-input-area")) document.querySelectorAll(".tag-input-area.show-overflow").forEach(area => area.classList.remove("show-overflow"));
+    const wrapper = e.target.closest(".autocomplete-wrapper");
+    const tagArea = e.target.closest(".tag-input-area");
+    const activeDropdown = wrapper?.querySelector(".autocomplete-dropdown");
+    closeAllAutocompleteDropdowns(activeDropdown?.id || "");
+    closeChipOverflowPopovers(tagArea);
     if (!e.target.closest(".hero-assist")) closeAssistPanels();
   });
   els["trip-help-btn"]?.addEventListener("click", event => {
@@ -5766,9 +5777,8 @@ function toggleChipOverflow(event, areaId) {
   event.stopPropagation();
   const area = document.getElementById(areaId);
   if (!area) return;
-  document.querySelectorAll(".tag-input-area.show-overflow").forEach(element => {
-    if (element !== area) element.classList.remove("show-overflow");
-  });
+  closeAllAutocompleteDropdowns();
+  closeChipOverflowPopovers(area);
   area.classList.toggle("show-overflow");
 }
 
