@@ -18,6 +18,7 @@ Use these preferences for future TravelHub edits.
 - Chart-applied filters should be easy to undo: clicking the same item again or using a nearby compact clear action should remove the filter.
 - Keep annual chart day labels subtle and configurable through the local label style constants.
 - KPI detail modals should be useful rankings with real counts or durations; avoid zero badges and plain unscored lists.
+- Destination day rankings should prefer an explicit spreadsheet column such as `Dias na cidade` / `Dias no destino`; repeated full-trip dates across multiple city rows must not be counted as full days for every city.
 - Upcoming trips should show one focused carousel item at a time; avoid peeking cut-off second cards.
 - Feedback such as save success should use fading toast alerts instead of persistent inline text when possible.
 - Planned items should appear as planned, but should not inflate effective trip counts.

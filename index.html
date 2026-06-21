@@ -6146,6 +6146,7 @@ function normalizeTrip(row, index) {
   const travelers = splitListValue(getField(["Acompanhantes"]), "companions");
   const lat = safeParseFloat(getField(["Latitude", "Lat"]));
   const lng = safeParseFloat(getField(["Longitude", "Lng", "Lon", "Long"]));
+  const destinationDays = safeParseFloat(getField(["Dias na cidade", "Dias no destino", "Dias no local", "Dias cidade", "Dias Destino"]));
   const recordId = String(getField(["Id", "TripId"])).trim();
   const planId = getField(["PlanId", "Plan Id", "PlanoId", "Plano Id", "Id do Plano"]) || "";
   const origin = planId ? "plan" : "manual";
@@ -6167,6 +6168,7 @@ function normalizeTrip(row, index) {
     tags,
     artists,
     travelers,
+    destinationDays: Number.isFinite(destinationDays) && destinationDays > 0 ? destinationDays : null,
     lat,
     lng,
     hasConfirmedCoords,
@@ -8078,7 +8080,10 @@ function getDestinationDaysForRows(group, rows, mode) {
   const groupDays = getTripTotalDays(group);
   if (mode === "countries" && getDestinationRowsByLabel(group, "countries").size <= 1) return groupDays;
 
-  const rowDays = rows.reduce((sum, row) => sum + getTripTotalDays(row), 0);
+  const hasExplicitDestinationDays = rows.some(row => Number.isFinite(row.destinationDays) && row.destinationDays > 0);
+  const rowDays = rows.reduce((sum, row) => sum + getTripDestinationDays(row), 0);
+  if (hasExplicitDestinationDays) return rowDays;
+
   const allRows = group.trips?.length ? group.trips : rows;
   const dateRanges = new Set(allRows.map(row => `${normalizeDateValue(row.startDate) || ""}|${normalizeDateValue(row.endDate) || ""}`));
   const repeatsFullJourneyDates = allRows.length > 1
@@ -8091,6 +8096,12 @@ function getDestinationDaysForRows(group, rows, mode) {
   }
 
   return rowDays;
+}
+
+function getTripDestinationDays(trip) {
+  return Number.isFinite(trip?.destinationDays) && trip.destinationDays > 0
+    ? trip.destinationDays
+    : getTripTotalDays(trip);
 }
 
 function buildYearlyTravelStats(trips) {
