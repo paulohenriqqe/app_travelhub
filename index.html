@@ -7427,7 +7427,8 @@ function tripMatchesDestinationFilter(trip, mode, label) {
   return normalizeLookupKey(getTripLocationLabel(trip)) === lookup || normalizeLookupKey(trip.city) === lookup;
 }
 
-function applyFilters() {
+function applyFilters(options = {}) {
+  const { render = true } = options;
   const { search, year, uf, tag, destinationMode, destinationLabel } = state.filters;
   const filteredTrips = state.trips.filter(trip => (
     (!search || trip.searchIndex.includes(search)) &&
@@ -7440,13 +7441,19 @@ function applyFilters() {
   state.filteredPlans = sortPlans(state.plans);
   computePlanMetrics();
   syncSelectedPlan();
-  renderAll();
+  if (render) renderAll();
 }
 
 function clearFilters() {
   state.filters = createEmptyFilters();
   syncFilterControls();
   applyFilters();
+}
+
+function resetFiltersSilently() {
+  state.filters = createEmptyFilters();
+  syncFilterControls();
+  applyFilters({ render: false });
 }
 
 function sortPlans(plans) {
@@ -7485,6 +7492,9 @@ function syncSelectedPlan() {
 
 function switchView(view) {
   const previousView = state.activeView;
+  if (previousView && previousView !== view) {
+    resetFiltersSilently();
+  }
   if (previousView === "editor" && view !== "editor") {
     resetTripForm(true);
     closeAllAutocompleteDropdowns();
