@@ -1237,6 +1237,7 @@
 
   .autocomplete-wrapper { position: relative; width: 100%; }
   .tag-input-area {
+    position: relative;
     min-height: 44px;
     padding: 6px 10px;
     border: 1px solid var(--line);
@@ -1273,6 +1274,61 @@
     display: flex;
   }
   .tag-chip button:hover { color: var(--accent); }
+  .tag-more-chip {
+    border: 0;
+    cursor: pointer;
+  }
+  .tag-overflow-popover {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 120;
+    width: min(300px, 92vw);
+    max-height: 230px;
+    overflow: auto;
+    display: none;
+    padding: 8px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 14px 36px rgba(8, 33, 55, 0.16);
+    backdrop-filter: blur(12px);
+  }
+  .tag-input-area.show-overflow { z-index: 140; }
+  .tag-input-area.show-overflow .tag-overflow-popover { display: grid; gap: 5px; }
+  .tag-overflow-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 26px;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 34px;
+    padding: 5px 6px 5px 10px;
+    border: 0;
+    border-radius: 10px;
+    background: var(--paper);
+    color: var(--ink);
+    font-size: 12px;
+    font-weight: 800;
+    text-align: left;
+  }
+  .tag-overflow-row span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .tag-overflow-row button {
+    width: 24px;
+    height: 24px;
+    border: 0;
+    border-radius: 999px;
+    background: rgba(212, 70, 28, 0.1);
+    color: var(--accent);
+    font-size: 16px;
+    font-weight: 900;
+    line-height: 1;
+    cursor: pointer;
+  }
   .tag-text-input {
     border: 0;
     outline: none;
@@ -1329,7 +1385,7 @@
     border-radius: 999px;
     background: transparent;
     color: var(--ink-3);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 900;
     line-height: 1;
   }
@@ -2835,11 +2891,9 @@
     min-height: 38px;
     padding: 5px 6px;
     flex-wrap: nowrap;
-    overflow-x: auto;
-    overflow-y: hidden;
+    overflow: visible;
     border-radius: 8px;
     background: var(--white);
-    scrollbar-width: thin;
   }
   .tag-input-area:focus-within {
     box-shadow: none;
@@ -2912,20 +2966,20 @@
     flex: 0 0 auto;
   }
   .tag-text-input {
-    flex: 0 0 180px;
-    min-width: 140px;
+    flex: 1 1 110px;
+    min-width: 90px;
   }
   .tag-clear-btn {
-    width: 26px;
-    height: 26px;
-    flex: 0 0 26px;
+    width: 22px;
+    height: 22px;
+    flex: 0 0 22px;
     display: none;
     place-items: center;
     border: 0;
     border-radius: 999px;
-    background: var(--paper-2);
-    color: var(--ink-3);
-    font-size: 14px;
+    background: transparent;
+    color: rgba(148, 163, 184, 0.82);
+    font-size: 15px;
     font-weight: 900;
     line-height: 1;
   }
@@ -4612,7 +4666,7 @@
               <div class="field field-full">
                 <label>Tags</label>
                 <div class="autocomplete-wrapper" id="ac-tags-wrapper">
-                  <div class="tag-input-area" id="tags-area"><input class="tag-text-input" id="tags-input" placeholder="Digite para buscar..."><button type="button" class="tag-clear-btn" aria-label="Limpar busca">x</button></div>
+                  <div class="tag-input-area" id="tags-area"><input class="tag-text-input" id="tags-input" placeholder="Digite para buscar..."><button type="button" class="tag-clear-btn" aria-label="Limpar busca">×</button></div>
                   <div class="autocomplete-dropdown" id="tags-dropdown"></div>
                 </div>
               </div>
@@ -4622,7 +4676,7 @@
               <div class="form-section-title"><i data-lucide="music-2"></i> Artistas</div>
               <div class="field field-full">
                 <div class="autocomplete-wrapper" id="ac-artists-wrapper">
-                  <div class="tag-input-area" id="artists-area"><input class="tag-text-input" id="artists-input" placeholder="Digite para buscar..."><button type="button" class="tag-clear-btn" aria-label="Limpar busca">x</button></div>
+                  <div class="tag-input-area" id="artists-area"><input class="tag-text-input" id="artists-input" placeholder="Digite para buscar..."><button type="button" class="tag-clear-btn" aria-label="Limpar busca">×</button></div>
                   <div class="autocomplete-dropdown" id="artists-dropdown"></div>
                 </div>
               </div>
@@ -4632,7 +4686,7 @@
               <div class="form-section-title"><i data-lucide="users"></i> Acompanhantes</div>
               <div class="field field-full">
                 <div class="autocomplete-wrapper" id="ac-companions-wrapper">
-                  <div class="tag-input-area" id="companions-area"><input class="tag-text-input" id="companions-input" placeholder="Digite para buscar..."><button type="button" class="tag-clear-btn" aria-label="Limpar busca">x</button></div>
+                  <div class="tag-input-area" id="companions-area"><input class="tag-text-input" id="companions-input" placeholder="Digite para buscar..."><button type="button" class="tag-clear-btn" aria-label="Limpar busca">×</button></div>
                   <div class="autocomplete-dropdown" id="companions-dropdown"></div>
                 </div>
               </div>
@@ -4690,21 +4744,21 @@
                   <div class="field">
                     <label>Tags</label>
                     <div class="autocomplete-wrapper" id="ac-plan-tags-wrapper">
-                      <div class="tag-input-area" id="plan-tags-area"><input class="tag-text-input" id="plan-tags-input" placeholder="Digite para buscar..."><button type="button" class="tag-clear-btn" aria-label="Limpar busca">x</button></div>
+                      <div class="tag-input-area" id="plan-tags-area"><input class="tag-text-input" id="plan-tags-input" placeholder="Digite para buscar..."><button type="button" class="tag-clear-btn" aria-label="Limpar busca">×</button></div>
                       <div class="autocomplete-dropdown" id="plan-tags-dropdown"></div>
                     </div>
                   </div>
                   <div class="field">
                     <label>Acompanhantes</label>
                     <div class="autocomplete-wrapper" id="ac-plan-companions-wrapper">
-                      <div class="tag-input-area" id="plan-companions-area"><input class="tag-text-input" id="plan-companions-input" placeholder="Digite para buscar..."><button type="button" class="tag-clear-btn" aria-label="Limpar busca">x</button></div>
+                      <div class="tag-input-area" id="plan-companions-area"><input class="tag-text-input" id="plan-companions-input" placeholder="Digite para buscar..."><button type="button" class="tag-clear-btn" aria-label="Limpar busca">×</button></div>
                       <div class="autocomplete-dropdown" id="plan-companions-dropdown"></div>
                     </div>
                   </div>
                   <div class="field field-full">
                     <label>Artistas</label>
                     <div class="autocomplete-wrapper" id="ac-plan-artists-wrapper">
-                      <div class="tag-input-area" id="plan-artists-area"><input class="tag-text-input" id="plan-artists-input" placeholder="Digite para buscar..."><button type="button" class="tag-clear-btn" aria-label="Limpar busca">x</button></div>
+                      <div class="tag-input-area" id="plan-artists-area"><input class="tag-text-input" id="plan-artists-input" placeholder="Digite para buscar..."><button type="button" class="tag-clear-btn" aria-label="Limpar busca">×</button></div>
                       <div class="autocomplete-dropdown" id="plan-artists-dropdown"></div>
                     </div>
                   </div>
@@ -5301,6 +5355,7 @@ function bindEvents() {
   document.getElementById("f-end").addEventListener("change", updateNameSuggestions);
   document.addEventListener("click", e => {
     if (!e.target.closest(".autocomplete-wrapper")) closeAllAutocompleteDropdowns();
+    if (!e.target.closest(".tag-input-area")) document.querySelectorAll(".tag-input-area.show-overflow").forEach(area => area.classList.remove("show-overflow"));
     if (!e.target.closest(".hero-assist")) closeAssistPanels();
   });
   els["trip-help-btn"]?.addEventListener("click", event => {
@@ -5536,7 +5591,7 @@ function renderDropdown(input, dropdown, listKey, stateKey) {
     html += items.slice(0, 8).map((item, index) => `
       <div class="ac-item ${index === 0 ? "selected" : ""}" role="option" aria-selected="${index === 0 ? "true" : "false"}" data-ac-action="select" data-ac-value="${encodeURIComponent(item)}">
         <span class="ac-item-label"><i data-lucide="check-circle-2"></i> ${escapeHtml(item)}</span>
-        <button type="button" class="ac-remove" aria-label="Remover ${escapeHtml(item)} da lista" title="Remover da lista" data-ac-remove="${encodeURIComponent(item)}">x</button>
+        <button type="button" class="ac-remove" aria-label="Remover ${escapeHtml(item)} da lista" title="Remover da lista" data-ac-remove="${encodeURIComponent(item)}">×</button>
       </div>
     `).join("");
   }
@@ -5682,12 +5737,36 @@ function renderChips(stateKey, area, input, listKey) {
   const meta = TAXONOMY_FIELD_META[stateKey];
   if (!meta || !area) return;
   const arr = state[meta.stateProp];
-  area.innerHTML = arr.map(value => `
-    <span class="tag-chip">${escapeHtml(value)}<button type="button" aria-label="Remover ${escapeHtml(value)}" title="Remover" onclick="removeFormTag('${stateKey}',decodeURIComponent('${encodeURIComponent(value)}'),'${listKey}')">x</button></span>
-  `).join("") + `<input class="tag-text-input" id="${meta.inputId}" placeholder="${arr.length ? "" : meta.placeholder}"><button type="button" class="tag-clear-btn" aria-label="Limpar busca">x</button>`;
+  const visibleLimit = arr.length > 3 ? 2 : 3;
+  const visible = arr.slice(0, visibleLimit);
+  const hidden = arr.slice(visibleLimit);
+  area.innerHTML = visible.map(value => `
+    <span class="tag-chip">${escapeHtml(value)}<button type="button" aria-label="Remover ${escapeHtml(value)}" title="Remover" onclick="removeFormTag('${stateKey}',decodeURIComponent('${encodeURIComponent(value)}'),'${listKey}')">×</button></span>
+  `).join("") + (hidden.length ? `
+    <button type="button" class="tag-chip tag-more-chip" aria-label="Ver todos os selecionados" onclick="toggleChipOverflow(event, '${meta.areaId}')">+${hidden.length}</button>
+    <div class="tag-overflow-popover" onclick="event.stopPropagation()">
+      ${arr.map(value => `
+        <div class="tag-overflow-row">
+          <span>${escapeHtml(value)}</span>
+          <button type="button" aria-label="Remover ${escapeHtml(value)}" title="Remover" onclick="removeFormTag('${stateKey}',decodeURIComponent('${encodeURIComponent(value)}'),'${listKey}')">×</button>
+        </div>
+      `).join("")}
+    </div>
+  ` : "") + `<input class="tag-text-input" id="${meta.inputId}" placeholder="${arr.length ? "" : meta.placeholder}"><button type="button" class="tag-clear-btn" aria-label="Limpar busca">×</button>`;
   const newInput = area.querySelector("input");
   setupAutocomplete(stateKey, meta.inputId, meta.areaId, meta.dropdownId, listKey);
   newInput.focus();
+}
+
+function toggleChipOverflow(event, areaId) {
+  event.preventDefault();
+  event.stopPropagation();
+  const area = document.getElementById(areaId);
+  if (!area) return;
+  document.querySelectorAll(".tag-input-area.show-overflow").forEach(element => {
+    if (element !== area) element.classList.remove("show-overflow");
+  });
+  area.classList.toggle("show-overflow");
 }
 
 function removeFormTag(stateKey, value, listKey) {
@@ -9528,7 +9607,7 @@ function resetTripForm(clearBanner) {
   els["city-blocks"].innerHTML = "";
   ["tags-area", "artists-area", "companions-area"].forEach(id => {
     const area = document.getElementById(id);
-    if (area) area.innerHTML = `<input class="tag-text-input" id="${id.replace("-area", "-input")}" placeholder="Digite para buscar..."><button type="button" class="tag-clear-btn" aria-label="Limpar busca">x</button>`;
+    if (area) area.innerHTML = `<input class="tag-text-input" id="${id.replace("-area", "-input")}" placeholder="Digite para buscar..."><button type="button" class="tag-clear-btn" aria-label="Limpar busca">×</button>`;
   });
   setupAutocomplete("tags", "tags-input", "tags-area", "tags-dropdown", "tags");
   setupAutocomplete("artists", "artists-input", "artists-area", "artists-dropdown", "artists");
