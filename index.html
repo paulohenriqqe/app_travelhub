@@ -5015,7 +5015,7 @@ const state = {
   filtered: [],
   plans: [],
   filteredPlans: [],
-  filters: { search: "", year: "", uf: "", tag: "" },
+  filters: { search: "", year: "", uf: "", tag: "", destinationMode: "", destinationLabel: "" },
   activeView: "dashboard",
   mapType: "coverage",
   mapDetail: "states",
@@ -5321,8 +5321,15 @@ function bindEvents() {
     switchView(btn.dataset.view);
   }));
   document.querySelector("[data-jump-form]").addEventListener("click", handleTopbarPrimaryAction);
-  els["filter-search"].addEventListener("input", e => { state.filters.search = e.target.value.trim().toLowerCase(); applyFilters(); });
+  els["filter-search"].addEventListener("input", e => {
+    state.filters.destinationMode = "";
+    state.filters.destinationLabel = "";
+    state.filters.search = e.target.value.trim().toLowerCase();
+    applyFilters();
+  });
   ["filter-year", "filter-uf", "filter-tag"].forEach(id => els[id].addEventListener("change", e => {
+    state.filters.destinationMode = "";
+    state.filters.destinationLabel = "";
     state.filters[id.replace("filter-", "")] = e.target.value;
     applyFilters();
   }));
@@ -7408,13 +7415,26 @@ function populateFilters() {
   fill("filter-tag", "Todos os motivos", trip => trip.tags);
 }
 
+function createEmptyFilters() {
+  return { search: "", year: "", uf: "", tag: "", destinationMode: "", destinationLabel: "" };
+}
+
+function tripMatchesDestinationFilter(trip, mode, label) {
+  if (!mode || !label) return true;
+  if (mode === "countries") return getGeoCountryKey(trip.country) === getGeoCountryKey(label);
+  if (mode === "regions") return normalizeLookupKey(trip.region || trip.uf) === normalizeLookupKey(label);
+  const lookup = normalizeLookupKey(label);
+  return normalizeLookupKey(getTripLocationLabel(trip)) === lookup || normalizeLookupKey(trip.city) === lookup;
+}
+
 function applyFilters() {
-  const { search, year, uf, tag } = state.filters;
+  const { search, year, uf, tag, destinationMode, destinationLabel } = state.filters;
   const filteredTrips = state.trips.filter(trip => (
     (!search || trip.searchIndex.includes(search)) &&
     (!year || trip.year === year) &&
     (!uf || (trip.region || trip.uf) === uf) &&
-    (!tag || trip.tags.includes(tag))
+    (!tag || trip.tags.includes(tag)) &&
+    tripMatchesDestinationFilter(trip, destinationMode, destinationLabel)
   ));
   state.filtered = filteredTrips.slice().reverse();
   state.filteredPlans = sortPlans(state.plans);
@@ -7424,7 +7444,7 @@ function applyFilters() {
 }
 
 function clearFilters() {
-  state.filters = { search: "", year: "", uf: "", tag: "" };
+  state.filters = createEmptyFilters();
   syncFilterControls();
   applyFilters();
 }
@@ -7651,10 +7671,11 @@ function renderDashboardResults() {
 }
 
 function getActiveFilterSummary() {
-  const { search, year, uf, tag } = state.filters;
+  const { search, year, uf, tag, destinationLabel } = state.filters;
   if (year) return year;
   if (uf) return uf;
   if (tag) return tag;
+  if (destinationLabel) return destinationLabel;
   if (search) return search;
   return "";
 }
@@ -8563,13 +8584,13 @@ function renderDestinationFallback(stats) {
 }
 
 function applyDashboardChartFilter(type, value) {
-  const sameYearFilter = type === "year" && state.filters.year === value && !state.filters.search && !state.filters.uf && !state.filters.tag;
+  const sameYearFilter = type === "year" && state.filters.year === value && !state.filters.search && !state.filters.uf && !state.filters.tag && !state.filters.destinationLabel;
   if (sameYearFilter) {
     clearFilters();
     showToast("Filtro removido.", "info", "Dashboard");
     return;
   }
-  state.filters = { search: "", year: "", uf: "", tag: "" };
+  state.filters = createEmptyFilters();
   if (type === "year") state.filters.year = value;
   syncFilterControls();
   applyFilters();
@@ -8577,21 +8598,22 @@ function applyDashboardChartFilter(type, value) {
 }
 
 function applyDestinationChartFilter(label) {
-  const nextSearch = state.destinationChartMode === "regions" ? "" : label.toLowerCase();
-  const nextUf = state.destinationChartMode === "regions" ? label : "";
-  const sameDestinationFilter = state.filters.search === nextSearch && state.filters.uf === nextUf && !state.filters.year && !state.filters.tag;
+  const nextMode = state.destinationChartMode;
+  const sameDestinationFilter = state.filters.destinationMode === nextMode
+    && normalizeLookupKey(state.filters.destinationLabel) === normalizeLookupKey(label)
+    && !state.filters.search
+    && !state.filters.year
+    && !state.filters.uf
+    && !state.filters.tag;
   if (sameDestinationFilter) {
     clearFilters();
     showToast("Filtro removido.", "info", "Top 5");
     return;
   }
-  state.filters = { search: "", year: "", uf: "", tag: "" };
-  if (state.destinationChartMode === "regions") {
-    state.filters.uf = nextUf;
-  } else {
-    state.filters.search = nextSearch;
-  }
-  syncFilterControls(state.destinationChartMode === "regions" ? "" : label);
+  state.filters = createEmptyFilters();
+  state.filters.destinationMode = nextMode;
+  state.filters.destinationLabel = label;
+  syncFilterControls();
   applyFilters();
   showToast(`Resultados filtrados por ${label}.`, "info", "Top 5");
 }
