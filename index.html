@@ -2638,6 +2638,10 @@
     width: 15px;
     height: 15px;
   }
+  .upcoming-nav[hidden] {
+    visibility: hidden;
+    pointer-events: none;
+  }
   .compact-empty {
     min-height: 116px;
     display: grid;
@@ -8476,8 +8480,8 @@ function renderUpcomingCarousel() {
   if (!els["stat-upcoming-plans"]) return;
   els["stat-upcoming-plans"].innerHTML = upcomingPlans.length ? `
     <div class="upcoming-carousel ${upcomingPlans.length <= 1 ? "single" : ""}">
-      ${upcomingPlans.length > 1 ? `<button type="button" class="upcoming-nav" aria-label="Viagem anterior" onclick="scrollUpcomingCarousel(-1)"><i data-lucide="chevron-left"></i></button>` : ""}
-      <div class="upcoming-track" id="upcoming-track">
+      ${upcomingPlans.length > 1 ? `<button type="button" class="upcoming-nav upcoming-nav-prev" aria-label="Viagem anterior" onclick="scrollUpcomingCarousel(-1)"><i data-lucide="chevron-left"></i></button>` : ""}
+      <div class="upcoming-track" id="upcoming-track" onscroll="updateUpcomingNavState()">
         ${upcomingPlans.map(plan => `
           <button type="button" class="upcoming-card" onclick="openPlanDetailModal(decodeURIComponent('${encodeURIComponent(plan.id)}'))">
             ${(() => {
@@ -8498,9 +8502,10 @@ function renderUpcomingCarousel() {
           </button>
         `).join("")}
       </div>
-      ${upcomingPlans.length > 1 ? `<button type="button" class="upcoming-nav" aria-label="Próxima viagem" onclick="scrollUpcomingCarousel(1)"><i data-lucide="chevron-right"></i></button>` : ""}
+      ${upcomingPlans.length > 1 ? `<button type="button" class="upcoming-nav upcoming-nav-next" aria-label="Próxima viagem" onclick="scrollUpcomingCarousel(1)"><i data-lucide="chevron-right"></i></button>` : ""}
     </div>
   ` : `<div class="empty-state compact-empty">Nenhuma viagem futura.</div>`;
+  if (upcomingPlans.length > 1) requestAnimationFrame(updateUpcomingNavState);
 }
 
 function getUpcomingDaysBadge(countdown) {
@@ -8517,6 +8522,21 @@ function scrollUpcomingCarousel(direction) {
   const card = track.querySelector(".upcoming-card");
   const distance = card ? card.getBoundingClientRect().width + 10 : 220;
   track.scrollBy({ left: direction * distance, behavior: "smooth" });
+  setTimeout(updateUpcomingNavState, 280);
+}
+
+function updateUpcomingNavState() {
+  const track = document.getElementById("upcoming-track");
+  const prev = document.querySelector(".upcoming-nav-prev");
+  const next = document.querySelector(".upcoming-nav-next");
+  if (!track || !prev || !next) return;
+  const maxScroll = Math.max(0, track.scrollWidth - track.clientWidth);
+  const atStart = track.scrollLeft <= 2;
+  const atEnd = track.scrollLeft >= maxScroll - 2;
+  prev.hidden = atStart;
+  next.hidden = atEnd;
+  prev.disabled = atStart;
+  next.disabled = atEnd;
 }
 
 function renderPlanningExperience() {
