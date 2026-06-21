@@ -5738,6 +5738,7 @@ function commitTag(stateKey, value, listKey, input, area) {
 function renderChips(stateKey, area, input, listKey) {
   const meta = TAXONOMY_FIELD_META[stateKey];
   if (!meta || !area) return;
+  const shouldRefocus = !!input && area.contains(document.activeElement);
   const arr = state[meta.stateProp];
   const visibleLimit = arr.length > 3 ? 2 : 3;
   const visible = arr.slice(0, visibleLimit);
@@ -5757,7 +5758,7 @@ function renderChips(stateKey, area, input, listKey) {
   ` : "") + `<input class="tag-text-input" id="${meta.inputId}" placeholder="${arr.length ? "" : meta.placeholder}"><button type="button" class="tag-clear-btn" aria-label="Limpar busca">×</button>`;
   const newInput = area.querySelector("input");
   setupAutocomplete(stateKey, meta.inputId, meta.areaId, meta.dropdownId, listKey);
-  newInput.focus();
+  if (shouldRefocus) newInput.focus();
 }
 
 function toggleChipOverflow(event, areaId) {
@@ -8877,6 +8878,7 @@ function resetPlanEditor(options = {}) {
   els["plan-draft-summary"].textContent = "";
   els["plan-message"].textContent = "";
   renderPlanTaxonomies();
+  closeAllAutocompleteDropdowns();
   updatePlanEditorUi();
   refreshIcons();
 }
@@ -8900,6 +8902,7 @@ function beginPlanEdit(planId) {
   els["plan-draft-summary"].textContent = itineraryHasEntries(plan.itinerary || { days: [], slots: {}, notes: "" }) ? "Roteiro pronto" : "";
   els["plan-message"].textContent = "";
   renderPlanTaxonomies();
+  closeAllAutocompleteDropdowns();
   updatePlanEditorUi();
   refreshIcons();
   switchView("planejar");
