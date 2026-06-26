@@ -21,6 +21,7 @@ Use these preferences for future TravelHub edits.
 - Destination day rankings should prefer an explicit spreadsheet column such as `Dias na cidade` / `Dias no destino`; repeated full-trip dates across multiple city rows must not be counted as full days for every city.
 - Planning and trip city blocks should expose `Dias na cidade` as an optional compact field and preserve it through conversion to effective trips.
 - Location pickers should prefer the offline `assets/data/places` dataset: load `index.json` first, then country city files on demand; do not reintroduce online IBGE/geocoding dependencies for normal country/state/city selection.
+- Brazil offline places must be generated from the official IBGE municipality list, not from the raw global city list; use the auxiliary coordinate CSV only to fill `lat/lng` for those official municipalities.
 - Preserve manual city fallback when a place is missing from the offline dataset, but only set `lat/lng` when a selected offline city record provides coordinates.
 - Upcoming trips should show one focused carousel item at a time; avoid peeking cut-off second cards.
 - Feedback such as save success should use fading toast alerts instead of persistent inline text when possible.
