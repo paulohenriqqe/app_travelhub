@@ -1214,8 +1214,71 @@
   }
   .remove-city-btn:hover { background: #fee2e2; color: #dc2626; }
   .remove-city-btn svg { width: 14px; height: 14px; }
-  .city-block-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
-  .city-block-grid.compact-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .city-block-grid,
+  .city-block-grid.compact-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr) minmax(0, 1.45fr) minmax(88px, 104px);
+    gap: 12px;
+    align-items: end;
+  }
+  .city-days-field { min-width: 88px; }
+  .field select.form-input {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .city-autocomplete { position: relative; }
+  .city-autocomplete-input { padding-right: 38px; }
+  .city-autocomplete-caret {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--ink-2);
+    font-size: 12px;
+    line-height: 1;
+  }
+  .city-autocomplete-dropdown {
+    max-height: 240px;
+    overflow-y: auto;
+    padding: 6px;
+  }
+  .city-ac-item {
+    width: 100%;
+    min-height: 34px;
+    padding: 8px 10px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 800;
+    text-align: left;
+    cursor: pointer;
+  }
+  .city-ac-item:hover,
+  .city-ac-item.selected {
+    background: var(--blue-pale);
+    color: var(--blue-dark);
+  }
+  .city-ac-item span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .city-ac-empty {
+    padding: 8px 10px;
+    color: var(--ink-3);
+    font-size: 12px;
+    font-weight: 700;
+  }
   .add-city-btn {
     display: inline-flex;
     align-items: center;
@@ -5008,7 +5071,7 @@ const COUNTRY_CANONICAL_LABELS = Object.freeze({
   emiradosrabesunidos: "Emirados Árabes Unidos"
 });
 
-const APP_VERSION = "2026-06-26-places-01";
+const APP_VERSION = "2026-06-26-city-autocomplete-01";
 
 const state = {
   trips: [],
@@ -5178,7 +5241,10 @@ function formatPeopleCount(count) {
 
 function closeAllAutocompleteDropdowns(exceptId = "") {
   document.querySelectorAll(".autocomplete-dropdown").forEach(dropdown => {
-    if (dropdown.id !== exceptId) dropdown.classList.remove("open");
+    if (dropdown.id === exceptId) return;
+    dropdown.classList.remove("open");
+    const input = dropdown.closest(".autocomplete-wrapper")?.querySelector("[aria-expanded]");
+    if (input) input.setAttribute("aria-expanded", "false");
   });
 }
 
@@ -5911,6 +5977,160 @@ function removeCityBlock(id) {
   updateNameSuggestions();
 }
 
+function renderCityAutocompleteInput(prefix, id, value = "", placeholder = "Digite para buscar", disabled = false) {
+  const inputId = `${prefix}-city-${id}`;
+  const dropdownId = `${prefix}-city-dropdown-${id}`;
+  return `
+    <div class="autocomplete-wrapper city-autocomplete">
+      <input class="form-input city-autocomplete-input" id="${inputId}" value="${escapeHtml(value)}" placeholder="${escapeHtml(placeholder)}" autocomplete="off" aria-autocomplete="list" aria-expanded="false" aria-controls="${dropdownId}" ${disabled ? "disabled" : ""}>
+      <span class="city-autocomplete-caret" aria-hidden="true">▼</span>
+      <div class="autocomplete-dropdown city-autocomplete-dropdown" id="${dropdownId}" role="listbox"></div>
+    </div>
+  `;
+}
+
+function getCityInputMeta(input) {
+  if (!input?.id) return null;
+  const isPlan = input.id.startsWith("plan-city-");
+  const blockId = Number(input.id.replace(isPlan ? "plan-city-" : "f-city-", ""));
+  if (!Number.isFinite(blockId)) return null;
+  const list = isPlan ? state.formPlanCities : state.formCities;
+  const cityObj = list.find(city => city.id === blockId);
+  return cityObj ? { isPlan, blockId, cityObj } : null;
+}
+
+async function ensureCitySuggestionsLoaded(cityObj) {
+  const cacheKey = getCountryCityCacheKey(cityObj.country, cityObj.region);
+  if (!cacheKey) return [];
+  if (!state.ibgeCitiesCache[cacheKey]) {
+    const countryData = await loadCountryCities(cityObj.country);
+    state.ibgeCitiesCache[cacheKey] = getCitiesFromCountryData(countryData, cityObj.country, cityObj.region);
+  }
+  return state.ibgeCitiesCache[cacheKey] || [];
+}
+
+function filterCitySuggestions(cityObj, query = "") {
+  const cacheKey = getCountryCityCacheKey(cityObj.country, cityObj.region);
+  const cities = state.ibgeCitiesCache[cacheKey] || [];
+  const lookup = normalizeLookupKey(query);
+  const matches = lookup
+    ? cities.filter(city => normalizeLookupKey(city.name || city.nome).includes(lookup))
+    : cities;
+  return matches
+    .slice()
+    .sort((a, b) => {
+      const aName = a.name || a.nome || "";
+      const bName = b.name || b.nome || "";
+      const aKey = normalizeLookupKey(aName);
+      const bKey = normalizeLookupKey(bName);
+      const aStarts = lookup && aKey.startsWith(lookup) ? 0 : 1;
+      const bStarts = lookup && bKey.startsWith(lookup) ? 0 : 1;
+      if (aStarts !== bStarts) return aStarts - bStarts;
+      return aName.localeCompare(bName, "pt-BR");
+    })
+    .slice(0, 8);
+}
+
+function renderCityAutocompleteDropdown(input, suggestions, onSelect) {
+  const dropdown = input.closest(".city-autocomplete")?.querySelector(".city-autocomplete-dropdown");
+  if (!dropdown) return;
+  const meta = getCityInputMeta(input);
+  if (!meta) return;
+  dropdown.innerHTML = suggestions.length
+    ? suggestions.map((city, index) => `
+      <button type="button" class="city-ac-item ${index === 0 ? "selected" : ""}" role="option" data-city-index="${index}">
+        <span>${escapeHtml(city.name || city.nome || "")}</span>
+      </button>
+    `).join("")
+    : `<div class="city-ac-empty">Nenhuma cidade encontrada.</div>`;
+  dropdown.querySelectorAll(".city-ac-item").forEach(button => {
+    button.addEventListener("mousedown", event => event.preventDefault());
+    button.addEventListener("click", () => {
+      const city = suggestions[Number(button.dataset.cityIndex)];
+      selectCitySuggestion(input, meta.cityObj, city, onSelect);
+    });
+  });
+}
+
+async function openCityAutocomplete(input, onSelect) {
+  if (!input || input.disabled) return;
+  const wrapper = input.closest(".city-autocomplete");
+  const dropdown = wrapper?.querySelector(".city-autocomplete-dropdown");
+  const meta = getCityInputMeta(input);
+  if (!dropdown || !meta) return;
+  closeAllAutocompleteDropdowns(dropdown.id);
+  dropdown.classList.add("open");
+  input.setAttribute("aria-expanded", "true");
+  dropdown.innerHTML = `<div class="city-ac-empty">Carregando cidades...</div>`;
+  const cacheKey = getCountryCityCacheKey(meta.cityObj.country, meta.cityObj.region);
+  await ensureCitySuggestionsLoaded(meta.cityObj);
+  if (!document.body.contains(input) || getCountryCityCacheKey(meta.cityObj.country, meta.cityObj.region) !== cacheKey) return;
+  renderCityAutocompleteDropdown(input, filterCitySuggestions(meta.cityObj, input.value), onSelect);
+}
+
+function closeCityAutocomplete(input) {
+  const dropdown = input?.closest(".city-autocomplete")?.querySelector(".city-autocomplete-dropdown");
+  if (!dropdown) return;
+  dropdown.classList.remove("open");
+  input.setAttribute("aria-expanded", "false");
+}
+
+function selectCitySuggestion(input, cityObj, cityRecord, onSelect) {
+  if (!input || !cityObj || !cityRecord) return;
+  applyResolvedCityToDraft(cityObj, cityRecord, cityObj.region);
+  input.value = cityObj.city;
+  closeCityAutocomplete(input);
+  onSelect?.();
+}
+
+function setupCityAutocompleteInput(input, cityObj, onSelect) {
+  if (!input || !cityObj) return;
+  input.addEventListener("focus", () => openCityAutocomplete(input, onSelect));
+  input.addEventListener("input", event => {
+    cityObj.city = cleanTextValue(event.target.value);
+    cityObj.lat = null;
+    cityObj.lng = null;
+    openCityAutocomplete(input, onSelect);
+  });
+  input.addEventListener("change", event => {
+    selectCityFromInput(cityObj, event.target);
+    onSelect?.();
+  });
+  input.addEventListener("keydown", event => {
+    const dropdown = input.closest(".city-autocomplete")?.querySelector(".city-autocomplete-dropdown");
+    const items = dropdown ? [...dropdown.querySelectorAll(".city-ac-item")] : [];
+    const selectedIndex = Math.max(0, items.findIndex(item => item.classList.contains("selected")));
+    if (event.key === "Escape") {
+      closeCityAutocomplete(input);
+      return;
+    }
+    if (event.key === "ArrowDown" && items.length) {
+      event.preventDefault();
+      items[selectedIndex]?.classList.remove("selected");
+      items[Math.min(items.length - 1, selectedIndex + 1)].classList.add("selected");
+      return;
+    }
+    if (event.key === "ArrowUp" && items.length) {
+      event.preventDefault();
+      items[selectedIndex]?.classList.remove("selected");
+      items[Math.max(0, selectedIndex - 1)].classList.add("selected");
+      return;
+    }
+    if (event.key === "Enter") {
+      event.preventDefault();
+      const meta = getCityInputMeta(input);
+      const city = meta ? filterCitySuggestions(meta.cityObj, input.value)[selectedIndex] : null;
+      if (city && dropdown?.classList.contains("open")) {
+        selectCitySuggestion(input, meta.cityObj, city, onSelect);
+        return;
+      }
+      selectCityFromInput(cityObj, input);
+      closeCityAutocomplete(input);
+      onSelect?.();
+    }
+  });
+}
+
 function renderCityBlock(id) {
   const cityObj = state.formCities.find(city => city.id === id);
   const block = document.getElementById(`city-block-${id}`);
@@ -5935,8 +6155,7 @@ function renderCityBlock(id) {
         </div>
         <div class="field">
           <label>Cidade *</label>
-          <input class="form-input" id="f-city-${id}" value="${escapeHtml(cityObj.city || "")}" placeholder="${cityObj.region ? "Digite para buscar" : "Selecione a UF"}" list="f-city-options-${id}" ${cityObj.region ? "" : "disabled"}>
-          <datalist id="f-city-options-${id}"></datalist>
+          ${renderCityAutocompleteInput("f", id, cityObj.city || "", cityObj.region ? "Digite para buscar" : "Selecione a UF", !cityObj.region)}
         </div>
       ` : `
         <div class="field">
@@ -5946,11 +6165,10 @@ function renderCityBlock(id) {
         </div>
         <div class="field">
           <label>Cidade *</label>
-          <input class="form-input" id="f-city-${id}" value="${escapeHtml(cityObj.city || "")}" placeholder="Digite para buscar" list="global-city-options-${id}">
-          <datalist id="global-city-options-${id}"></datalist>
+          ${renderCityAutocompleteInput("f", id, cityObj.city || "", "Digite para buscar")}
         </div>
       `}
-      <div class="field">
+      <div class="field city-days-field">
         <label>Dias na cidade</label>
         <input type="number" min="1" step="1" class="form-input" id="f-days-${id}" value="${escapeHtml(cityObj.destinationDays || "")}" placeholder="auto">
       </div>
@@ -5973,12 +6191,7 @@ function renderCityBlock(id) {
     const regionSelect = document.getElementById(`f-region-${id}`);
     const citySelect = document.getElementById(`f-city-${id}`);
     if (regionSelect) regionSelect.addEventListener("change", event => onBrazilRegionChange(id, event.target.value));
-    if (citySelect) {
-      citySelect.addEventListener("change", event => {
-        selectCityFromInput(cityObj, event.target);
-        updateNameSuggestions();
-      });
-    }
+    setupCityAutocompleteInput(citySelect, cityObj, updateNameSuggestions);
     if (cityObj.region) onBrazilRegionChange(id, cityObj.region, true);
   } else {
     const regionInput = document.getElementById(`f-region-${id}`);
@@ -5999,12 +6212,7 @@ function renderCityBlock(id) {
         renderCityBlock(id);
       });
     }
-    if (cityInput) {
-      cityInput.addEventListener("change", event => {
-        selectCityFromInput(cityObj, event.target);
-        updateNameSuggestions();
-      });
-    }
+    setupCityAutocompleteInput(cityInput, cityObj, updateNameSuggestions);
     hydrateGlobalCityOptions(id, false);
   }
 
@@ -6071,17 +6279,16 @@ async function onBrazilRegionChange(blockId, region, preserveCity) {
 }
 
 function fillCitySelect(input, cities, selectedCity) {
-  const listId = input?.getAttribute?.("list");
-  const list = listId ? document.getElementById(listId) : null;
-  if (!list) return;
-  list.innerHTML = (cities || []).map(city => {
-    const name = city.name || city.nome || "";
-    const region = city.stateCode || city.uf || "";
-    return `<option value="${escapeHtml(name)}" label="${escapeHtml(region ? `${name}, ${region}` : name)}"></option>`;
-  }).join("");
+  if (!input) return;
   if (selectedCity) {
-    const option = [...list.options].find(item => normalizeLookupKey(item.value) === normalizeLookupKey(selectedCity));
-    input.value = option?.value || selectedCity;
+    const option = (cities || []).find(city => normalizeLookupKey(city.name || city.nome) === normalizeLookupKey(selectedCity));
+    input.value = option?.name || option?.nome || selectedCity;
+  } else {
+    input.value = "";
+  }
+  if (document.activeElement === input) {
+    const meta = getCityInputMeta(input);
+    if (meta) renderCityAutocompleteDropdown(input, filterCitySuggestions(meta.cityObj, input.value));
   }
 }
 
@@ -7443,8 +7650,7 @@ function renderPlanCityBlock(id) {
         </div>
         <div class="field">
           <label>Cidade *</label>
-          <input class="form-input" id="plan-city-${id}" value="${escapeHtml(cityObj.city || "")}" placeholder="${cityObj.region ? "Digite para buscar" : "Selecione a UF"}" list="plan-city-options-${id}" ${cityObj.region ? "" : "disabled"}>
-          <datalist id="plan-city-options-${id}"></datalist>
+          ${renderCityAutocompleteInput("plan", id, cityObj.city || "", cityObj.region ? "Digite para buscar" : "Selecione a UF", !cityObj.region)}
         </div>
       ` : `
         <div class="field">
@@ -7454,11 +7660,10 @@ function renderPlanCityBlock(id) {
         </div>
         <div class="field">
           <label>Cidade *</label>
-          <input class="form-input" id="plan-city-${id}" value="${escapeHtml(cityObj.city || "")}" placeholder="Digite para buscar" list="plan-global-city-options-${id}">
-          <datalist id="plan-global-city-options-${id}"></datalist>
+          ${renderCityAutocompleteInput("plan", id, cityObj.city || "", "Digite para buscar")}
         </div>
       `}
-      <div class="field">
+      <div class="field city-days-field">
         <label>Dias na cidade</label>
         <input type="number" min="1" step="1" class="form-input" id="plan-days-${id}" value="${escapeHtml(cityObj.destinationDays || "")}" placeholder="auto">
       </div>
@@ -7481,11 +7686,7 @@ function renderPlanCityBlock(id) {
     const regionSelect = document.getElementById(`plan-region-${id}`);
     const citySelect = document.getElementById(`plan-city-${id}`);
     if (regionSelect) regionSelect.addEventListener("change", event => onPlanBrazilRegionChangeBlock(id, event.target.value));
-    if (citySelect) {
-      citySelect.addEventListener("change", event => {
-        selectCityFromInput(cityObj, event.target);
-      });
-    }
+    setupCityAutocompleteInput(citySelect, cityObj);
     if (cityObj.region) onPlanBrazilRegionChangeBlock(id, cityObj.region, true);
   } else {
     const regionInput = document.getElementById(`plan-region-${id}`);
@@ -7505,11 +7706,7 @@ function renderPlanCityBlock(id) {
         renderPlanCityBlock(id);
       });
     }
-    if (cityInput) {
-      cityInput.addEventListener("change", event => {
-        selectCityFromInput(cityObj, event.target);
-      });
-    }
+    setupCityAutocompleteInput(cityInput, cityObj);
     hydrateGlobalCityOptions(id, true);
   }
 
