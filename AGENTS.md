@@ -20,6 +20,8 @@ Use these preferences for future TravelHub edits.
 - KPI detail modals should be useful rankings with real counts or durations; avoid zero badges and plain unscored lists.
 - Destination day rankings should prefer an explicit spreadsheet column such as `Dias na cidade` / `Dias no destino`; repeated full-trip dates across multiple city rows must not be counted as full days for every city.
 - Planning and trip city blocks should expose `Dias na cidade` as an optional compact field and preserve it through conversion to effective trips.
+- Location pickers should prefer the offline `assets/data/places` dataset: load `index.json` first, then country city files on demand; do not reintroduce online IBGE/geocoding dependencies for normal country/state/city selection.
+- Preserve manual city fallback when a place is missing from the offline dataset, but only set `lat/lng` when a selected offline city record provides coordinates.
 - Upcoming trips should show one focused carousel item at a time; avoid peeking cut-off second cards.
 - Feedback such as save success should use fading toast alerts instead of persistent inline text when possible.
 - Planned items should appear as planned, but should not inflate effective trip counts.

@@ -5008,7 +5008,7 @@ const COUNTRY_CANONICAL_LABELS = Object.freeze({
   emiradosrabesunidos: "Emirados Árabes Unidos"
 });
 
-const APP_VERSION = "2026-06-04-07";
+const APP_VERSION = "2026-06-26-places-01";
 
 const state = {
   trips: [],
@@ -5047,6 +5047,7 @@ const state = {
   ibgeUFs: [],
   ibgeCitiesCache: {},
   globalGeo: { countries: [], subdivisions: {} },
+  places: { countries: [], byKey: {}, byIso2: {}, countryData: {}, loading: {} },
   selectedPlanId: null,
   returnToPlanEditSheetAfterItinerary: false,
   planMetrics: { total: 0, open: 0, inProgress: 0, converted: 0, conversionRate: 0, canceled: 0 },
@@ -5150,6 +5151,8 @@ function normalizeCountryValue(value) {
   const text = cleanTextValue(value || "Brasil");
   const key = normalizeLookupKey(text || "Brasil");
   if (!key) return "Brasil";
+  const placeCountry = getPlaceCountryByKey(key);
+  if (placeCountry) return placeCountry.displayName || placeCountry.name || text;
   if (COUNTRY_CANONICAL_LABELS[key]) return COUNTRY_CANONICAL_LABELS[key];
   return titleCaseLabel(text);
 }
@@ -5216,11 +5219,94 @@ function closeTransientPanels() {
 }
 
 function getGlobalCountrySuggestions() {
-  return dedupeValues([...(state.globalGeo.countries || []), ...DEFAULT_GLOBAL_COUNTRIES]);
+  return dedupeValues([...(state.places.countries || []).map(country => country.displayName || country.name), ...(state.globalGeo.countries || []), ...DEFAULT_GLOBAL_COUNTRIES]);
 }
 
 function getGlobalSubdivisionSuggestions(country) {
+  const placeCountry = getPlaceCountry(country);
+  if (placeCountry?.states?.length) {
+    return dedupeValues(placeCountry.states.map(state => normalizeRegionValue(isBrazilCountry(country) ? (state.code || state.name) : (state.name || state.code), country)));
+  }
   return state.globalGeo.subdivisions[normalizeLookupKey(country)] || [];
+}
+
+function getPlaceCountryByKey(key) {
+  return state.places.byKey?.[key] || null;
+}
+
+function getPlaceCountry(country) {
+  const key = normalizeLookupKey(country || "Brasil");
+  return getPlaceCountryByKey(key) || getPlaceCountryByKey(normalizeLookupKey(normalizeCountryValue(country || "Brasil")));
+}
+
+function getPlaceCountryCode(country) {
+  const placeCountry = getPlaceCountry(country);
+  return placeCountry?.iso2 || (isBrazilCountry(country) ? "BR" : "");
+}
+
+function getPlaceState(country, region) {
+  const placeCountry = getPlaceCountry(country);
+  if (!placeCountry || !region) return null;
+  const regionKey = normalizeLookupKey(region);
+  return (placeCountry.states || []).find(state => (
+    normalizeLookupKey(state.code) === regionKey ||
+    normalizeLookupKey(state.name) === regionKey
+  )) || null;
+}
+
+function getCountryCityCacheKey(country, region = "") {
+  return [getPlaceCountryCode(country), normalizeLookupKey(region)].filter(Boolean).join("|");
+}
+
+async function loadCountryCities(country) {
+  const iso2 = getPlaceCountryCode(country);
+  if (!iso2) return null;
+  if (state.places.countryData[iso2]) return state.places.countryData[iso2];
+  if (!state.places.loading[iso2]) {
+    state.places.loading[iso2] = fetch(withCacheBust(`assets/data/places/${iso2}.json`), { cache: "no-store" })
+      .then(response => {
+        if (!response.ok) throw new Error(`Falha ao carregar cidades de ${iso2}.`);
+        return response.json();
+      })
+      .then(data => {
+        state.places.countryData[iso2] = data;
+        return data;
+      })
+      .finally(() => {
+        delete state.places.loading[iso2];
+      });
+  }
+  try {
+    return await state.places.loading[iso2];
+  } catch (error) {
+    return null;
+  }
+}
+
+function getCitiesFromCountryData(countryData, country, region = "") {
+  if (!countryData?.states?.length) return [];
+  const stateMeta = getPlaceState(country, region);
+  const regionKey = normalizeLookupKey(region);
+  const states = region
+    ? countryData.states.filter(state => (
+        String(state.id) === String(stateMeta?.id || "") ||
+        normalizeLookupKey(state.code) === regionKey ||
+        normalizeLookupKey(state.name) === regionKey
+      ))
+    : countryData.states;
+  return states.flatMap(state => (state.cities || []).map(city => ({ ...city, stateCode: city.stateCode || state.code, stateName: state.name })));
+}
+
+function applyResolvedCityToDraft(cityObj, cityRecord, regionFallback = "") {
+  if (!cityObj || !cityRecord) return;
+  cityObj.city = cleanTextValue(cityRecord.name);
+  const regionValue = isBrazilCountry(cityObj.country)
+    ? (cityRecord.stateCode || regionFallback || cityObj.region)
+    : (cityRecord.stateName || regionFallback || cityRecord.stateCode || cityObj.region);
+  cityObj.region = normalizeRegionValue(regionValue, cityObj.country);
+  cityObj.uf = isBrazilCountry(cityObj.country) ? cityObj.region : "";
+  cityObj.lat = safeParseFloat(cityRecord.lat);
+  cityObj.lng = safeParseFloat(cityRecord.lng);
 }
 
 function getCountrySelectOptions(selectedCountry = "") {
@@ -5264,8 +5350,7 @@ document.addEventListener("DOMContentLoaded", () => {
   bindEvents();
   refreshIcons();
   loadMapGeoData();
-  loadGlobalRegionData();
-  initIBGEForm();
+  loadPlacesIndex();
   renderListasView();
   addCityBlock();
   addPlanCityBlock();
@@ -5850,7 +5935,8 @@ function renderCityBlock(id) {
         </div>
         <div class="field">
           <label>Cidade *</label>
-          <select class="form-input" id="f-city-${id}" ${cityObj.region ? "" : "disabled"}><option value="">${cityObj.region ? "Carregando..." : "Selecione a UF"}</option></select>
+          <input class="form-input" id="f-city-${id}" value="${escapeHtml(cityObj.city || "")}" placeholder="${cityObj.region ? "Digite para buscar" : "Selecione a UF"}" list="f-city-options-${id}" ${cityObj.region ? "" : "disabled"}>
+          <datalist id="f-city-options-${id}"></datalist>
         </div>
       ` : `
         <div class="field">
@@ -5860,7 +5946,8 @@ function renderCityBlock(id) {
         </div>
         <div class="field">
           <label>Cidade *</label>
-          <input class="form-input" id="f-city-${id}" value="${escapeHtml(cityObj.city || "")}" placeholder="Ex: Lisboa">
+          <input class="form-input" id="f-city-${id}" value="${escapeHtml(cityObj.city || "")}" placeholder="Digite para buscar" list="global-city-options-${id}">
+          <datalist id="global-city-options-${id}"></datalist>
         </div>
       `}
       <div class="field">
@@ -5888,9 +5975,7 @@ function renderCityBlock(id) {
     if (regionSelect) regionSelect.addEventListener("change", event => onBrazilRegionChange(id, event.target.value));
     if (citySelect) {
       citySelect.addEventListener("change", event => {
-        cityObj.city = cleanTextValue(event.target.value);
-        cityObj.lat = null;
-        cityObj.lng = null;
+        selectCityFromInput(cityObj, event.target);
         updateNameSuggestions();
       });
     }
@@ -5899,20 +5984,28 @@ function renderCityBlock(id) {
     const regionInput = document.getElementById(`f-region-${id}`);
     const cityInput = document.getElementById(`f-city-${id}`);
     if (regionInput) {
+      regionInput.addEventListener("input", event => {
+        cityObj.region = normalizeRegionValue(event.target.value, cityObj.country);
+        cityObj.uf = "";
+        cityObj.lat = null;
+        cityObj.lng = null;
+        hydrateGlobalCityOptions(id, false);
+      });
       regionInput.addEventListener("change", event => {
         cityObj.region = normalizeRegionValue(event.target.value, cityObj.country);
         cityObj.uf = "";
+        cityObj.city = "";
         updateNameSuggestions();
+        renderCityBlock(id);
       });
     }
     if (cityInput) {
       cityInput.addEventListener("change", event => {
-        cityObj.city = cleanTextValue(event.target.value);
-        cityObj.lat = null;
-        cityObj.lng = null;
+        selectCityFromInput(cityObj, event.target);
         updateNameSuggestions();
       });
     }
+    hydrateGlobalCityOptions(id, false);
   }
 
   refreshIcons();
@@ -5953,48 +6046,78 @@ async function onBrazilRegionChange(blockId, region, preserveCity) {
   cityObj.lat = null;
   cityObj.lng = null;
 
-  const select = document.getElementById(`f-city-${blockId}`);
-  if (!select) return;
+  const input = document.getElementById(`f-city-${blockId}`);
+  if (!input) return;
   if (!cityObj.region) {
-    select.innerHTML = `<option value="">Selecione a UF</option>`;
-    select.disabled = true;
+    fillCitySelect(input, [], "");
+    input.placeholder = "Selecione a UF";
+    input.disabled = true;
     updateNameSuggestions();
     return;
   }
 
-  select.disabled = false;
-  select.innerHTML = `<option value="">Carregando...</option>`;
+  input.disabled = false;
+  input.placeholder = "Carregando...";
 
-  if (state.ibgeCitiesCache[cityObj.region]) {
-    fillCitySelect(select, state.ibgeCitiesCache[cityObj.region], cityObj.city);
-  } else {
-    try {
-      const response = await fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${cityObj.region}/municipios`);
-      const cities = await response.json();
-      state.ibgeCitiesCache[cityObj.region] = cities;
-      fillCitySelect(select, cities, cityObj.city);
-    } catch (error) {
-      select.innerHTML = `<option value="">Erro ao carregar cidades</option>`;
-    }
+  const cacheKey = getCountryCityCacheKey(cityObj.country, cityObj.region);
+  if (!state.ibgeCitiesCache[cacheKey]) {
+    const countryData = await loadCountryCities(cityObj.country);
+    state.ibgeCitiesCache[cacheKey] = getCitiesFromCountryData(countryData, cityObj.country, cityObj.region);
   }
+  if (getCountryCityCacheKey(cityObj.country, cityObj.region) !== cacheKey) return;
+  fillCitySelect(input, state.ibgeCitiesCache[cacheKey] || [], cityObj.city);
+  input.placeholder = "Digite para buscar";
   updateNameSuggestions();
 }
 
-function fillCitySelect(select, cities, selectedCity) {
-  select.innerHTML = `<option value="">Selecione a Cidade</option>` + cities.map(city => `<option value="${city.nome}">${city.nome}</option>`).join("");
+function fillCitySelect(input, cities, selectedCity) {
+  const listId = input?.getAttribute?.("list");
+  const list = listId ? document.getElementById(listId) : null;
+  if (!list) return;
+  list.innerHTML = (cities || []).map(city => {
+    const name = city.name || city.nome || "";
+    const region = city.stateCode || city.uf || "";
+    return `<option value="${escapeHtml(name)}" label="${escapeHtml(region ? `${name}, ${region}` : name)}"></option>`;
+  }).join("");
   if (selectedCity) {
-    const option = [...select.options].find(item => normalizeLookupKey(item.value) === normalizeLookupKey(selectedCity));
-    if (option) select.value = option.value;
+    const option = [...list.options].find(item => normalizeLookupKey(item.value) === normalizeLookupKey(selectedCity));
+    input.value = option?.value || selectedCity;
   }
 }
 
-async function initIBGEForm() {
-  try {
-    const response = await fetch("https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome");
-    state.ibgeUFs = await response.json();
-    state.formCities.filter(city => isBrazilCountry(city.country)).forEach(city => renderCityBlock(city.id));
-    state.formPlanCities.filter(city => isBrazilCountry(city.country)).forEach(city => renderPlanCityBlock(city.id));
-  } catch (error) {}
+function findCityRecordForDraft(cityObj, cityName) {
+  const key = getCountryCityCacheKey(cityObj.country, cityObj.region);
+  const cities = state.ibgeCitiesCache[key] || [];
+  const lookup = normalizeLookupKey(cityName);
+  return cities.find(city => normalizeLookupKey(city.name || city.nome) === lookup) || null;
+}
+
+function selectCityFromInput(cityObj, input) {
+  const cityName = cleanTextValue(input.value);
+  const match = findCityRecordForDraft(cityObj, cityName);
+  if (match) {
+    applyResolvedCityToDraft(cityObj, match, cityObj.region);
+    input.value = cityObj.city;
+    return;
+  }
+  cityObj.city = cityName;
+  cityObj.lat = null;
+  cityObj.lng = null;
+}
+
+async function hydrateGlobalCityOptions(blockId, isPlan = false) {
+  const list = isPlan ? state.formPlanCities : state.formCities;
+  const cityObj = list.find(city => city.id === blockId);
+  const inputId = isPlan ? `plan-city-${blockId}` : `f-city-${blockId}`;
+  const input = document.getElementById(inputId);
+  if (!cityObj || !input) return;
+  const cacheKey = getCountryCityCacheKey(cityObj.country, cityObj.region);
+  if (!state.ibgeCitiesCache[cacheKey]) {
+    const countryData = await loadCountryCities(cityObj.country);
+    state.ibgeCitiesCache[cacheKey] = getCitiesFromCountryData(countryData, cityObj.country, cityObj.region);
+  }
+  if (getCountryCityCacheKey(cityObj.country, cityObj.region) !== cacheKey) return;
+  fillCitySelect(input, state.ibgeCitiesCache[cacheKey] || [], cityObj.city);
 }
 
 function updateNameSuggestions() {
@@ -6212,6 +6335,45 @@ async function loadGlobalRegionData() {
   } catch (error) {
     state.globalGeo = { countries: [...DEFAULT_GLOBAL_COUNTRIES], subdivisions: {} };
     renderGlobalCountryOptions();
+  }
+}
+
+async function loadPlacesIndex() {
+  try {
+    const response = await fetch(withCacheBust("assets/data/places/index.json"), { cache: "no-store" });
+    if (!response.ok) throw new Error("Falha ao carregar base offline de lugares.");
+    const data = await response.json();
+    state.places.countries = (data.countries || []).map(country => ({
+      ...country,
+      displayName: normalizeCountryValue(country.displayName || country.name || country.iso2),
+      states: (country.states || []).map(state => ({
+        ...state,
+        code: cleanTextValue(state.code),
+        name: cleanTextValue(state.name)
+      }))
+    }));
+    state.places.byKey = {};
+    state.places.byIso2 = {};
+    state.places.countries.forEach(country => {
+      const aliases = [country.iso2, country.iso3, country.name, country.displayName].filter(Boolean);
+      aliases.forEach(alias => {
+        state.places.byKey[normalizeLookupKey(alias)] = country;
+      });
+      state.places.byIso2[country.iso2] = country;
+    });
+    state.globalGeo.countries = dedupeValues([...(state.places.countries || []).map(country => country.displayName), ...DEFAULT_GLOBAL_COUNTRIES]);
+    state.globalGeo.subdivisions = state.places.countries.reduce((acc, country) => {
+      acc[normalizeLookupKey(country.displayName)] = dedupeValues((country.states || []).map(state => normalizeRegionValue(country.iso2 === "BR" ? (state.code || state.name) : (state.name || state.code), country.displayName)));
+      acc[normalizeLookupKey(country.name)] = acc[normalizeLookupKey(country.displayName)];
+      return acc;
+    }, {});
+    const brazil = state.places.byIso2.BR;
+    state.ibgeUFs = (brazil?.states || []).map(state => ({ sigla: state.code, nome: state.name }));
+    renderGlobalCountryOptions();
+    state.formCities.forEach(city => renderCityBlock(city.id));
+    state.formPlanCities.forEach(city => renderPlanCityBlock(city.id));
+  } catch (error) {
+    await loadGlobalRegionData();
   }
 }
 
@@ -7281,7 +7443,8 @@ function renderPlanCityBlock(id) {
         </div>
         <div class="field">
           <label>Cidade *</label>
-          <select class="form-input" id="plan-city-${id}" ${cityObj.region ? "" : "disabled"}><option value="">${cityObj.region ? "Carregando..." : "Selecione a UF"}</option></select>
+          <input class="form-input" id="plan-city-${id}" value="${escapeHtml(cityObj.city || "")}" placeholder="${cityObj.region ? "Digite para buscar" : "Selecione a UF"}" list="plan-city-options-${id}" ${cityObj.region ? "" : "disabled"}>
+          <datalist id="plan-city-options-${id}"></datalist>
         </div>
       ` : `
         <div class="field">
@@ -7291,7 +7454,8 @@ function renderPlanCityBlock(id) {
         </div>
         <div class="field">
           <label>Cidade *</label>
-          <input class="form-input" id="plan-city-${id}" value="${escapeHtml(cityObj.city || "")}" placeholder="Ex: Lisboa">
+          <input class="form-input" id="plan-city-${id}" value="${escapeHtml(cityObj.city || "")}" placeholder="Digite para buscar" list="plan-global-city-options-${id}">
+          <datalist id="plan-global-city-options-${id}"></datalist>
         </div>
       `}
       <div class="field">
@@ -7319,9 +7483,7 @@ function renderPlanCityBlock(id) {
     if (regionSelect) regionSelect.addEventListener("change", event => onPlanBrazilRegionChangeBlock(id, event.target.value));
     if (citySelect) {
       citySelect.addEventListener("change", event => {
-        cityObj.city = cleanTextValue(event.target.value);
-        cityObj.lat = null;
-        cityObj.lng = null;
+        selectCityFromInput(cityObj, event.target);
       });
     }
     if (cityObj.region) onPlanBrazilRegionChangeBlock(id, cityObj.region, true);
@@ -7329,18 +7491,26 @@ function renderPlanCityBlock(id) {
     const regionInput = document.getElementById(`plan-region-${id}`);
     const cityInput = document.getElementById(`plan-city-${id}`);
     if (regionInput) {
+      regionInput.addEventListener("input", event => {
+        cityObj.region = normalizeRegionValue(event.target.value, cityObj.country);
+        cityObj.uf = "";
+        cityObj.lat = null;
+        cityObj.lng = null;
+        hydrateGlobalCityOptions(id, true);
+      });
       regionInput.addEventListener("change", event => {
         cityObj.region = normalizeRegionValue(event.target.value, cityObj.country);
         cityObj.uf = "";
+        cityObj.city = "";
+        renderPlanCityBlock(id);
       });
     }
     if (cityInput) {
       cityInput.addEventListener("change", event => {
-        cityObj.city = cleanTextValue(event.target.value);
-        cityObj.lat = null;
-        cityObj.lng = null;
+        selectCityFromInput(cityObj, event.target);
       });
     }
+    hydrateGlobalCityOptions(id, true);
   }
 
   refreshIcons();
@@ -7380,29 +7550,26 @@ async function onPlanBrazilRegionChangeBlock(blockId, region, preserveCity) {
   cityObj.lat = null;
   cityObj.lng = null;
 
-  const select = document.getElementById(`plan-city-${blockId}`);
-  if (!select) return;
+  const input = document.getElementById(`plan-city-${blockId}`);
+  if (!input) return;
   if (!cityObj.region) {
-    select.innerHTML = `<option value="">Selecione a UF</option>`;
-    select.disabled = true;
+    fillCitySelect(input, [], "");
+    input.placeholder = "Selecione a UF";
+    input.disabled = true;
     return;
   }
 
-  select.disabled = false;
-  select.innerHTML = `<option value="">Carregando...</option>`;
+  input.disabled = false;
+  input.placeholder = "Carregando...";
 
-  if (state.ibgeCitiesCache[cityObj.region]) {
-    fillCitySelect(select, state.ibgeCitiesCache[cityObj.region], cityObj.city);
-  } else {
-    try {
-      const response = await fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${cityObj.region}/municipios`);
-      const cities = await response.json();
-      state.ibgeCitiesCache[cityObj.region] = cities;
-      fillCitySelect(select, cities, cityObj.city);
-    } catch (error) {
-      select.innerHTML = `<option value="">Erro ao carregar cidades</option>`;
-    }
+  const cacheKey = getCountryCityCacheKey(cityObj.country, cityObj.region);
+  if (!state.ibgeCitiesCache[cacheKey]) {
+    const countryData = await loadCountryCities(cityObj.country);
+    state.ibgeCitiesCache[cacheKey] = getCitiesFromCountryData(countryData, cityObj.country, cityObj.region);
   }
+  if (getCountryCityCacheKey(cityObj.country, cityObj.region) !== cacheKey) return;
+  fillCitySelect(input, state.ibgeCitiesCache[cacheKey] || [], cityObj.city);
+  input.placeholder = "Digite para buscar";
 }
 
 function populateFilters() {
