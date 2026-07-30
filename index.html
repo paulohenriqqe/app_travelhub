@@ -6626,7 +6626,7 @@ function normalizeTrip(row, index) {
   const lng = safeParseFloat(getField(["Longitude", "Lng", "Lon", "Long"]));
   const destinationDays = safeParseFloat(getField(["Dias na cidade", "Dias no destino", "Dias no local", "Dias cidade", "Dias Destino"]));
   const recordId = String(getField(["Id", "TripId"])).trim();
-  const planId = getField(["PlanId", "Plan Id", "PlanoId", "Plano Id", "Id do Plano"]) || "";
+  const planId = String(getField(["PlanId", "Plan Id", "PlanoId", "Plano Id", "Id do Plano"]) || "").trim();
   const origin = planId ? "plan" : "manual";
   const year = getYearFromDate(startDate);
   const hasConfirmedCoords = Number.isFinite(lat) && Number.isFinite(lng);
@@ -6750,6 +6750,19 @@ function normalizeStatus(value) {
   if (cleaned.includes("efet")) return "efetivado";
   if (cleaned.includes("cancel")) return "cancelado";
   return "planejado";
+}
+
+function getLinkedPlanIds() {
+  return new Set(state.trips.map(trip => String(trip.planId || "").trim()).filter(Boolean));
+}
+
+function getResolvedPlanStatus(plan, linkedPlanIds = getLinkedPlanIds()) {
+  if (linkedPlanIds.has(String(plan?.id || "").trim())) return "efetivado";
+  return normalizeStatus(plan?.status);
+}
+
+function isPlanOpenForPlanning(plan, linkedPlanIds = getLinkedPlanIds()) {
+  return !["cancelado", "efetivado"].includes(getResolvedPlanStatus(plan, linkedPlanIds));
 }
 
 function parseItinerary(rawValue, startDate, endDate) {
@@ -6931,7 +6944,7 @@ function getGeoFeatureCountryLabelPt(feature, key) {
 function getMapFocusBounds() {
   const points = [
     ...state.filtered.map(item => getMapCoordinates(item)).filter(Boolean),
-    ...(state.showPlannedMap ? state.plans.filter(plan => plan.city && plan.status !== "cancelado").map(plan => getMapCoordinates(plan)).filter(Boolean) : [])
+    ...(state.showPlannedMap ? state.plans.filter(plan => isPlanOpenForPlanning(plan)).map(plan => getMapCoordinates(plan)).filter(Boolean) : [])
   ];
   if (!points.length) {
     return { south: -40, north: 15, west: -85, east: -28 };
@@ -7060,7 +7073,8 @@ function buildPlannedCoverageCollections() {
   const countries = new Map();
   const regions = new Map();
   const cities = new Map();
-  const plans = state.plans.filter(plan => plan.status !== "cancelado" && !!getMapCoordinates(plan));
+  const linkedPlanIds = getLinkedPlanIds();
+  const plans = state.plans.filter(plan => isPlanOpenForPlanning(plan, linkedPlanIds) && !!getMapCoordinates(plan));
 
   plans.forEach(plan => {
     const country = normalizeCountryValue(plan.country || "Brasil");
@@ -7203,8 +7217,9 @@ function getListSubtitle(title) {
 
 function getUpcomingPlans(limit) {
   const today = new Date().toISOString().slice(0, 10);
+  const linkedPlanIds = getLinkedPlanIds();
   return state.plans
-    .filter(plan => !["cancelado", "efetivado"].includes(plan.status))
+    .filter(plan => isPlanOpenForPlanning(plan, linkedPlanIds))
     .filter(plan => {
       const referenceDate = plan.endDate || plan.startDate || "";
       return !referenceDate || referenceDate >= today;
@@ -7396,7 +7411,8 @@ function renderMapMetaStrip() {
 }
 
 function getMappablePlanCount() {
-  return state.plans.filter(plan => plan.status !== "cancelado" && !!getMapCoordinates(plan)).length;
+  const linkedPlanIds = getLinkedPlanIds();
+  return state.plans.filter(plan => isPlanOpenForPlanning(plan, linkedPlanIds) && !!getMapCoordinates(plan)).length;
 }
 
 function getRouteOverlayCount() {
@@ -7830,10 +7846,11 @@ function sortPlans(plans) {
 }
 
 function computePlanMetrics() {
-  const linkedIds = new Set(state.trips.map(trip => trip.planId).filter(Boolean));
-  const converted = state.plans.filter(plan => linkedIds.has(plan.id) || plan.status === "efetivado").length;
-  const open = state.plans.filter(plan => !["efetivado", "cancelado"].includes(plan.status)).length;
-  const canceled = state.plans.filter(plan => plan.status === "cancelado").length;
+  const linkedPlanIds = getLinkedPlanIds();
+  const resolvedStatuses = state.plans.map(plan => getResolvedPlanStatus(plan, linkedPlanIds));
+  const converted = resolvedStatuses.filter(status => status === "efetivado").length;
+  const open = resolvedStatuses.filter(status => !["efetivado", "cancelado"].includes(status)).length;
+  const canceled = resolvedStatuses.filter(status => status === "cancelado").length;
   const total = state.plans.length;
   state.planMetrics = {
     total,
@@ -8471,8 +8488,9 @@ function renderMapLayer(preserveViewport = false) {
   }
 
   if (showPlannedCoverage && cityMode) {
+      const linkedPlanIds = getLinkedPlanIds();
       state.plans
-        .filter(plan => plan.status !== "cancelado" && !!getMapCoordinates(plan))
+        .filter(plan => isPlanOpenForPlanning(plan, linkedPlanIds) && !!getMapCoordinates(plan))
         .forEach(plan => {
           const coords = getMapCoordinates(plan);
           if (!coords) return;
@@ -9127,7 +9145,7 @@ function renderPlanningSourceNote() {
 }
 
 function renderPlanningMetrics() {
-  const linkedIds = new Set(state.trips.map(trip => trip.planId).filter(Boolean));
+  const linkedIds = getLinkedPlanIds();
   const metrics = [
     { key: "total", label: "Planos", value: state.planMetrics.total },
     { key: "open", label: "Em aberto", value: state.planMetrics.open },
@@ -9142,7 +9160,8 @@ function renderPlanningMetrics() {
 }
 
 function renderPlanList() {
-  const openPlans = state.filteredPlans.filter(plan => !["efetivado", "cancelado"].includes(plan.status));
+  const linkedPlanIds = getLinkedPlanIds();
+  const openPlans = state.filteredPlans.filter(plan => isPlanOpenForPlanning(plan, linkedPlanIds));
   if (!openPlans.length) {
     els["plan-list"].innerHTML = `<div class="empty-state">Nenhum plano em aberto.</div>`;
     return;
@@ -9166,7 +9185,7 @@ function renderPlanList() {
 }
 
 function openPlansMetricModal(metricKey = "total") {
-  const linkedIds = new Set(state.trips.map(trip => trip.planId).filter(Boolean));
+  const linkedPlanIds = getLinkedPlanIds();
   const config = {
     total: {
       title: "Planos",
@@ -9174,11 +9193,11 @@ function openPlansMetricModal(metricKey = "total") {
     },
     open: {
       title: "Planos em aberto",
-      plans: state.plans.filter(plan => !["efetivado", "cancelado"].includes(plan.status))
+      plans: state.plans.filter(plan => isPlanOpenForPlanning(plan, linkedPlanIds))
     },
     converted: {
       title: "Planos efetivados",
-      plans: state.plans.filter(plan => linkedIds.has(plan.id) || plan.status === "efetivado")
+      plans: state.plans.filter(plan => getResolvedPlanStatus(plan, linkedPlanIds) === "efetivado")
     }
   }[metricKey] || { title: "Planos", plans: state.plans };
   openPlansListModal(config.title, config.plans);
@@ -9192,7 +9211,7 @@ function openPlansListModal(title, plans) {
       ${plans.map(plan => `
         <button type="button" class="modal-list-item planned" onclick="openPlanDetailModal(decodeURIComponent('${encodeURIComponent(plan.id)}'))">
           <span class="modal-list-label">${escapeHtml(plan.destination)}<br><small>${escapeHtml(getPlanLocationLabel(plan))} · ${escapeHtml(formatDateRange(plan.startDate, plan.endDate))}</small></span>
-          <span class="modal-list-badge">${escapeHtml(STATUS_META[normalizeStatus(plan.status)]?.label || "Planejado")}</span>
+          <span class="modal-list-badge">${escapeHtml(STATUS_META[getResolvedPlanStatus(plan)]?.label || "Planejado")}</span>
         </button>
       `).join("")}
     </div>
@@ -9301,7 +9320,7 @@ function beginPlanEdit(planId) {
   state.currentPlanDraftItinerary = plan.itinerary || null;
   els["plan-start"].value = plan.startDate || "";
   els["plan-end"].value = plan.endDate || "";
-  els["plan-status"].value = plan.status || "planejado";
+  els["plan-status"].value = getResolvedPlanStatus(plan);
   els["plan-grid-container"].style.display = "none";
   els["plan-grid-title"].textContent = `Roteiro diário: ${plan.destination}`;
   els["itinerary-table-wrapper"].innerHTML = "";
@@ -9327,6 +9346,7 @@ function openPlanDetailModal(planId) {
   state.selectedPlanId = plan.id;
   renderPlanList();
   const linkedTrips = getLinkedTripsForPlan(plan.id);
+  const resolvedStatus = getResolvedPlanStatus(plan);
   const chips = [
     ...(plan.locations || []).map(location => ({ icon: "map-pin", value: formatLocationLabel(location) || location.city || location.country })),
     ...plan.tags.map(tag => ({ icon: "hash", value: tag })),
@@ -9337,7 +9357,7 @@ function openPlanDetailModal(planId) {
   els["modal-header"].innerHTML = `
     <div class="trip-modal-header-shell plan-modal-header">
       <div class="trip-modal-header-main">
-        <div class="trip-modal-badges">${renderStatusChip(plan.status)}</div>
+        <div class="trip-modal-badges">${renderStatusChip(resolvedStatus)}</div>
         <h2 class="trip-modal-title">${escapeHtml(plan.destination)}</h2>
         <div class="trip-modal-meta">
           <i data-lucide="map-pin"></i>
@@ -9353,7 +9373,7 @@ function openPlanDetailModal(planId) {
   els["modal-body"].innerHTML = `
     <div class="plan-modal-strip">
       <span><i data-lucide="calendar-range"></i>${escapeHtml(formatDateRange(plan.startDate, plan.endDate))}</span>
-      <span><i data-lucide="git-branch-plus"></i>${linkedTrips.length ? formatCountLabel(linkedTrips.length, "linha efetivada", "linhas efetivadas") : "Ainda não efetivado"}</span>
+      <span><i data-lucide="git-branch-plus"></i>${resolvedStatus === "efetivado" ? (linkedTrips.length ? formatCountLabel(linkedTrips.length, "linha efetivada", "linhas efetivadas") : "Efetivado") : "Ainda não efetivado"}</span>
     </div>
     ${chips.length ? `<div class="meta-cloud plan-modal-cloud">${chips.map(item => `<span class="meta-pill"><i data-lucide="${item.icon}"></i>${escapeHtml(item.value)}</span>`).join("")}</div>` : ""}
     <div class="detail-section-title">Roteiro diário</div>
@@ -9986,8 +10006,15 @@ async function handleFormSubmit(event) {
     }
 
     if (planId) {
-      const linkedPlan = state.plans.find(plan => plan.id === planId);
+      const linkedPlan = state.plans.find(plan => String(plan.id || "").trim() === String(planId).trim());
       if (linkedPlan) linkedPlan.status = "efetivado";
+      if (!state.editingTripId) {
+        try {
+          await postToAppsScript("update_plan_status", { planId, status: "efetivado" });
+        } catch (syncError) {
+          console.warn("A viagem foi salva, mas o status do plano não foi sincronizado.", syncError);
+        }
+      }
     }
 
     message.style.color = "var(--success)";
@@ -10296,7 +10323,8 @@ function createEmptySlots(days) {
 }
 
 function getLinkedTripsForPlan(planId) {
-  return state.trips.filter(trip => trip.planId === planId);
+  const normalizedPlanId = String(planId || "").trim();
+  return state.trips.filter(trip => String(trip.planId || "").trim() === normalizedPlanId);
 }
 
 function getTripTotalDays(trip) {
