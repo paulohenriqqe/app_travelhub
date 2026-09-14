@@ -2,7 +2,7 @@
 
 Viagens planejadas, concluídas e canceladas compartilham um cadastro. O aplicativo lê e grava a aba `Viagens` pelo Apps Script. Home, mapas e gráficos usam apenas viagens concluídas.
 
-Se a integração estiver indisponível, o aplicativo pode consultar a mesma aba `Viagens` pelo CSV já publicado da planilha. Esse modo aparece como **Somente consulta** e bloqueia gravações, sem simular sucesso ou usar as abas antigas. Atualizar os dados reativa a gravação quando o serviço estiver disponível.
+Se a leitura da integração estiver indisponível, o aplicativo pode consultar a mesma aba `Viagens` pelo CSV já publicado da planilha. Esse modo aparece como **Conexão instável**. As gravações continuam apontadas exclusivamente para a integração v2 publicada e exigem confirmação; nenhuma ação grava nas abas antigas.
 
 Se a resposta de gravação se perder, a confirmação alternativa exige que a planilha contenha o identificador exato da solicitação, a versão esperada e todos os dados enviados. Uma leitura antiga, outro pedido ou uma edição concorrente não confirmam sucesso. Enquanto esse recibo não estiver disponível, o formulário preserva os dados e permite repetir o mesmo pedido.
 

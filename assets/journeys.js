@@ -51,6 +51,7 @@ const Journeys = (() => {
       records=data.journeys.map(raw=>{const j=M.normalize(raw);if(ids.has(j.id)) throw new Error('A base contém identificadores duplicados.');ids.add(j.id);return j;});
       readOnly=data.readOnly===true;loaded=true;project();
       if(readOnly){error='Consulta disponível. A gravação aguarda a publicação da integração no Google.';render();$('sync-text').textContent='Somente consulta';$('sync-pill').className='sync-pill warning';}
+      else if(data.limitedConnection){$('sync-text').textContent='Conexão instável';$('sync-pill').className='sync-pill warning';}
     } catch(e) {
       error=e.message || 'Sem conexão. Tente atualizar novamente.';
       $('sync-text').textContent='Falha ao atualizar';$('sync-pill').className='sync-pill warning';render();

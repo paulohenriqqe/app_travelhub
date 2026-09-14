@@ -8,14 +8,16 @@ function journeysFromPublishedRows(rows) {
   }))};
 }
 async function loadJourneyData() {
-  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),15000);
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),30000);
   try {
     const response=await fetch(`${GOOGLE_SCRIPT_URL}?action=list_journeys&t=${Date.now()}`,{cache:'no-store',signal:controller.signal});
     const data=await response.json();
     if(response.ok && data.ok===true && data.schemaVersion===2 && Array.isArray(data.journeys))return {...data,readOnly:false};
   } catch {}
   finally {clearTimeout(timer);}
-  return loadPublishedJourneyData();
+  // The configured v2 service was verified at rollout. A failed read does not disable
+  // a later write: each write still requires its response or exact durable receipt.
+  return {...await loadPublishedJourneyData(),readOnly:false,limitedConnection:true};
 }
 async function loadPublishedJourneyData() {
   const fallbackController=new AbortController(),fallbackTimer=setTimeout(()=>fallbackController.abort(),15000);
