@@ -13,7 +13,7 @@
   await ready;
   if(unified) {
     const load=src=>new Promise((resolve,reject)=>{const script=document.createElement('script');script.src=src;script.onload=resolve;script.onerror=reject;document.body.appendChild(script);});
-    try {await load('assets/journey-model.js');await load('assets/journeys.js');}
+    try {await load('assets/journey-model.js?v=2');await load('assets/journeys.js?v=2');}
     catch {document.getElementById('sync-text').textContent='Atualize a página para carregar o aplicativo.';return;}
   }
   initializeTravelHub();
