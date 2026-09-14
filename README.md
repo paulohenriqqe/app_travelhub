@@ -2,6 +2,8 @@
 
 Viagens planejadas, concluídas e canceladas compartilham um cadastro. O aplicativo lê e grava a aba `Viagens` pelo Apps Script. Home, mapas e gráficos usam apenas viagens concluídas.
 
+Se a integração estiver indisponível, o aplicativo pode consultar a mesma aba `Viagens` pelo CSV já publicado da planilha. Esse modo aparece como **Somente consulta** e bloqueia gravações, sem simular sucesso ou usar as abas antigas. Atualizar os dados reativa a gravação quando o serviço estiver disponível.
+
 ## Validação
 
 ```sh

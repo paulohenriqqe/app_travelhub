@@ -1,7 +1,7 @@
 /* One canonical collection; legacy map/chart renderers receive read-only stop projections. */
 const Journeys = (() => {
   const M=TravelHubModel, labels={planejada:'Planejada',concluida:'Concluída',cancelada:'Cancelada'};
-  let records=[], filter='', query='', year='', region='', tag='', editor=null, busy=false, error='', loaded=false, itineraryReturn=false;
+  let records=[], filter='', query='', year='', region='', tag='', editor=null, busy=false, error='', loaded=false, itineraryReturn=false, readOnly=false;
   const $=id=>document.getElementById(id), esc=value=>escapeHtml(value);
   const uuid=()=>crypto.randomUUID();
   const today=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
@@ -21,6 +21,7 @@ const Journeys = (() => {
     applyFilters(); render(); updateSyncPill();
   }
   async function request(body) {
+    if(readOnly)throw new Error('Gravação indisponível. A integração precisa ser publicada no Google. Seus dados continuam no formulário.');
     const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),30000);
     let response;
     try {response=await fetch(GOOGLE_SCRIPT_URL, {method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body),signal:controller.signal});}
@@ -36,11 +37,12 @@ const Journeys = (() => {
     error=''; $('sync-text').textContent='Sincronizando';
     try {
       let data=initial;
-      if(!data){const response=await fetch(`${GOOGLE_SCRIPT_URL}?action=list_journeys&t=${Date.now()}`,{cache:'no-store'});data=await response.json();if(!response.ok)throw new Error('Não foi possível carregar a base de viagens.');}
+      if(!data)data=await loadJourneyData();
       if(data.ok!==true || data.schemaVersion!==2 || !Array.isArray(data.journeys)) throw new Error(data.message || 'Não foi possível carregar a base de viagens.');
       const ids=new Set();
       records=data.journeys.map(raw=>{const j=M.normalize(raw);if(ids.has(j.id)) throw new Error('A base contém identificadores duplicados.');ids.add(j.id);return j;});
-      loaded=true;project();
+      readOnly=data.readOnly===true;loaded=true;project();
+      if(readOnly){error='Consulta disponível. A gravação aguarda a publicação da integração no Google.';render();$('sync-text').textContent='Somente consulta';$('sync-pill').className='sync-pill warning';}
     } catch(e) {
       error=e.message || 'Sem conexão. Tente atualizar novamente.';
       $('sync-text').textContent='Falha ao atualizar';$('sync-pill').className='sync-pill warning';render();
