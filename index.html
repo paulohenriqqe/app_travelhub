@@ -5410,7 +5410,7 @@ function cleanAndDedupeLists() {
   });
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+function initializeTravelHub() {
   loadListsFromStorage();
   cacheElements();
   bindEvents();
@@ -5423,7 +5423,7 @@ document.addEventListener("DOMContentLoaded", () => {
   updateTripFormUi();
   resetPlanEditor();
   loadData();
-});
+}
 
 function cacheElements() {
   [
@@ -10475,5 +10475,7 @@ function escapeHtml(value) {
 }
 
 </script>
+<link rel="stylesheet" href="assets/journeys.css">
+<script src="assets/bootstrap.js"></script>
 </body>
 </html>
