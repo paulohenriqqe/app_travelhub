@@ -2,6 +2,7 @@
 const http=require('node:http'),fs=require('node:fs'),path=require('node:path');
 const M=require('../assets/journey-model.js');
 const root=path.resolve(__dirname,'..');
+const port=Number(process.argv[3]) || 8765;
 let data=JSON.parse(fs.readFileSync(process.argv[2],'utf8')), mode='normal';
 http.createServer(async(req,res)=>{
   const url=new URL(req.url,'http://localhost');
@@ -21,7 +22,7 @@ http.createServer(async(req,res)=>{
   }
   const file=path.resolve(root,'.'+(url.pathname==='/'?'/index.html':url.pathname));
   if(!file.startsWith(root+path.sep)){res.writeHead(403).end();return;}
-  try{let content=fs.readFileSync(file);if(file.endsWith('index.html'))content=content.toString().replace(/const GOOGLE_SCRIPT_URL = "[^"]+";/,'const GOOGLE_SCRIPT_URL = "http://localhost:8765/api";');
+  try{let content=fs.readFileSync(file);if(file.endsWith('index.html'))content=content.toString().replace(/const GOOGLE_SCRIPT_URL = "[^"]+";/,`const GOOGLE_SCRIPT_URL = "http://localhost:${port}/api";`);
     res.setHeader('Content-Type',file.endsWith('.html')?'text/html;charset=utf-8':file.endsWith('.js')||file.endsWith('.cjs')?'text/javascript;charset=utf-8':file.endsWith('.css')?'text/css':file.endsWith('.svg')?'image/svg+xml':'application/json;charset=utf-8');res.end(content);
   }catch{res.writeHead(404).end();}
-}).listen(8765,'127.0.0.1',()=>console.log('TravelHub preview: http://localhost:8765'));
+}).listen(port,'127.0.0.1',()=>console.log(`TravelHub preview: http://localhost:${port}`));

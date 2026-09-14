@@ -7,17 +7,24 @@ function journeysFromPublishedRows(rows) {
     locations:parse(r,'Localizacoes',[]),itinerary:parse(r,'Itinerario Diario',{}),plannedSnapshot:parse(r,'Planejamento original',null),history:parse(r,'Historico',[]),sourceRefs:parse(r,'Origem',[]),requests:parse(r,'Solicitacoes',[]),version:Number(r.Versao),createdAt:r['Criado em'],updatedAt:r['Atualizado em'],dayBasis:r['Contagem de dias']
   }))};
 }
-async function loadJourneyData() {
+async function loadApiJourneyData() {
   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),30000);
   try {
     const response=await fetch(`${GOOGLE_SCRIPT_URL}?action=list_journeys&t=${Date.now()}`,{cache:'no-store',signal:controller.signal});
     const data=await response.json();
     if(response.ok && data.ok===true && data.schemaVersion===2 && Array.isArray(data.journeys))return {...data,readOnly:false};
-  } catch {}
+    throw new Error('Não foi possível atualizar as viagens.');
+  }
   finally {clearTimeout(timer);}
-  // The configured v2 service was verified at rollout. A failed read does not disable
-  // a later write: each write still requires its response or exact durable receipt.
-  return {...await loadPublishedJourneyData(),readOnly:false,limitedConnection:true};
+}
+async function loadJourneyData({onUpdate}={}) {
+  // Read both representations of the canonical sheet in parallel. A slow API
+  // must not hold back the published sheet; reconcile newer versions later.
+  const api=loadApiJourneyData();
+  const sheet=loadPublishedJourneyData().then(data=>({...data,readOnly:false,source:'sheet'}));
+  const first=await Promise.any([api,sheet]);
+  if(first.source==='sheet')api.then(data=>onUpdate?.(data)).catch(()=>{});
+  return first;
 }
 async function loadPublishedJourneyData() {
   const fallbackController=new AbortController(),fallbackTimer=setTimeout(()=>fallbackController.abort(),15000);
@@ -37,4 +44,25 @@ function confirmedJourneyFromReceipt(data,body,model) {
   if(actual.status!==expected.status || JSON.stringify(stable(model.snapshot(actual)))!==JSON.stringify(stable(model.snapshot(expected))))return null;
   return actual;
 }
-if(typeof module!=='undefined')module.exports={journeysFromPublishedRows,confirmedJourneyFromReceipt};
+const JOURNEY_CACHE_KEY='travelhub:journeys:v2';
+function readCachedJourneys(storage,endpoint=GOOGLE_SCRIPT_URL,now=Date.now()) {
+  try {
+    storage ??= localStorage;
+    const data=JSON.parse(storage.getItem(JOURNEY_CACHE_KEY));
+    if(data.endpoint!==endpoint || now-data.savedAt>7*86400000 || data.schemaVersion!==2 || !Array.isArray(data.journeys) || !data.journeys.every(j=>j.id && Number.isInteger(j.version) && j.version>0))return null;
+    return {...data,ok:true,cached:true};
+  }catch{return null;}
+}
+function writeCachedJourneys(data,storage,endpoint=GOOGLE_SCRIPT_URL,now=Date.now()) {
+  try {
+    storage ??= localStorage;
+    const journeys=data.journeys.map(({requests,sourceRefs,...j})=>j);
+    storage.setItem(JOURNEY_CACHE_KEY,JSON.stringify({schemaVersion:2,endpoint,savedAt:now,journeys}));
+  }catch{} // Private browsing or quota limits must never block the app.
+}
+function mergeJourneyVersions(current,incoming) {
+  const merged=new Map(current.map(j=>[j.id,j]));
+  incoming.forEach(j=>{if(!merged.has(j.id) || j.version>=merged.get(j.id).version)merged.set(j.id,j);});
+  return [...merged.values()];
+}
+if(typeof module!=='undefined')module.exports={journeysFromPublishedRows,confirmedJourneyFromReceipt,loadJourneyData,readCachedJourneys,writeCachedJourneys,mergeJourneyVersions};

@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TravelHub</title>
 <link rel="icon" type="image/svg+xml" href="assets/travelhub-favicon.svg">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+<script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script defer src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -4889,7 +4889,6 @@
 <datalist id="plan-region-options"></datalist>
 
 <script>
-if (window.Chart && window.ChartDataLabels) Chart.register(ChartDataLabels);
 
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRNecMUqxdEaBZw6QzMixrnF-o7n4Ldu5eaOVsLR8vWT0QhxalCbImnUNqJhPshjLyIW5a2Yf6F-Gvb/pub?output=csv";
 const PLANNING_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRNecMUqxdEaBZw6QzMixrnF-o7n4Ldu5eaOVsLR8vWT0QhxalCbImnUNqJhPshjLyIW5a2Yf6F-Gvb/pub?gid=1966843480&single=true&output=csv";
@@ -5411,6 +5410,7 @@ function cleanAndDedupeLists() {
 }
 
 function initializeTravelHub() {
+  if (window.Chart && window.ChartDataLabels) Chart.register(ChartDataLabels);
   loadListsFromStorage();
   cacheElements();
   bindEvents();
@@ -7886,7 +7886,7 @@ function switchView(view) {
   document.getElementById(`view-${view}`).classList.add("active");
   document.querySelectorAll(".nav-item").forEach(button => button.classList.toggle("active", button.dataset.view === view));
   const titles = {
-    dashboard: "Ciclo de <em>viagens</em>",
+    dashboard: "Suas <em>viagens</em>",
     map: "Cobertura das <em>viagens</em>",
     editor: "Nova <em>viagem</em>",
     planejar: "Planejar <em>roteiro</em>"
@@ -9062,6 +9062,7 @@ function renderTravelEvolutionFallback(yearlyStats) {
 function renderUpcomingCarousel() {
   const upcomingPlans = getUpcomingPlans(6);
   if (!els["stat-upcoming-plans"]) return;
+  els["stat-upcoming-plans"].closest('.dashboard-upcoming-panel').classList.toggle('is-empty',!upcomingPlans.length);
   els["stat-upcoming-plans"].innerHTML = upcomingPlans.length ? `
     <div class="upcoming-carousel ${upcomingPlans.length <= 1 ? "single" : ""}">
       ${upcomingPlans.length > 1 ? `<button type="button" class="upcoming-nav upcoming-nav-prev" aria-label="Viagem anterior" onclick="scrollUpcomingCarousel(-1)"><i data-lucide="chevron-left"></i></button>` : ""}
@@ -9088,7 +9089,7 @@ function renderUpcomingCarousel() {
       </div>
       ${upcomingPlans.length > 1 ? `<button type="button" class="upcoming-nav upcoming-nav-next" aria-label="Próxima viagem" onclick="scrollUpcomingCarousel(1)"><i data-lucide="chevron-right"></i></button>` : ""}
     </div>
-  ` : `<div class="empty-state compact-empty">Nenhuma viagem futura.</div>`;
+  ` : `<div class="upcoming-empty"><span>Nenhuma viagem planejada por enquanto.</span><button type="button" class="text-action" onclick="openFreshTripEditor()">Planejar viagem <span aria-hidden="true">→</span></button></div>`;
   if (upcomingPlans.length > 1) requestAnimationFrame(updateUpcomingNavState);
 }
 
@@ -10475,8 +10476,11 @@ function escapeHtml(value) {
 }
 
 </script>
-<link rel="stylesheet" href="assets/journeys.css?v=2">
-<script src="assets/journey-source.js?v=4"></script>
-<script src="assets/bootstrap.js?v=4"></script>
+<link rel="stylesheet" href="assets/journeys.css?v=5">
+<link rel="stylesheet" href="assets/layout.css?v=5">
+<script defer src="assets/journey-model.js?v=5"></script>
+<script defer src="assets/journey-source.js?v=5"></script>
+<script defer src="assets/journeys.js?v=5"></script>
+<script defer src="assets/bootstrap.js?v=5"></script>
 </body>
 </html>

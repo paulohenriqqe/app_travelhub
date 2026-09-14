@@ -6,6 +6,8 @@ Se a leitura da integração estiver indisponível, o aplicativo pode consultar 
 
 Se a resposta de gravação se perder, a confirmação alternativa exige que a planilha contenha o identificador exato da solicitação, a versão esperada e todos os dados enviados. Uma leitura antiga, outro pedido ou uma edição concorrente não confirmam sucesso. Enquanto esse recibo não estiver disponível, o formulário preserva os dados e permite repetir o mesmo pedido.
 
+A interface abre antes das consultas. Os dados confirmados ficam em cache neste navegador por até sete dias, sem as linhas brutas de origem nem os recibos. As duas leituras da base são iniciadas em paralelo; dados mais antigos não substituem versões já salvas. O histórico do planejamento permanece preservado e é acessado nos detalhes em **Histórico da viagem**.
+
 ## Validação
 
 ```sh

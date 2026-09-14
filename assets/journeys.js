@@ -1,14 +1,14 @@
 /* One canonical collection; legacy map/chart renderers receive read-only stop projections. */
 const Journeys = (() => {
   const M=TravelHubModel, labels={planejada:'Planejada',concluida:'Concluída',cancelada:'Cancelada'};
-  let records=[], filter='', query='', year='', region='', tag='', editor=null, busy=false, error='', loaded=false, itineraryReturn=false, readOnly=false;
+  let records=[], filter='', query='', year='', region='', tag='', editor=null, busy=false, error='', loaded=false, itineraryReturn=false, readOnly=false, loading=false, deferredProject=false, revision=0;
   const $=id=>document.getElementById(id), esc=value=>escapeHtml(value);
   const uuid=()=>crypto.randomUUID();
   const today=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
   const find=id=>records.find(j=>j.id===id || j.locations.some(l=>l.id===id));
   const button=(text,action,id='',kind='small-action')=>`<button type="button" class="${kind}" data-journey-action="${action}" data-id="${esc(id)}">${text}</button>`;
   const notice=j=>M.situation(j,today());
-  function project() {
+  function project(persist=true) {
     state.trips=records.filter(j=>j.status==='concluida').flatMap(j=>j.locations.map(l=>({
       ...l,id:l.id,recordId:l.id,journeyId:j.id,name:j.name,startDate:j.startDate,endDate:j.endDate,year:j.startDate.slice(0,4),
       tags:l.tags || j.tags,artists:l.artists || j.artists,travelers:l.travelers || j.travelers,planId:'',origin:'manual',sourceLabel:'Viagem concluída',
@@ -19,6 +19,7 @@ const Journeys = (() => {
     populateListsFromTrips(state.trips); populateFilters();
     state.loaded.trips=true;state.loaded.plans=true;state.errors.trips='';state.errors.plans='';
     applyFilters(); render(); updateSyncPill();
+    if(persist)writeCachedJourneys({journeys:records});
   }
   async function request(body) {
     if(readOnly)throw new Error('Gravação indisponível. A integração precisa ser publicada no Google. Seus dados continuam no formulário.');
@@ -41,22 +42,34 @@ const Journeys = (() => {
     if(data.schemaVersion!==2 || data.requestId!==body.requestId || data.journey?.id!==body.payload.journey.id || !Number.isInteger(data.version) || data.journey.version!==data.version) throw new Error('A confirmação recebida está incompleta. Tente novamente.');
     return data.journey;
   }
-  async function load(initial) {
-    error=''; $('sync-text').textContent='Sincronizando';
+  function acceptData(data) {
+    if(data.ok!==true || data.schemaVersion!==2 || !Array.isArray(data.journeys))throw new Error('Não foi possível carregar as viagens.');
+    const ids=new Set();
+    const incoming=data.journeys.map(raw=>{
+      const {requests,sourceRefs,...value}=raw,j=M.normalize(value);
+      if(ids.has(j.id))throw new Error('A base contém identificadores duplicados.');
+      ids.add(j.id);return j;
+    });
+    const next=mergeJourneyVersions(records,incoming),changed=!loaded || JSON.stringify(next)!==JSON.stringify(records);
+    records=next;readOnly=data.readOnly===true;loaded=true;error='';
+    document.body.classList.remove('journeys-loading');
+    if(changed){if(editor || busy){deferredProject=true;}else project(!data.cached);}
+    if(!data.cached){writeCachedJourneys({journeys:records});$('sync-text').textContent='Atualizado';$('sync-pill').className='sync-pill online';}
+  }
+  async function load() {
+    if(loading)return;
+    loading=true;const current=++revision;
+    if(!loaded){const cached=readCachedJourneys();if(cached){try{acceptData(cached);}catch{}}}
+    error='';$('sync-text').textContent=loaded?'Atualizando…':'Carregando…';
+    if(!loaded)document.body.classList.add('journeys-loading');
     try {
-      let data=initial;
-      if(!data)data=await loadJourneyData();
-      if(data.ok!==true || data.schemaVersion!==2 || !Array.isArray(data.journeys)) throw new Error(data.message || 'Não foi possível carregar a base de viagens.');
-      const ids=new Set();
-      records=data.journeys.map(raw=>{const j=M.normalize(raw);if(ids.has(j.id)) throw new Error('A base contém identificadores duplicados.');ids.add(j.id);return j;});
-      readOnly=data.readOnly===true;loaded=true;project();
-      if(readOnly){error='Consulta disponível. A gravação aguarda a publicação da integração no Google.';render();$('sync-text').textContent='Somente consulta';$('sync-pill').className='sync-pill warning';}
-      else if(data.limitedConnection){$('sync-text').textContent='Conexão instável';$('sync-pill').className='sync-pill warning';}
+      const data=await loadJourneyData({onUpdate:next=>{if(current===revision){try{acceptData(next);}catch{}}}});
+      if(current===revision)acceptData(data);
     } catch(e) {
-      error=e.message || 'Sem conexão. Tente atualizar novamente.';
-      $('sync-text').textContent='Falha ao atualizar';$('sync-pill').className='sync-pill warning';render();
-      showToast(error,'error');
-    }
+      error=loaded?'Sem conexão. Seus dados salvos continuam disponíveis.':'Não foi possível carregar as viagens. Tente novamente.';
+      $('sync-text').textContent=loaded?'Dados salvos':'Sem conexão';$('sync-pill').className='sync-pill warning';render();
+      if(!loaded)showToast(error,'error');
+    }finally{loading=false;document.body.classList.remove('journeys-loading');}
   }
   function render() {
     if(!$('journeys-list')) return;
@@ -73,8 +86,20 @@ const Journeys = (() => {
     closeModal();
     $('modal-header').innerHTML=`<span class="j-status ${j.status}">${labels[j.status]}</span><h2 class="trip-modal-title">${esc(j.name)}</h2><p>${esc(formatDateRange(j.startDate,j.endDate))}${j.startDate?` · ${M.travelDays(j)} ${j.dayBasis==='stops'?'dias registrados':'dias'}`:''}</p><div class="j-actions">${j.status==='planejada'?button('Concluir viagem','complete',j.id,'primary-action'):''}${button('Editar viagem','edit',j.id)}${j.status==='concluida'?button('Reabrir viagem','reopen',j.id):''}${j.status==='planejada'?button('Reagendar','edit',j.id)+button('Cancelar viagem','cancel',j.id):''}${j.status==='cancelada'?button('Retomar planejamento','reopen',j.id):''}</div>`;
     const summary=(items,label)=>items.length?`<p><strong>${label}</strong> ${esc(items.join(', '))}</p>`:'';
-    $('modal-body').innerHTML=`${notice(j)?`<p class="j-notice">${notice(j)}</p>`:''}<div class="j-stops">${j.locations.map(l=>`<div><strong>${esc(l.city)}</strong><span>${esc([l.region,l.country].filter(Boolean).join(', '))}</span><span>${M.destinationDays(j,l)??'—'} dias${l.startDate?` · ${esc(formatDateRange(l.startDate,l.endDate))}`:''}</span></div>`).join('')}</div>${summary(j.tags,'Tags')}${summary(j.travelers,'Acompanhantes')}${summary(j.artists,'Artistas')}<h3>Roteiro diário</h3>${renderItineraryTable(parseItinerary(j.itinerary,j.startDate,j.endDate),false,j.startDate,j.endDate)}${j.itinerary.notes?`<p>${esc(j.itinerary.notes)}</p>`:''}${j.plannedSnapshot?`<details class="j-original"><summary>Ver planejamento original</summary><p>${esc(j.plannedSnapshot.name)} · ${esc(formatDateRange(j.plannedSnapshot.startDate,j.plannedSnapshot.endDate))}</p><p>${esc(j.plannedSnapshot.locations.map(l=>l.city).join(', '))}</p>${summary(j.plannedSnapshot.tags || [],'Tags')}${summary(j.plannedSnapshot.travelers || [],'Acompanhantes')}${summary(j.plannedSnapshot.artists || [],'Artistas')}${renderItineraryTable(parseItinerary(j.plannedSnapshot.itinerary,j.plannedSnapshot.startDate,j.plannedSnapshot.endDate),false,j.plannedSnapshot.startDate,j.plannedSnapshot.endDate)}</details>`:''}`;
+    const dayLabel=n=>n==null?'Dias a definir':`${n} ${n===1?'dia':'dias'}`;
+    $('modal-body').innerHTML=`${notice(j)?`<p class="j-notice">${notice(j)}</p>`:''}<div class="j-stops">${j.locations.map(l=>`<div><strong>${esc(l.city)}</strong><span>${esc([l.region,l.country].filter(Boolean).join(', '))}</span><span>${dayLabel(M.destinationDays(j,l))}${l.startDate?` · ${esc(formatDateRange(l.startDate,l.endDate))}`:''}</span></div>`).join('')}</div><div class="j-detail-meta">${summary(j.tags,'Tags')}${summary(j.travelers,'Acompanhantes')}${summary(j.artists,'Artistas')}</div>${itineraryMarkup(j)}${j.plannedSnapshot || j.history?.length?`<div class="j-history-link">${button('Histórico da viagem','history',j.id)}</div>`:''}`;
     $('trip-modal').classList.add('open');refreshIcons();
+  }
+  function itineraryMarkup(j) {
+    const filled=Object.values(j.itinerary?.slots || {}).some(day=>Object.values(day).some(v=>String(v || '').trim()));
+    return `${filled?`<h3 class="j-section-title">Roteiro</h3>${renderItineraryTable(parseItinerary(j.itinerary,j.startDate,j.endDate),false,j.startDate,j.endDate)}`:''}${j.itinerary?.notes?`<p class="j-detail-notes">${esc(j.itinerary.notes)}</p>`:''}`;
+  }
+  function history(id) {
+    const j=find(id);if(!j)return;
+    $('modal-header').innerHTML=`<h2 class="trip-modal-title">Histórico da viagem</h2><p>${esc(j.name)}</p>${button('Voltar à viagem','detail',j.id)}`;
+    const events=(j.history || []).slice().reverse().map(event=>`<li><strong>${labels[event.to] || 'Cadastro atualizado'}</strong>${event.at?`<time>${esc(formatDateShort(event.at.slice(0,10)))}</time>`:''}${event.reason?`<p>${esc(event.reason)}</p>`:''}</li>`).join('');
+    const original=j.plannedSnapshot;
+    $('modal-body').innerHTML=`${events?`<ol class="j-history-list">${events}</ol>`:''}${original?`<details class="j-original"><summary>Dados antes da conclusão</summary><p>${esc(formatDateRange(original.startDate,original.endDate))}</p><p>${esc(original.locations.map(l=>l.city).join(' · '))}</p>${original.travelers?.length?`<p>${esc(original.travelers.join(', '))}</p>`:''}${itineraryMarkup(original)}</details>`:''}`;
   }
   function open(id, status) {
     if(busy)return;
@@ -100,12 +125,14 @@ const Journeys = (() => {
     $('cancel-plan-edit-btn').style.display='none';
     $('j-editor-body').appendChild($('plan-editor-panel'));
     $('j-editor-notes').value=j.itinerary.notes || '';
+    $('plan-editor-panel').insertBefore($('j-editor-notes').closest('label'),$('plan-editor-panel').querySelector('.form-actions-row'));
     $('journey-editor').showModal(); $('plan-name').focus();
   }
   function closeEditor() {
     if(busy)return;
     if(editor && editorDirty() && !confirm('Descartar as alterações desta viagem?'))return;
     $('journey-editor').close();restorePlanEditorPanel();editor=null;
+    if(deferredProject){deferredProject=false;project();}
   }
   function draft() {
     const j=M.clone(editor.journey);
@@ -151,6 +178,7 @@ const Journeys = (() => {
     }catch(e){showToast(e.message,'error');}finally{busy=false;}
   }
   function install() {
+    $('page-title').innerHTML='Suas <em>viagens</em>';
     document.querySelectorAll('[data-view="planejar"]').forEach(el=>{el.innerHTML='<i data-lucide="luggage"></i> Viagens';el.dataset.view='journeys';});
     document.querySelector('.brand-name span').textContent='SUAS VIAGENS';
     const container=document.createElement('section');container.id='view-journeys';container.className='view';
@@ -167,7 +195,7 @@ const Journeys = (() => {
       const status=e.target.closest('[data-status]');if(status){filter=status.dataset.status;render();return;}
       const target=e.target.closest('[data-journey-action]');if(!target)return;
       const {journeyAction:action,id}=target.dataset;
-      if(action==='detail')detail(id);if(action==='edit')open(id);if(action==='complete')open(id,'concluida');if(action==='cancel')change(id,'cancelada');if(action==='reopen')change(id,'planejada');if(action==='refresh')load();
+      if(action==='detail')detail(id);if(action==='history')history(id);if(action==='all')switchView('journeys');if(action==='edit')open(id);if(action==='complete')open(id,'concluida');if(action==='cancel')change(id,'cancelada');if(action==='reopen')change(id,'planejada');if(action==='refresh')load();
       if(action==='clear'){query='';year='';region='';tag='';$('j-search').value='';render();}
     });
     window.addEventListener('beforeunload',e=>{if(editorDirty() || busy){e.preventDefault();e.returnValue='';}});
@@ -177,7 +205,7 @@ const Journeys = (() => {
 })();
 
 // Route all visible entry points to the unified lifecycle before existing events bind.
-loadData=()=>{const data=window.travelhubInitialData;delete window.travelhubInitialData;return Journeys.load(data);};
+loadData=()=>Journeys.load();
 fetchTrips=()=>Journeys.load();fetchPlans=async()=>{};
 salvarPlanejamento=()=>Journeys.save();
 openFreshTripEditor=()=>Journeys.open();
@@ -201,8 +229,11 @@ buildMapCollections=()=>{
 getTripTotalDays=trip=>{const j=Journeys.find(trip.journeyId || trip.id);return j?TravelHubModel.travelDays(j):TravelHubModel.days(trip.startDate,trip.endDate).length;};
 getTripDestinationDays=trip=>trip.destinationDays ?? 0;
 renderTripContextChips=()=>'';
-const oldRenderDashboardResults=renderDashboardResults;
-renderDashboardResults=()=>{oldRenderDashboardResults();if(state.filtered.length)els['dashboard-results'].innerHTML=`<div class="gallery-grid">${getJourneyGroups(state.filtered).map(j=>renderTripCard({...j,city:j.cities.join(' · ')})).join('')}</div>`;};
+renderDashboardResults=()=>{
+  const active=getActiveFilterSummary(),groups=getJourneyGroups(state.filtered),visible=active?groups:groups.slice(0,8);
+  els['result-count'].innerHTML=`<span>${active?escapeHtml(formatCountLabel(groups.length,'viagem encontrada','viagens encontradas')):'Últimas viagens'}</span>${active?`<button class="filter-return" onclick="clearFilters()">Limpar filtro · ${escapeHtml(active)}</button>`:`<button class="text-action" data-journey-action="all">Ver todas (${groups.length}) <span aria-hidden="true">→</span></button>`}`;
+  els['dashboard-results'].innerHTML=visible.length?`<div class="home-journeys">${visible.map(j=>`<button class="home-trip" data-journey-action="detail" data-id="${escapeHtml(j.id)}"><span class="home-trip-date">${escapeHtml(formatDateShort(j.startDate))}</span><span class="home-trip-main"><strong>${escapeHtml(j.name)}</strong><span>${escapeHtml(formatTripLocation(j))}</span></span><span class="home-trip-days">${getTripTotalDays(j)} ${getTripTotalDays(j)===1?'dia':'dias'}</span><span class="home-trip-arrow" aria-hidden="true">›</span></button>`).join('')}</div>`:`<div class="empty-state compact-empty">Nenhuma viagem nesse filtro.</div>`;
+};
 const oldBuildLocationDraft=buildLocationDraft;
 buildLocationDraft=l=>({...oldBuildLocationDraft(l),lat:TravelHubModel.number(l?.lat),lng:TravelHubModel.number(l?.lng),stopId:l?.stopId || l?.id,stopStart:l?.stopStart || l?.startDate || '',stopEnd:l?.stopEnd || l?.endDate || '',stopMetadata:l?.stopMetadata});
 const oldAddPlanCityBlock=addPlanCityBlock;
