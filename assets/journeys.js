@@ -192,6 +192,12 @@ switchView=view=>{if(view==='editor'){Journeys.open();return;}if(view==='planeja
 updateTopbarPrimaryAction=()=>{const b=document.getElementById('topbar-primary-action');if(b){b.style.display='inline-flex';b.innerHTML='<i data-lucide="plus"></i> Nova viagem';}};
 getJourneyKey=trip=>trip.journeyId || trip.id;
 getJourneyGroups=trips=>{const groups=new Map();trips.forEach(t=>{const id=t.journeyId || t.id;if(!groups.has(id)){const j=Journeys.find(id);groups.set(id,{...t,id,key:id,journeyId:id,name:j?.name || t.name,trips:[],cities:[]});}const g=groups.get(id);g.trips.push(t);if(!g.cities.includes(t.city))g.cities.push(t.city);g.count=g.trips.length;});return [...groups.values()].sort((a,b)=>b.startDate.localeCompare(a.startDate));};
+const oldBuildMapCollections=buildMapCollections;
+buildMapCollections=()=>{
+  const collections=oldBuildMapCollections();
+  [collections.countries,collections.regions,collections.cities].forEach(map=>map.forEach(item=>{item.trips=getJourneyGroups(item.trips);}));
+  return collections;
+};
 getTripTotalDays=trip=>{const j=Journeys.find(trip.journeyId || trip.id);return j?TravelHubModel.travelDays(j):TravelHubModel.days(trip.startDate,trip.endDate).length;};
 getTripDestinationDays=trip=>trip.destinationDays ?? 0;
 renderTripContextChips=()=>'';
