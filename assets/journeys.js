@@ -22,9 +22,17 @@ const Journeys = (() => {
   }
   async function request(body) {
     if(readOnly)throw new Error('Gravação indisponível. A integração precisa ser publicada no Google. Seus dados continuam no formulário.');
+    try {return await send(body);}
+    catch(error) {
+      // A lost HTTP response is confirmed only by this exact persisted request and content.
+      try {const saved=confirmedJourneyFromReceipt(await loadPublishedJourneyData(),body,M);if(saved)return saved;}catch {}
+      throw error;
+    }
+  }
+  async function send(body) {
     const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),30000);
     let response;
-    try {response=await fetch(GOOGLE_SCRIPT_URL, {method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body),signal:controller.signal});}
+    try {response=await fetch(`${GOOGLE_SCRIPT_URL}?t=${Date.now()}`, {method:'POST',cache:'no-store',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body),signal:controller.signal});}
     catch {throw new Error('Sem confirmação de gravação. Seus dados continuam no formulário; tente novamente.');}
     finally {clearTimeout(timer);}
     let data;
